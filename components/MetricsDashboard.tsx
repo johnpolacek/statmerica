@@ -5,6 +5,7 @@ import MetricCard from "@/components/MetricCard"
 import AdministrationSelect from "@/components/AdministrationSelect"
 import { administrations, type MetricSummary } from "@/lib/metrics"
 import cpi from "@/data/cpi.json"
+import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number }
 type CpiJson = { meta: { title: string; units: string; description?: string }; data: CpiDataPoint[] }
@@ -19,7 +20,6 @@ type AdminComputed = {
 }
 
 const getParty = (value: string): "D" | "R" | "U" => (administrations.find(a => a.value === value)?.party as any) ?? "U"
-const partyColor = (p: "D" | "R" | "U") => (p === "R" ? "#dc2626" : p === "D" ? "#2563eb" : "#6b7280")
 const partyText = (p: "D" | "R" | "U") => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
 
 export default function MetricsDashboard() {
@@ -94,10 +94,12 @@ export default function MetricsDashboard() {
   }))
 
   // For CPI YoY, lower average is better
-  let winnerOverride: "Trump" | "Biden" = "Biden"
-  if (adminAComputed.average != null && adminBComputed.average != null) {
-    winnerOverride = adminAComputed.average < adminBComputed.average ? "Trump" : "Biden"
-  }
+  const aAvg = adminAComputed.average
+  const bAvg = adminBComputed.average
+  const adminAWins = aAvg != null && bAvg != null && aAvg < bAvg ? 1 : 0
+  const adminBWins = aAvg != null && bAvg != null && bAvg < aAvg ? 1 : 0
+  const adminAMetrics: string[] = adminAWins ? ["Inflation (CPI YoY)"] : []
+  const adminBMetrics: string[] = adminBWins ? ["Inflation (CPI YoY)"] : []
 
   const latestYear = Math.max(...cpiJson.data.map(d => d.year))
   const latestVal = cpiJson.data.find(d => d.year === latestYear)?.value ?? 0
@@ -109,12 +111,12 @@ export default function MetricsDashboard() {
       title: "Inflation (CPI YoY)",
       value: yoyLabel,
       trend,
-      change: `avg ${adminAComputed.average?.toFixed(2) ?? "–"}% vs ${adminBComputed.average?.toFixed(2) ?? "–"}%`,
+      change: `avg ${aAvg?.toFixed(2) ?? "–"}% vs ${bAvg?.toFixed(2) ?? "–"}%`,
     },
   ]
 
-  const adminAValueLabel = adminAComputed.average != null ? `${adminAComputed.average.toFixed(2)}%` : "–"
-  const adminBValueLabel = adminBComputed.average != null ? `${adminBComputed.average.toFixed(2)}%` : "–"
+  const adminAValueLabel = aAvg != null ? `${aAvg.toFixed(2)}%` : "–"
+  const adminBValueLabel = bAvg != null ? `${bAvg.toFixed(2)}%` : "–"
 
   return (
     <section className="w-full">
@@ -146,12 +148,12 @@ export default function MetricsDashboard() {
                       adminBStart: adminBComputed.series.find(v => v != null) ?? null,
                       adminBEnd: [...adminBComputed.series].reverse().find(v => v != null) ?? null,
                     }}
-                    winnerOverride={winnerOverride}
+                    winnerOverride={adminAWins > adminBWins ? "Trump" : "Biden"}
                     isPercent
                     adminAValueLabel={adminAValueLabel}
                     adminBValueLabel={adminBValueLabel}
-                    partyA={partyA}
-                    partyB={partyB}
+                    partyA={adminAComputed.party}
+                    partyB={adminBComputed.party}
                   />
                 </div>
               </div>
@@ -174,13 +176,30 @@ export default function MetricsDashboard() {
                   {yearsA.length > 0 && (
                     <div className="text-xs text-muted-foreground">{yearsA[0]}–{yearsA[yearsA.length - 1]}</div>
                   )}
+                  <div className="text-center py-2 space-y-1">
+                    {adminAMetrics.map((metric, index) => (
+                      <div key={index} className="w-full flex items-center justify-center gap-2 font-bold"><CircleCheckBig className={partyText(adminAComputed.party)} /> {metric}</div>
+                    ))}
+                  </div>
                 </div>
                 <div className="p-8">
                   <div className={`text-3xl font-bold ${partyText(adminBComputed.party)}`}>{adminBName}</div>
                   {yearsB.length > 0 && (
                     <div className="text-xs text-muted-foreground">{yearsB[0]}–{yearsB[yearsB.length - 1]}</div>
                   )}
+                  <div className="text-center space-y-1">
+                    {adminBMetrics.map((metric, index) => (
+                      <div key={index} className="font-bold"><CircleCheckBig className={partyText(adminBComputed.party)} /> {metric}</div>
+                    ))}
+                  </div>
                 </div>
+              </div>
+              <div className="py-6 border-t border-dashed">
+                <div className="text-lg text-muted-foreground mb-2">Overall Winner</div>
+                <div className={`text-8xl font-extrabold uppercase ${adminAWins > adminBWins ? partyText(adminAComputed.party) : partyText(adminBComputed.party)}`}>
+                  {adminAWins > adminBWins ? adminAName : adminBName}
+                </div>
+                <div className="text-sm text-muted-foreground mt-2">Based on winning {adminAWins > adminBWins ? adminAWins : adminBWins} / {metrics.length} key metrics</div>
               </div>
             </div>
           </div>
