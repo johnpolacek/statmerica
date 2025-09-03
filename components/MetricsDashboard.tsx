@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import MetricCard from "@/components/MetricCard"
 import AdministrationSelect from "@/components/AdministrationSelect"
 import { administrations, type MetricSummary } from "@/lib/metrics"
@@ -19,8 +19,30 @@ type AdminComputed = {
   party: "D" | "R" | "U"
 }
 
-const getParty = (value: string): "D" | "R" | "U" => (administrations.find(a => a.value === value)?.party as any) ?? "U"
+const getParty = (value: string): "D" | "R" | "U" => (administrations.find(a => a.value === value)?.party as any) ?? (value === "party-D" ? "D" : value === "party-R" ? "R" : "U")
 const partyText = (p: "D" | "R" | "U") => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
+
+const TERM_MAP: Record<string, [number, number]> = {
+  "reagan-1": [1981, 1984],
+  "reagan-2": [1985, 1988],
+  "ghwbush-1": [1989, 1992],
+  "clinton-1": [1993, 1996],
+  "clinton-2": [1997, 2000],
+  "gwbush-1": [2001, 2004],
+  "gwbush-2": [2005, 2008],
+  "obama-1": [2009, 2012],
+  "obama-2": [2013, 2016],
+  "trump-1": [2017, 2020],
+  "biden-1": [2021, 2024],
+  "trump-2": [2025, 2028],
+}
+
+const getTermYears = (value: string): number[] => {
+  const span = TERM_MAP[value]
+  if (!span) return []
+  const [start, end] = span
+  return [start, start + 1, start + 2, start + 3].filter(y => y <= end)
+}
 
 export default function MetricsDashboard() {
   const [adminA, setAdminA] = useState("trump-1")
@@ -29,57 +51,51 @@ export default function MetricsDashboard() {
   const cpiJson = cpi as unknown as CpiJson
   const byYear = useMemo(() => new Map<number, number>(cpiJson.data.map(d => [d.year, d.value])), [cpiJson.data])
 
-  const getAdminLabel = (value: string) => administrations.find(a => a.value === value)?.label ?? value
+  const getAdminLabel = (value: string) => {
+    if (value === "party-D") return "Democrats"
+    if (value === "party-R") return "Republicans"
+    return administrations.find(a => a.value === value)?.label ?? value
+  }
 
-  const getTermYears = (value: string): number[] => {
-    const map: Record<string, [number, number]> = {
-      "reagan-1": [1981, 1984],
-      "reagan-2": [1985, 1988],
-      "ghwbush-1": [1989, 1992],
-      "clinton-1": [1993, 1996],
-      "clinton-2": [1997, 2000],
-      "gwbush-1": [2001, 2004],
-      "gwbush-2": [2005, 2008],
-      "obama-1": [2009, 2012],
-      "obama-2": [2013, 2016],
-      "trump-1": [2017, 2020],
-      "biden-1": [2021, 2024],
-      "trump-2": [2025, 2028],
+  const buildSeriesForAdmin = (value: string): AdminSeries => {
+    if (value === "party-D" || value === "party-R") {
+      const targetParty = value === "party-D" ? "D" : "R"
+      const terms = administrations.filter(a => (a as any).party === targetParty).map(a => a.value)
+      const yearOfTermValues: number[][] = [[], [], [], []]
+      for (const term of terms) {
+        const years = getTermYears(term)
+        years.forEach((y, idx) => {
+          const v = byYear.get(y)
+          if (typeof v === "number") yearOfTermValues[idx].push(v)
+        })
+      }
+      const averaged: AdminSeries = yearOfTermValues.map(arr => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null))
+      return averaged
     }
-    const span = map[value]
-    if (!span) return []
-    const [start, end] = span
-    return [start, start + 1, start + 2, start + 3].filter(y => y <= end)
+    const years = getTermYears(value)
+    return years.map(y => byYear.get(y) ?? null)
   }
 
-  const buildSeries = (years: number[]): AdminSeries => years.map(y => byYear.get(y) ?? null)
+  const seriesA = buildSeriesForAdmin(adminA)
+  const seriesB = buildSeriesForAdmin(adminB)
 
-  const computeAverage = (series: AdminSeries) => {
+  const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
-    if (values.length === 0) return null
-    return values.reduce((a, b) => a + b, 0) / values.length
+    return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
   }
-
-  const partyA = getParty(adminA)
-  const partyB = getParty(adminB)
-
-  const yearsA = getTermYears(adminA)
-  const yearsB = getTermYears(adminB)
-  const seriesA = buildSeries(yearsA)
-  const seriesB = buildSeries(yearsB)
 
   const adminAComputed: AdminComputed = {
     label: getAdminLabel(adminA),
     series: seriesA,
-    average: computeAverage(seriesA),
-    party: partyA,
+    average: avg(seriesA),
+    party: getParty(adminA),
   }
 
   const adminBComputed: AdminComputed = {
     label: getAdminLabel(adminB),
     series: seriesB,
-    average: computeAverage(seriesB),
-    party: partyB,
+    average: avg(seriesB),
+    party: getParty(adminB),
   }
 
   const stripYears = (label: string) => label.replace(/\s*\([^)]*\)\s*$/, "")
@@ -118,6 +134,9 @@ export default function MetricsDashboard() {
   const adminAValueLabel = aAvg != null ? `${aAvg.toFixed(2)}%` : "–"
   const adminBValueLabel = bAvg != null ? `${bAvg.toFixed(2)}%` : "–"
 
+  const overallWinnerName = adminAWins > adminBWins ? adminAName : adminBWins > adminAWins ? adminBName : "Tie"
+  const overallWinnerParty = adminAWins > adminBWins ? adminAComputed.party : adminBWins > adminAWins ? adminBComputed.party : "U"
+
   return (
     <section className="w-full">
       <div className="w-full">
@@ -148,7 +167,7 @@ export default function MetricsDashboard() {
                       adminBStart: adminBComputed.series.find(v => v != null) ?? null,
                       adminBEnd: [...adminBComputed.series].reverse().find(v => v != null) ?? null,
                     }}
-                    winnerOverride={adminAWins > adminBWins ? "Trump" : "Biden"}
+                    winnerSide={adminAWins > adminBWins ? "A" : adminBWins > adminAWins ? "B" : "none"}
                     isPercent
                     adminAValueLabel={adminAValueLabel}
                     adminBValueLabel={adminBValueLabel}
@@ -173,9 +192,6 @@ export default function MetricsDashboard() {
               <div className="grid grid-cols-2">
                 <div className="border-r border-dashed p-8">
                   <div className={`text-3xl font-bold ${partyText(adminAComputed.party)}`}>{adminAName}</div>
-                  {yearsA.length > 0 && (
-                    <div className="text-xs text-muted-foreground">{yearsA[0]}–{yearsA[yearsA.length - 1]}</div>
-                  )}
                   <div className="text-center py-2 space-y-1">
                     {adminAMetrics.map((metric, index) => (
                       <div key={index} className="w-full flex items-center justify-center gap-2 font-bold"><CircleCheckBig className={partyText(adminAComputed.party)} /> {metric}</div>
@@ -184,22 +200,17 @@ export default function MetricsDashboard() {
                 </div>
                 <div className="p-8">
                   <div className={`text-3xl font-bold ${partyText(adminBComputed.party)}`}>{adminBName}</div>
-                  {yearsB.length > 0 && (
-                    <div className="text-xs text-muted-foreground">{yearsB[0]}–{yearsB[yearsB.length - 1]}</div>
-                  )}
-                  <div className="text-center space-y-1">
+                  <div className="text-center py-2 space-y-1">
                     {adminBMetrics.map((metric, index) => (
-                      <div key={index} className="font-bold"><CircleCheckBig className={partyText(adminBComputed.party)} /> {metric}</div>
+                      <div key={index} className="w-full flex items-center justify-center gap-2 font-bold"><CircleCheckBig className={partyText(adminBComputed.party)} /> {metric}</div>
                     ))}
                   </div>
                 </div>
               </div>
               <div className="py-6 border-t border-dashed">
                 <div className="text-lg text-muted-foreground mb-2">Overall Winner</div>
-                <div className={`text-8xl font-extrabold uppercase ${adminAWins > adminBWins ? partyText(adminAComputed.party) : partyText(adminBComputed.party)}`}>
-                  {adminAWins > adminBWins ? adminAName : adminBName}
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">Based on winning {adminAWins > adminBWins ? adminAWins : adminBWins} / {metrics.length} key metrics</div>
+                <div className={`text-7xl font-extrabold uppercase ${partyText(overallWinnerParty)}`}>{overallWinnerName}</div>
+                <div className="text-sm text-muted-foreground mt-2">Based on winning {Math.max(adminAWins, adminBWins)} / {metrics.length} key metrics</div>
               </div>
             </div>
           </div>
