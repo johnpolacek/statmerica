@@ -186,7 +186,7 @@ export default function MetricsDashboard() {
         <div className="mt-12">
           <div className="max-w-4xl mx-auto border border-dashed rounded-lg py-4">
             <div className="text-center border-b border-dashed pb-4">
-              <div className="text-2xl font-bold">Final Scorecard</div>
+              <div className="text-xl text-foreground/50 font-mono">Final Scorecard</div>
             </div>
             <div className="text-center">
               <div className="grid grid-cols-2">
@@ -208,9 +208,9 @@ export default function MetricsDashboard() {
                 </div>
               </div>
               <div className="py-6 border-t border-dashed">
-                <div className="text-lg text-muted-foreground mb-2">Overall Winner</div>
+                <div className="text-base uppercase tracking-wider font-bold text-muted-foreground mb-2">Overall Winner</div>
                 <div className={`text-7xl font-extrabold uppercase ${partyText(overallWinnerParty)}`}>{overallWinnerName}</div>
-                <div className="text-sm text-muted-foreground mt-2">Based on winning {Math.max(adminAWins, adminBWins)} / {metrics.length} key metrics</div>
+                <div className="font-mono text-muted-foreground mt-2">Based on winning {Math.max(adminAWins, adminBWins)}/{metrics.length} key metrics</div>
               </div>
             </div>
           </div>

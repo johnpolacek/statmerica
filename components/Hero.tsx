@@ -5,7 +5,7 @@ export default function Hero() {
         <h2 className="text-4xl md:text-6xl font-bold text-balance mb-6">
           Compare Stats Across U.S. Presidential Administrations
         </h2>
-        <p className="text-xl text-muted-foreground text-balance max-w-2xl mx-auto">
+        <p className="text-lg font-mono text-muted-foreground text-balance max-w-2xl mx-auto">
           Numbers don&apos;t lie. Explore key statistics over time across different administrations and see who did it better.
         </p>
       </div>

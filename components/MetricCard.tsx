@@ -84,7 +84,9 @@ export default function MetricCard({
 
   const winningParty: Party = winnerSide === "A" ? partyA : winnerSide === "B" ? partyB : "U"
   const badgeClass = sameParty || winnerSide === "none" ? "bg-muted text-foreground/70" : partyBadge(winningParty)
-  const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winnerSide === "A" ? (adminALabel ?? "Admin A") : (adminBLabel ?? "Admin B")} Wins`
+  const winningLabel = winnerSide === "A" ? (adminALabel ?? "Admin A") : (winnerSide === "B" ? (adminBLabel ?? "Admin B") : "")
+  const isAggregateParty = winningLabel === "Democrats" || winningLabel === "Republicans"
+  const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winningLabel} ${isAggregateParty ? "Win" : "Wins"}`
 
   return (
     <div className="p-8">
@@ -111,7 +113,7 @@ export default function MetricCard({
               <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
                 {adminBValueLabel ?? adminBTrend.change}
               </div>
-              <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+              <div className={`text-xs scale-x-90 tracking-titter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
                 {formatRange(adminRanges.adminBStart)} → {formatRange(adminRanges.adminBEnd)}
               </div>
             </div>
