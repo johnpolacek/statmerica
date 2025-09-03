@@ -1,0 +1,132 @@
+{
+  "meta": {
+    "id": "cpi",
+    "title": "Consumer Price Index (All items, CPI-U)",
+    "description": "CPI-U, All items (Dec per year; current year latest month)",
+    "units": "Index 1982–84=100",
+    "frequency": "Annual (Dec), plus current year latest",
+    "coverage": {
+      "start": 1980,
+      "end": 2025
+    },
+    "fetchedAt": "2025-09-03T03:00:59.442Z",
+    "source": {
+      "name": "U.S. Bureau of Labor Statistics",
+      "homepage": "https://www.bls.gov/cpi/",
+      "api": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "attribution": "Public domain"
+    },
+    "seriesId": "CUUR0000SA0",
+    "seriesLabel": "All items (NSA)",
+    "filters": {
+      "decOnlyThrough": 2024,
+      "includeCurrentYearLatest": true
+    }
+  },
+  "data": [
+    {
+      "year": 1980,
+      "value": 86.3
+    },
+    {
+      "year": 1981,
+      "value": 94
+    },
+    {
+      "year": 1982,
+      "value": 97.6
+    },
+    {
+      "year": 1983,
+      "value": 101.3
+    },
+    {
+      "year": 1984,
+      "value": 105.3
+    },
+    {
+      "year": 1985,
+      "value": 109.3
+    },
+    {
+      "year": 1986,
+      "value": 110.5
+    },
+    {
+      "year": 1987,
+      "value": 115.4
+    },
+    {
+      "year": 1988,
+      "value": 120.5
+    },
+    {
+      "year": 1989,
+      "value": 126.1
+    },
+    {
+      "year": 2000,
+      "value": 174
+    },
+    {
+      "year": 2001,
+      "value": 176.7
+    },
+    {
+      "year": 2002,
+      "value": 180.9
+    },
+    {
+      "year": 2003,
+      "value": 184.3
+    },
+    {
+      "year": 2004,
+      "value": 190.3
+    },
+    {
+      "year": 2005,
+      "value": 196.8
+    },
+    {
+      "year": 2006,
+      "value": 201.8
+    },
+    {
+      "year": 2007,
+      "value": 210.036
+    },
+    {
+      "year": 2008,
+      "value": 210.228
+    },
+    {
+      "year": 2009,
+      "value": 215.949
+    },
+    {
+      "year": 2020,
+      "value": 260.474
+    },
+    {
+      "year": 2021,
+      "value": 278.802
+    },
+    {
+      "year": 2022,
+      "value": 296.797
+    },
+    {
+      "year": 2023,
+      "value": 306.746
+    },
+    {
+      "year": 2024,
+      "value": 315.605
+    },
+    {
+      "year": 2025,
+      "value": 323.048
+    }
+  ]
+}
