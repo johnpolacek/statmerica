@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Minus, TrendingDown, TrendingUp } from "lucide-react"
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line } from "recharts"
 import { calculateTrend, determineWinner, generateComparisonData } from "@/lib/metrics"
@@ -72,11 +71,11 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
   const getTrendIcon = (trendType: string) => {
     switch (trendType) {
       case "up":
-        return <TrendingUp className="h-3 w-3 text-green-500" />
+        return <TrendingUp className="h-4 w-4 text-green-500" />
       case "down":
-        return <TrendingDown className="h-3 w-3 text-gray-500" />
+        return <TrendingDown className="h-4 w-4 text-gray-500" />
       default:
-        return <Minus className="h-3 w-3 text-muted-foreground" />
+        return <Minus className="h-4 w-4 text-muted-foreground" />
     }
   }
 
@@ -92,16 +91,16 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
   }
 
   return (
-    <Card className="cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] mb-6">
-      <CardHeader className="pb-4">
+    <div className="p-8">
+      <div className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+            <div className="text-3xl pl-8 font-bold">{title}</div>
             <div
-              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+              className={`px-2 py-1 font-mono rounded-full text-xs font-semibold ${
                 winner === "Trump"
-                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                  : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  ? "bg-red-100 text-red-800/70 dark:bg-red-900 dark:text-red-200"
+                  : "bg-blue-100 text-blue-800/70 dark:bg-blue-900 dark:text-blue-200"
               }`}
             >
               {winner} Wins
@@ -110,28 +109,26 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
           <div className="flex items-center gap-8">
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Trump</div>
-              <div className="text-sm font-semibold text-red-600">
+              <div className="text-xs font-semibold text-red-600 font-mono">
                 {adminValues.trumpStart} → {adminValues.trumpEnd}
               </div>
-              <div className={`flex items-center justify-center gap-1 text-xs ${getTrendColor(trumpTrend.trend)}`}>
-                {getTrendIcon(trumpTrend.trend)}
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${getTrendColor(trumpTrend.trend)}`}>
                 {trumpTrend.change}
               </div>
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">Biden</div>
-              <div className="text-sm font-semibold text-blue-600">
+              <div className="text-xs font-semibold text-blue-600 font-mono">
                 {adminValues.bidenStart} → {adminValues.bidenEnd}
               </div>
-              <div className={`flex items-center justify-center gap-1 text-xs ${getTrendColor(bidenTrend.trend)}`}>
-                {getTrendIcon(bidenTrend.trend)}
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${getTrendColor(bidenTrend.trend)}`}>
                 {bidenTrend.change}
               </div>
             </div>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -173,8 +170,8 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 

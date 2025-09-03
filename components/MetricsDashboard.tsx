@@ -14,25 +14,35 @@ export default function MetricsDashboard({ adminA, onAdminAChange, adminB, onAdm
   const { trumpWins, bidenWins, trumpMetrics, bidenMetrics, overallWinner } = calculateOverallWinner()
 
   return (
-    <section className="py-16 px-4 bg-muted/30">
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-3xl font-bold">Key Metrics</h3>
-          <div className="flex items-center gap-3">
+    <section className="w-full">
+      <div className="w-full">
+        <div>
+          <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto mb-6">
             <AdministrationSelect value={adminA} onChange={onAdminAChange} />
             <span className="text-sm text-muted-foreground">vs</span>
             <AdministrationSelect value={adminB} onChange={onAdminBChange} />
           </div>
         </div>
-        <div className="space-y-6">
+        <div>
           {metrics.map((metric, index) => (
-            <MetricCard
-              key={index}
-              title={metric.title}
-              value={metric.value}
-              trend={metric.trend}
-              change={metric.change}
-            />
+            <div>
+              <div key={index} className="border-y border-dashed">
+                <div className="max-w-6xl mx-auto border-x border-dashed">
+                  <MetricCard
+                    key={index}
+                    title={metric.title}
+                    value={metric.value}
+                    trend={metric.trend}
+                    change={metric.change}
+                  />
+                </div>
+              </div>
+              {
+                index !== metrics.length - 1 && (
+                  <div className="w-full max-w-6xl h-12 mx-auto border-x border-dashed"></div>
+                )
+              }
+            </div>
           ))}
         </div>
 

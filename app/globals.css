@@ -24,7 +24,7 @@
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.9 0 0); /* Light gray borders */
-  --input: oklch(1 0 0);
+  --input: oklch(0.9 0 0); /* Match border tone for visible input borders */
   /* Updated ring to patriotic blue */
   --ring: oklch(0.45 0.2 240); /* USA Blue for focus rings */
   /* Updated chart colors to patriotic theme */
