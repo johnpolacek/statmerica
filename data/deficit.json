@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "id": "deficit",
+    "title": "Federal Budget Deficit (Fiscal Year)",
+    "description": "Annual deficit computed as outlays minus receipts, aggregated by fiscal year (Oct–Sep). Latest row is current FY to date.",
+    "units": "USD (billions) for value, Percent for yoy",
+    "frequency": "Annual (FY), plus current FY-to-date latest month",
+    "coverage": {
+      "start": 2015,
+      "end": 2025
+    },
+    "fetchedAt": "2025-09-06T04:10:40.113Z",
+    "source": {
+      "name": "U.S. Department of the Treasury — Fiscal Data (MTS Table 1)",
+      "homepage": "https://fiscaldata.treasury.gov/",
+      "api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_1",
+      "attribution": "Public domain"
+    },
+    "notes": "API amounts are in US dollars; values converted to billions. YoY computed on deficit level. Latest is FYTD vs prior FY same month when available."
+  },
+  "data": [
+    {
+      "year": 2015,
+      "value": 6218.69
+    },
+    {
+      "year": 2016,
+      "value": 9680.44,
+      "yoy": 55.67
+    },
+    {
+      "year": 2017,
+      "value": 11706.45,
+      "yoy": 20.93
+    },
+    {
+      "year": 2018,
+      "value": 13531.79,
+      "yoy": 15.59
+    },
+    {
+      "year": 2019,
+      "value": 16553.41,
+      "yoy": 22.33
+    },
+    {
+      "year": 2020,
+      "value": 29456.8,
+      "yoy": 77.95
+    },
+    {
+      "year": 2021,
+      "value": 56614.33,
+      "yoy": 92.19
+    },
+    {
+      "year": 2022,
+      "value": 39950.71,
+      "yoy": -29.43
+    },
+    {
+      "year": 2023,
+      "value": 27949.61,
+      "yoy": -30.04
+    },
+    {
+      "year": 2024,
+      "value": 32297.15,
+      "yoy": 15.55
+    },
+    {
+      "year": 2025,
+      "value": 28589.18,
+      "yoy": -11.48
+    },
+    {
+      "year": 2025,
+      "value": 28589.18,
+      "latest": true,
+      "month": 12,
+      "yoy": -100
+    }
+  ]
+}

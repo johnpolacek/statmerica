@@ -1,0 +1,279 @@
+import { Minus, TrendingDown, TrendingUp, ExternalLink } from "lucide-react"
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip } from "recharts"
+import { calculateTrend, generateComparisonData } from "@/lib/metrics"
+import Link from "next/link"
+import { useState } from "react"
+import { Switch } from "@/components/ui/switch"
+
+type Party = "D" | "R" | "U"
+
+type ChartDatum = { year: string; adminA: number | null; adminB: number | null; adminAValue?: number | null; adminBValue?: number | null }
+
+type MetricCardProps = {
+  title: string
+  value: string
+  trend: string
+  change: string
+  adminALabel?: string
+  adminBLabel?: string
+  chartDataOverride?: ChartDatum[]
+  adminTrendsOverride?: { adminA: { trend: string; change: string }; adminB: { trend: string; change: string } }
+  adminRangesOverride?: { adminAStart: number | null; adminAEnd: number | null; adminBStart: number | null; adminBEnd: number | null }
+  winnerSide?: "A" | "B" | "none"
+  isPercent?: boolean
+  adminAValueLabel?: string
+  adminBValueLabel?: string
+  partyA?: Party
+  partyB?: Party
+  explanation?: string
+  methodBadge?: string
+  dataSource?: string
+  dataSourceUrl?: string
+  valueLabel?: string
+}
+
+export default function MetricCard({
+  title,
+  value,
+  trend,
+  change,
+  adminALabel,
+  adminBLabel,
+  chartDataOverride,
+  adminTrendsOverride,
+  adminRangesOverride,
+  winnerSide = "none",
+  isPercent,
+  adminAValueLabel,
+  adminBValueLabel,
+  partyA = "U",
+  partyB = "U",
+  explanation,
+  methodBadge,
+  dataSource,
+  dataSourceUrl,
+  valueLabel,
+}: MetricCardProps) {
+  const chartData: ChartDatum[] =
+    chartDataOverride ??
+    generateComparisonData(title).map((d) => ({ year: d.year as unknown as string, adminA: (d as any).trump ?? null, adminB: (d as any).biden ?? null }))
+
+  const adminATrend = adminTrendsOverride?.adminA ?? { trend, change }
+  const adminBTrend = adminTrendsOverride?.adminB ?? { trend, change }
+
+  const [isYoY, setIsYoY] = useState(true)
+
+  // Build display data mapping to adminA/adminB depending on YoY vs Raw toggle
+  const displayData: ChartDatum[] = chartData.map(d => ({
+    year: d.year,
+    adminA: isYoY ? d.adminA : (d.adminAValue ?? null),
+    adminB: isYoY ? d.adminB : (d.adminBValue ?? null),
+    adminAValue: d.adminAValue,
+    adminBValue: d.adminBValue,
+  }))
+
+  const partyStroke = (p: Party) => (p === "R" ? "#dc2626" : p === "D" ? "#2563eb" : "#6b7280")
+  const partyLightStroke = (p: Party) => (p === "R" ? "#fca5a5" : p === "D" ? "#93c5fd" : "#9ca3af")
+  const partyText = (p: Party) => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
+  const partyBadge = (p: Party) => (p === "R" ? "bg-red-100 text-red-800/70 dark:bg-red-900 dark:text-red-200" : p === "D" ? "bg-blue-100 text-blue-800/70 dark:bg-blue-900 dark:text-blue-200" : "bg-muted text-foreground/70")
+
+  const sameParty = partyA === partyB && partyA !== "U"
+
+  const getDefaultRanges = (title: string) => {
+    const aData: { [key: string]: number[] } = {
+      "Inflation (CPI)": [2.3, 1.8, 1.2, 0.1],
+    }
+
+    const bData: { [key: string]: number[] } = {
+      "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1],
+    }
+
+    const aVals = aData[title] || [50, 55, 60, 58]
+    const bVals = bData[title] || [60, 65, 70, 68]
+
+    return {
+      adminAStart: aVals[0],
+      adminAEnd: aVals[aVals.length - 1],
+      adminBStart: bVals[0],
+      adminBEnd: bVals[bVals.length - 1],
+    }
+  }
+
+  const adminRanges = adminRangesOverride ?? getDefaultRanges(title)
+
+  const formatRange = (v: number | null | undefined) => {
+    if (v == null) return "–"
+    return v.toFixed(1)
+  }
+
+  const winningParty: Party = winnerSide === "A" ? partyA : winnerSide === "B" ? partyB : "U"
+  const badgeClass = sameParty || winnerSide === "none" ? "bg-muted text-foreground/70" : partyBadge(winningParty)
+  const winningLabel = winnerSide === "A" ? (adminALabel ?? "Admin A") : (winnerSide === "B" ? (adminBLabel ?? "Admin B") : "")
+  const isAggregateParty = winningLabel === "Democrats" || winningLabel === "Republicans"
+  const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winningLabel} ${isAggregateParty ? "Win" : "Wins"}`
+
+  const renderTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload || !payload.length) return null
+    return (
+      <div className="rounded-md border border-foreground/10 bg-background/95 backdrop-blur p-2 shadow text-sm">
+        <div className="font-mono text-[12px] text-muted-foreground mb-1">{label}</div>
+        {payload.map((entry: any, idx: number) => {
+          const isA = entry.dataKey === 'adminA'
+          const raw = isA ? entry.payload.adminAValue : entry.payload.adminBValue
+          const yoyNum = typeof entry.value === 'number' ? entry.value : null
+          const yoyText = yoyNum != null ? `${yoyNum.toFixed(2)}%` : entry.value
+          const rawText = raw != null ? (typeof raw === 'number' ? raw.toFixed(2) : raw) : '–'
+          return (
+            <div key={idx} className="mb-1 last:mb-0">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                <span className="font-semibold">{entry.name}</span>
+              </div>
+              {isYoY ? (
+                <>
+                  <div className="pl-4 text-muted-foreground">YoY Change: {yoyText}</div>
+                  {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+                </>
+              ) : (
+                <>
+                  {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+                  <div className="pl-4 text-muted-foreground">YoY Change: {yoyText}</div>
+                </>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  return (
+    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70">
+      <div className="pb-4">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-0">
+          <div className="flex flex-col gap-2">
+            <div id="metric-header" className="text-2xl sm:text-3xl pl-0 sm:pl-8 font-bold flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <span>{title}</span>
+              {methodBadge && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-foreground/60 font-mono">
+                  {methodBadge}
+                </span>
+              )}
+              {valueLabel && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-foreground/60 font-mono">
+                  {valueLabel}
+                </span>
+              )}
+            </div>
+            <div className="pl-0 sm:pl-8 text-center sm:text-left">
+              <div className={`px-3 py-1 inline-block font-mono rounded text-xs font-semibold ${badgeClass}`}>
+              {badgeLabel}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center lg:justify-end gap-4 sm:gap-6 lg:gap-8 flex-wrap">
+            <div className="w-full lg:w-auto flex items-center justify-center gap-2 text-[11px] sm:text-xs text-muted-foreground">
+              <span>Raw</span>
+              <Switch checked={isYoY} onCheckedChange={(v) => setIsYoY(v)} aria-label="Toggle YoY mode" />
+              <span>YoY</span>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground mb-1">{adminALabel ?? "Admin A"}</div>
+              <div className={`flex items-center justify-center gap-1 font-mono text-lg sm:text-xl font-extrabold ${partyText(partyA)}`}>
+                {adminAValueLabel ?? adminATrend.change}
+              </div>
+              <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyA)}`}>
+                {formatRange(adminRanges.adminAStart)} → {formatRange(adminRanges.adminAEnd)}
+              </div>
+              {valueLabel && (
+                <div className="text-[10px] text-muted-foreground font-mono -mt-px">{valueLabel}</div>
+              )}
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground mb-1">{adminBLabel ?? "Admin B"}</div>
+              <div className={`flex items-center justify-center gap-1 font-mono text-lg sm:text-xl font-extrabold ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+                {adminBValueLabel ?? adminBTrend.change}
+              </div>
+              <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+                {formatRange(adminRanges.adminBStart)} → {formatRange(adminRanges.adminBEnd)}
+              </div>
+              {valueLabel && (
+                <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{valueLabel}</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={displayData} margin={{ top: 16, right: 30, left: 20, bottom: 28 }}>
+              <XAxis
+                dataKey="year"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                width={50}
+                domain={["dataMin - 5", "dataMax + 5"]}
+                tickFormatter={(v: number) => (isYoY && isPercent ? `${v.toFixed(1)}%` : v.toFixed(1))}
+              />
+              <Tooltip content={renderTooltip} wrapperStyle={{ fontSize: 12 }} />
+              <Legend wrapperStyle={{ marginTop: 12 }} />
+              <Line
+                type="monotone"
+                dataKey="adminA"
+                stroke={partyStroke(partyA)}
+                strokeWidth={3}
+                dot={{ r: 4, fill: partyStroke(partyA), strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: partyStroke(partyA) }}
+                connectNulls={false}
+                name={adminALabel ?? "Admin A"}
+              />
+              <Line
+                type="monotone"
+                dataKey="adminB"
+                stroke={sameParty ? partyLightStroke(partyB) : partyStroke(partyB)}
+                strokeOpacity={sameParty ? 0.85 : 1}
+                strokeDasharray={sameParty ? "6 4" : undefined}
+                strokeWidth={3}
+                dot={{ r: 4, fill: sameParty ? partyLightStroke(partyB) : partyStroke(partyB), strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: sameParty ? partyLightStroke(partyB) : partyStroke(partyB) }}
+                connectNulls={false}
+                name={adminBLabel ?? "Admin B"}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        {explanation && (
+          <div className="py-2 px-8 text-sm">
+            {explanation}
+          </div>
+        )}
+        {dataSource && (
+          <div className="pt-3 pb-2 px-8 border-t border-dashed border-foreground/20">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Data Source:</span>
+                <span>{dataSource}</span>
+              </div>
+              <Link 
+                href={dataSourceUrl || "/data-sources"} 
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              >
+                View Details
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+

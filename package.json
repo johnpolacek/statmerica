@@ -6,7 +6,16 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "fetch:cpi": "node --env-file=.env scripts/fetch-cpi.mjs --series cuur",
+    "fetch:gas": "node --env-file=.env scripts/fetch-gas-prices.mjs",
+    "wid:extract": "node scripts/wid-extract-us.mjs",
+    "wid:extract:income": "node scripts/wid-extract-income-us.mjs",
+    "fetch:income-gap": "node scripts/fetch-income-gap.mjs",
+    "fetch:deficit": "node --env-file=.env scripts/fetch-deficit.mjs",
+    "fetch:unemployment": "node --env-file=.env scripts/fetch-unemployment.mjs",
+    "fetch:sp500": "node --env-file=.env scripts/fetch-sp500.mjs --series NASDAQCOM",
+    "fetch:nasdaq": "node --env-file=.env scripts/fetch-sp500.mjs --series NASDAQCOM"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
