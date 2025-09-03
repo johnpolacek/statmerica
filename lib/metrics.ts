@@ -1,30 +1,30 @@
 export const administrations = [
-  { value: "trump-2", label: "Trump (2025-present)" },
+  { value: "trump-2", label: "Trump (2025-present)", party: "R" },
   
   // Biden
-  { value: "biden-1", label: "Biden (2021–2025)" },
+  { value: "biden-1", label: "Biden (2021–2025)", party: "D" },
 
   // Trump
-  { value: "trump-1", label: "Trump (2017–2021)" },
+  { value: "trump-1", label: "Trump (2017–2021)", party: "R" },
 
   // Obama
-  { value: "obama-1", label: "Obama (2009–2013)" },
-  { value: "obama-2", label: "Obama (2013–2017)" },
+  { value: "obama-1", label: "Obama (2009–2013)", party: "D" },
+  { value: "obama-2", label: "Obama (2013–2017)", party: "D" },
 
   // George W. Bush
-  { value: "gwbush-1", label: "George W. Bush (2001–2005)" },
-  { value: "gwbush-2", label: "George W. Bush (2005–2009)" },
+  { value: "gwbush-1", label: "George W. Bush (2001–2005)", party: "R" },
+  { value: "gwbush-2", label: "George W. Bush (2005–2009)", party: "R" },
 
   // Clinton
-  { value: "clinton-1", label: "Clinton (1993–1997)" },
-  { value: "clinton-2", label: "Clinton (1997–2001)" },
+  { value: "clinton-1", label: "Clinton (1993–1997)", party: "D" },
+  { value: "clinton-2", label: "Clinton (1997–2001)", party: "D" },
 
   // George H. W. Bush
-  { value: "ghwbush-1", label: "George H. W. Bush (1989–1993)" },
+  { value: "ghwbush-1", label: "George H. W. Bush (1989–1993)", party: "R" },
 
   // Reagan
-  { value: "reagan-1", label: "Reagan (1981–1985)" },
-  { value: "reagan-2", label: "Reagan (1985–1989)" },
+  { value: "reagan-1", label: "Reagan (1981–1985)", party: "R" },
+  { value: "reagan-2", label: "Reagan (1985–1989)", party: "R" },
 ];
 
 export type MetricSummary = {

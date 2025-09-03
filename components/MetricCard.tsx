@@ -2,22 +2,62 @@ import { Minus, TrendingDown, TrendingUp } from "lucide-react"
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line } from "recharts"
 import { calculateTrend, determineWinner, generateComparisonData } from "@/lib/metrics"
 
+type Party = "D" | "R" | "U"
+
+type ChartDatum = { year: string; adminA: number | null; adminB: number | null }
+
 type MetricCardProps = {
   title: string
   value: string
   trend: string
   change: string
+  adminALabel?: string
+  adminBLabel?: string
+  chartDataOverride?: ChartDatum[]
+  adminTrendsOverride?: { adminA: { trend: string; change: string }; adminB: { trend: string; change: string } }
+  adminRangesOverride?: { adminAStart: number | null; adminAEnd: number | null; adminBStart: number | null; adminBEnd: number | null }
+  winnerOverride?: string
+  isPercent?: boolean
+  adminAValueLabel?: string
+  adminBValueLabel?: string
+  partyA?: Party
+  partyB?: Party
 }
 
-export default function MetricCard({ title, value, trend, change }: MetricCardProps) {
-  const chartData = generateComparisonData(title)
-  const winner = determineWinner(title)
+export default function MetricCard({
+  title,
+  value,
+  trend,
+  change,
+  adminALabel,
+  adminBLabel,
+  chartDataOverride,
+  adminTrendsOverride,
+  adminRangesOverride,
+  winnerOverride,
+  isPercent,
+  adminAValueLabel,
+  adminBValueLabel,
+  partyA = "U",
+  partyB = "U",
+}: MetricCardProps) {
+  const chartData: ChartDatum[] =
+    chartDataOverride ??
+    generateComparisonData(title).map((d) => ({ year: d.year as unknown as string, adminA: (d as any).trump ?? null, adminB: (d as any).biden ?? null }))
 
-  const trumpTrend = calculateTrend(title, "trump")
-  const bidenTrend = calculateTrend(title, "biden")
+  const computedWinner = winnerOverride ?? determineWinner(title)
 
-  const getAdminValues = (title: string) => {
-    const trumpData: { [key: string]: number[] } = {
+  const adminATrend = adminTrendsOverride?.adminA ?? calculateTrend(title, "trump")
+  const adminBTrend = adminTrendsOverride?.adminB ?? calculateTrend(title, "biden")
+
+  const partyStroke = (p: Party) => (p === "R" ? "#dc2626" : p === "D" ? "#2563eb" : "#6b7280")
+  const partyLightStroke = (p: Party) => (p === "R" ? "#fca5a5" : p === "D" ? "#93c5fd" : "#9ca3af")
+  const partyText = (p: Party) => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
+
+  const sameParty = partyA === partyB && partyA !== "U"
+
+  const getDefaultRanges = (title: string) => {
+    const aData: { [key: string]: number[] } = {
       "Inflation (CPI)": [2.3, 1.8, 1.2, 0.1],
       "Average Wage": [25.2, 25.8, 26.1, 26.8],
       "Gas Prices": [2.74, 2.6, 2.17, 2.25],
@@ -36,7 +76,7 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
       "Incarceration Rate": [655, 581, 541, 531],
     }
 
-    const bidenData: { [key: string]: number[] } = {
+    const bData: { [key: string]: number[] } = {
       "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1],
       "Average Wage": [26.8, 27.2, 27.8, 28.1],
       "Gas Prices": [2.17, 3.01, 5.01, 3.52],
@@ -55,40 +95,18 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
       "Incarceration Rate": [531, 520, 515, 510],
     }
 
-    const trumpValues = trumpData[title] || [50, 55, 60, 58]
-    const bidenValues = bidenData[title] || [60, 65, 70, 68]
+    const aVals = aData[title] || [50, 55, 60, 58]
+    const bVals = bData[title] || [60, 65, 70, 68]
 
     return {
-      trumpStart: trumpValues[0],
-      trumpEnd: trumpValues[trumpValues.length - 1],
-      bidenStart: bidenValues[0],
-      bidenEnd: bidenValues[bidenValues.length - 1],
+      adminAStart: aVals[0],
+      adminAEnd: aVals[aVals.length - 1],
+      adminBStart: bVals[0],
+      adminBEnd: bVals[bVals.length - 1],
     }
   }
 
-  const adminValues = getAdminValues(title)
-
-  const getTrendIcon = (trendType: string) => {
-    switch (trendType) {
-      case "up":
-        return <TrendingUp className="h-4 w-4 text-green-500" />
-      case "down":
-        return <TrendingDown className="h-4 w-4 text-gray-500" />
-      default:
-        return <Minus className="h-4 w-4 text-muted-foreground" />
-    }
-  }
-
-  const getTrendColor = (trendType: string) => {
-    switch (trendType) {
-      case "up":
-        return "text-green-500"
-      case "down":
-        return "text-gray-500"
-      default:
-        return "text-muted-foreground"
-    }
-  }
+  const adminRanges = adminRangesOverride ?? getDefaultRanges(title)
 
   return (
     <div className="p-8">
@@ -98,31 +116,33 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
             <div className="text-3xl pl-8 font-bold">{title}</div>
             <div
               className={`px-2 py-1 font-mono rounded-full text-xs font-semibold ${
-                winner === "Trump"
+                sameParty
+                  ? "bg-muted text-foreground/70"
+                  : computedWinner === "Trump"
                   ? "bg-red-100 text-red-800/70 dark:bg-red-900 dark:text-red-200"
                   : "bg-blue-100 text-blue-800/70 dark:bg-blue-900 dark:text-blue-200"
               }`}
             >
-              {winner} Wins
+              {sameParty ? "Comparison" : `${computedWinner} Wins`}
             </div>
           </div>
           <div className="flex items-center gap-8">
             <div className="text-center">
-              <div className="text-xs text-muted-foreground mb-1">Trump</div>
-              <div className="text-xs font-semibold text-red-600 font-mono">
-                {adminValues.trumpStart} → {adminValues.trumpEnd}
+              <div className="text-xs text-muted-foreground mb-1">{adminALabel ?? "Admin A"}</div>
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${partyText(partyA)}`}>
+                {adminAValueLabel ?? adminATrend.change}
               </div>
-              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${getTrendColor(trumpTrend.trend)}`}>
-                {trumpTrend.change}
+              <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyA)}`}>
+                {adminRanges.adminAStart} → {adminRanges.adminAEnd}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs text-muted-foreground mb-1">Biden</div>
-              <div className="text-xs font-semibold text-blue-600 font-mono">
-                {adminValues.bidenStart} → {adminValues.bidenEnd}
+              <div className="text-xs text-muted-foreground mb-1">{adminBLabel ?? "Admin B"}</div>
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+                {adminBValueLabel ?? adminBTrend.change}
               </div>
-              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${getTrendColor(bidenTrend.trend)}`}>
-                {bidenTrend.change}
+              <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+                {adminRanges.adminBStart} → {adminRanges.adminBEnd}
               </div>
             </div>
           </div>
@@ -144,28 +164,30 @@ export default function MetricCard({ title, value, trend, change }: MetricCardPr
                 tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 width={50}
                 domain={["dataMin - 5", "dataMax + 5"]}
-                grid={{ stroke: "hsl(var(--border))", strokeDasharray: "3 3" }}
+                tickFormatter={isPercent ? (v: number) => `${v.toFixed(2)}%` : undefined}
               />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="trump"
-                stroke="#dc2626"
+                dataKey="adminA"
+                stroke={partyStroke(partyA)}
                 strokeWidth={3}
-                dot={{ r: 4, fill: "#dc2626", strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: "#dc2626" }}
+                dot={{ r: 4, fill: partyStroke(partyA), strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: partyStroke(partyA) }}
                 connectNulls={false}
-                name="Trump (2017-2021)"
+                name={adminALabel ?? "Admin A"}
               />
               <Line
                 type="monotone"
-                dataKey="biden"
-                stroke="#2563eb"
+                dataKey="adminB"
+                stroke={sameParty ? partyLightStroke(partyB) : partyStroke(partyB)}
+                strokeOpacity={sameParty ? 0.85 : 1}
+                strokeDasharray={sameParty ? "6 4" : undefined}
                 strokeWidth={3}
-                dot={{ r: 4, fill: "#2563eb", strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: "#2563eb" }}
+                dot={{ r: 4, fill: sameParty ? partyLightStroke(partyB) : partyStroke(partyB), strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: sameParty ? partyLightStroke(partyB) : partyStroke(partyB) }}
                 connectNulls={false}
-                name="Biden (2021-2024)"
+                name={adminBLabel ?? "Admin B"}
               />
             </LineChart>
           </ResponsiveContainer>
