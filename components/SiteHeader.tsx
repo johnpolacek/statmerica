@@ -7,7 +7,7 @@ type SiteHeaderProps = {}
 
 export default function SiteHeader({}: SiteHeaderProps) {
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-dashed backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-[60] w-full border-b border-dashed backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="px-4 h-16 flex items-center justify-start bg-gradient-to-tl from-foreground/5 dark:from-foreground/20 dark:via-foreground/5 to-background">
         <div className="w-full flex items-center max-w-6xl mx-auto">
           <Image src="flag.svg" alt="" width={36} height={36} className="scale-x-75" />
