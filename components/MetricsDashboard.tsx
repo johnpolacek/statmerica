@@ -187,10 +187,10 @@ export default function MetricsDashboard() {
           ))}
         </div>
 
-        <div className="mt-12">
-          <div className="max-w-4xl mx-auto border border-dashed border-foreground/20 rounded-lg py-4">
+        <div className="mt-12 border-y border-dashed border-foreground/20">
+          <div className="max-w-4xl mx-auto border-x border-dashed border-foreground/20 py-4 bg-background">
             <div className="text-center border-b border-dashed border-foreground/20 pb-4">
-              <div className="text-xl text-foreground/50 font-mono">Final Scorecard</div>
+              <div className="text-lg font-mono">Final Scorecard</div>
             </div>
             <div className="text-center">
               <div className="grid grid-cols-2">
