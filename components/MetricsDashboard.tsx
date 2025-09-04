@@ -124,10 +124,12 @@ export default function MetricsDashboard() {
 
   const metrics: MetricSummary[] = [
     {
-      title: "Inflation (CPI YoY)",
+      title: "Inflation Rate",
       value: yoyLabel,
       trend,
       change: `avg ${aAvg?.toFixed(2) ?? "–"}% vs ${bAvg?.toFixed(2) ?? "–"}%`,
+      explanation:
+        "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
     },
   ]
 
@@ -140,8 +142,8 @@ export default function MetricsDashboard() {
   return (
     <section className="w-full">
       <div className="w-full">
-        <div>
-          <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto mb-6">
+        <div className="bg-gradient-to-tl from-background/90 via-background/90 to-background/50">
+          <div className="flex items-center justify-center gap-3 max-w-6xl mx-auto py-6">
             <AdministrationSelect value={adminA} onChange={setAdminA} />
             <span className="text-sm text-muted-foreground">vs</span>
             <AdministrationSelect value={adminB} onChange={setAdminB} />
@@ -150,8 +152,8 @@ export default function MetricsDashboard() {
         <div>
           {metrics.map((metric, index) => (
             <div key={index}>
-              <div className="border-y border-dashed">
-                <div className="max-w-6xl mx-auto border-x border-dashed">
+              <div className="border-y border-dashed border-foreground/20 bg-gradient-to-t from-background/70 to-transparent">
+                <div className="max-w-6xl mx-auto border-x border-dashed border-foreground/20 relative z-50">
                   <MetricCard
                     title={metric.title}
                     value={metric.value}
@@ -173,24 +175,26 @@ export default function MetricsDashboard() {
                     adminBValueLabel={adminBValueLabel}
                     partyA={adminAComputed.party}
                     partyB={adminBComputed.party}
+                    explanation={metric.explanation}
+                    methodBadge="CPI YoY"
                   />
                 </div>
               </div>
               {index !== metrics.length - 1 && (
-                <div className="w-full max-w-6xl h-12 mx-auto border-x border-dashed"></div>
+                <div className="w-full max-w-6xl h-12 mx-auto border-x border-dashed border-foreground/20"></div>
               )}
             </div>
           ))}
         </div>
 
         <div className="mt-12">
-          <div className="max-w-4xl mx-auto border border-dashed rounded-lg py-4">
-            <div className="text-center border-b border-dashed pb-4">
+          <div className="max-w-4xl mx-auto border border-dashed border-foreground/20 rounded-lg py-4">
+            <div className="text-center border-b border-dashed border-foreground/20 pb-4">
               <div className="text-xl text-foreground/50 font-mono">Final Scorecard</div>
             </div>
             <div className="text-center">
               <div className="grid grid-cols-2">
-                <div className="border-r border-dashed p-8">
+                <div className="border-r border-dashed border-foreground/20 p-8">
                   <div className={`text-3xl font-bold ${partyText(adminAComputed.party)}`}>{adminAName}</div>
                   <div className="text-center py-2 space-y-1">
                     {adminAMetrics.map((metric, index) => (
@@ -207,7 +211,7 @@ export default function MetricsDashboard() {
                   </div>
                 </div>
               </div>
-              <div className="py-6 border-t border-dashed">
+              <div className="py-6 border-t border-dashed border-foreground/20">
                 <div className="text-base uppercase tracking-wider font-bold text-muted-foreground mb-2">Overall Winner</div>
                 <div className={`text-7xl font-extrabold uppercase ${partyText(overallWinnerParty)}`}>{overallWinnerName}</div>
                 <div className="font-mono text-muted-foreground mt-2">Based on winning {Math.max(adminAWins, adminBWins)}/{metrics.length} key metrics</div>

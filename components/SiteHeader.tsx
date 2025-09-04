@@ -6,9 +6,9 @@ type SiteHeaderProps = {}
 
 export default function SiteHeader({}: SiteHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-dashed bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-8">
+    <header className="sticky top-0 z-30 w-full border-b border-dashed backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="px-4 h-16 flex items-center justify-start bg-gradient-to-tl from-foreground/5 dark:from-foreground/20 dark:via-foreground/5 to-background">
+        <div className="w-full flex items-center gap-8 max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold">
             <span className="text-primary">Stat</span>
             <span className="text-secondary">merica</span>

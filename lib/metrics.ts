@@ -32,6 +32,7 @@ export type MetricSummary = {
   value: string
   trend: string
   change: string
+  explanation?: string
 }
 
 export const metrics: MetricSummary[] = [

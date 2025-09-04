@@ -5,7 +5,7 @@
 
 :root {
   --background: oklch(1 0 0); /* Pure white */
-  --foreground: oklch(0.35 0 0); /* Dark gray for text */
+  --foreground: oklch(0 0 0); /* Dark gray for text */
   --card: oklch(0.98 0 0); /* Soft off-white for cards */
   --card-foreground: oklch(0.35 0 0);
   --popover: oklch(1 0 0);
@@ -130,5 +130,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .recharts-default-legend {
+    margin-top: 4px !important;
   }
 }

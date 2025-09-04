@@ -22,6 +22,8 @@ type MetricCardProps = {
   adminBValueLabel?: string
   partyA?: Party
   partyB?: Party
+  explanation?: string
+  methodBadge?: string
 }
 
 export default function MetricCard({
@@ -40,6 +42,8 @@ export default function MetricCard({
   adminBValueLabel,
   partyA = "U",
   partyB = "U",
+  explanation,
+  methodBadge,
 }: MetricCardProps) {
   const chartData: ChartDatum[] =
     chartDataOverride ??
@@ -89,11 +93,18 @@ export default function MetricCard({
   const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winningLabel} ${isAggregateParty ? "Win" : "Wins"}`
 
   return (
-    <div className="p-8">
+    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70">
       <div className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-3xl pl-8 font-bold">{title}</div>
+            <div className="text-3xl pl-8 font-bold flex items-center gap-2">
+              <span>{title}</span>
+              {methodBadge && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-foreground/60 font-mono">
+                  {methodBadge}
+                </span>
+              )}
+            </div>
             <div className={`px-2 py-1 font-mono rounded-full text-xs font-semibold ${badgeClass}`}>
               {badgeLabel}
             </div>
@@ -123,7 +134,7 @@ export default function MetricCard({
       <div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart data={chartData} margin={{ top: 16, right: 30, left: 20, bottom: 28 }}>
               <XAxis
                 dataKey="year"
                 axisLine={false}
@@ -138,7 +149,7 @@ export default function MetricCard({
                 domain={["dataMin - 5", "dataMax + 5"]}
                 tickFormatter={isPercent ? (v: number) => `${v.toFixed(2)}%` : undefined}
               />
-              <Legend />
+              <Legend wrapperStyle={{ marginTop: 12 }} />
               <Line
                 type="monotone"
                 dataKey="adminA"
@@ -164,6 +175,11 @@ export default function MetricCard({
             </LineChart>
           </ResponsiveContainer>
         </div>
+        {explanation && (
+          <div className="pt-3 px-8 text-xs text-muted-foreground font-mono leading-relaxed">
+            {explanation}
+          </div>
+        )}
       </div>
     </div>
   )
