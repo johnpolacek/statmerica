@@ -176,7 +176,7 @@ export default function MetricCard({
           </ResponsiveContainer>
         </div>
         {explanation && (
-          <div className="pt-3 px-8 text-xs text-muted-foreground font-mono leading-relaxed">
+          <div className="py-2 px-8 text-sm">
             {explanation}
           </div>
         )}

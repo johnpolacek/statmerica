@@ -1,6 +1,7 @@
 "use client"
 
 import ThemeToggle from "@/components/ThemeToggle"
+import Image from "next/image"
 
 type SiteHeaderProps = {}
 
@@ -8,9 +9,10 @@ export default function SiteHeader({}: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-dashed backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="px-4 h-16 flex items-center justify-start bg-gradient-to-tl from-foreground/5 dark:from-foreground/20 dark:via-foreground/5 to-background">
-        <div className="w-full flex items-center gap-8 max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold">
-            <span className="text-primary">Stat</span>
+        <div className="w-full flex items-center max-w-6xl mx-auto">
+          <Image src="flag.svg" alt="" width={36} height={36} className="scale-x-75" />
+          <h1 className="text-2xl font-extrabold mr-6 uppercase">
+            <span className="text-primary font-semibold">Stat</span>
             <span className="text-secondary">merica</span>
           </h1>
           <nav className="hidden md:flex items-center gap-6">
