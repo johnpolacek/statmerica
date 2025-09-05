@@ -7,7 +7,7 @@ import SiteFooter from "@/components/SiteFooter"
 export default function StatmericaHomepage() {
   return (
     <div className="min-h-screen relative bg-background">
-      <div id="pattern" className="z-40 pointer-events-none opacity-[.1875] absolute inset-0 bg-[length:20%_20%] bg-[url('/dot-grid-l.png')] dark:bg-[url('/dot-grid-d.png')]"></div>
+      <div id="pattern" className="z-40 pointer-events-none opacity-30 absolute inset-0 bg-[length:10%_6%] bg-[url('/dot-grid-l.png')] dark:bg-[url('/dot-grid-d.png')]"></div>
       <SiteHeader />
       <div className="w-full relative z-0 -mt-20">
         <HeroImage />

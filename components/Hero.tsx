@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="pt-28 px-4">
+    <section className="pt-28 xl:pt-36 px-4">
       <div className="container mx-auto text-center max-w-6xl">
         <h2 className="text-4xl md:text-6xl font-bold text-balance mb-2">
           Compare Stats Across U.S. Presidential Administrations

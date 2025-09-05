@@ -1,6 +1,7 @@
-import { Minus, TrendingDown, TrendingUp } from "lucide-react"
+import { Minus, TrendingDown, TrendingUp, ExternalLink } from "lucide-react"
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line } from "recharts"
 import { calculateTrend, generateComparisonData } from "@/lib/metrics"
+import Link from "next/link"
 
 type Party = "D" | "R" | "U"
 
@@ -24,6 +25,8 @@ type MetricCardProps = {
   partyB?: Party
   explanation?: string
   methodBadge?: string
+  dataSource?: string
+  dataSourceUrl?: string
 }
 
 export default function MetricCard({
@@ -44,6 +47,8 @@ export default function MetricCard({
   partyB = "U",
   explanation,
   methodBadge,
+  dataSource,
+  dataSourceUrl,
 }: MetricCardProps) {
   const chartData: ChartDatum[] =
     chartDataOverride ??
@@ -112,7 +117,7 @@ export default function MetricCard({
           <div className="flex items-center gap-8">
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">{adminALabel ?? "Admin A"}</div>
-              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${partyText(partyA)}`}>
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-extrabold ${partyText(partyA)}`}>
                 {adminAValueLabel ?? adminATrend.change}
               </div>
               <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyA)}`}>
@@ -121,7 +126,7 @@ export default function MetricCard({
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">{adminBLabel ?? "Admin B"}</div>
-              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-bold ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
+              <div className={`flex items-center justify-center gap-1 font-mono text-xl font-extrabold ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
                 {adminBValueLabel ?? adminBTrend.change}
               </div>
               <div className={`text-xs scale-x-90 tracking-titter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
@@ -178,6 +183,23 @@ export default function MetricCard({
         {explanation && (
           <div className="py-2 px-8 text-sm">
             {explanation}
+          </div>
+        )}
+        {dataSource && (
+          <div className="pt-3 pb-2 px-8 border-t border-dashed border-foreground/20">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">Data Source:</span>
+                <span>{dataSource}</span>
+              </div>
+              <Link 
+                href={dataSourceUrl || "/data-sources"} 
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+              >
+                View Details
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
         )}
       </div>

@@ -193,6 +193,8 @@ export default function MetricsDashboard() {
       methodBadge: "CPI YoY",
       explanation:
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
+      dataSource: "U.S. Bureau of Labor Statistics",
+      dataSourceUrl: "/data-sources#cpi",
     },
     {
       title: "Income Gap YoY",
@@ -208,6 +210,8 @@ export default function MetricsDashboard() {
       adminBValueLabel: igBAvg != null ? `${igBAvg.toFixed(2)}%` : "–",
       methodBadge: "Income Gap YoY",
       explanation: "YoY percent change in income gap (P90/P50 ratio). Measures how fast the 90th percentile income grows relative to the median income. 2024-2025 extrapolated using last 3 years growth.",
+      dataSource: "World Inequality Database",
+      dataSourceUrl: "/data-sources#income-gap",
     },
   ]
 
@@ -252,6 +256,8 @@ export default function MetricsDashboard() {
                     partyB={adminBComputed.party}
                     explanation={metric.explanation}
                     methodBadge={metric.methodBadge}
+                    dataSource={metric.dataSource}
+                    dataSourceUrl={metric.dataSourceUrl}
                   />
                 </div>
               </div>

@@ -14,14 +14,16 @@ const getDataSourcesMetadata = () => {
       displayTitle: "Consumer Price Index (CPI)",
       displayDescription: "Year-over-year inflation rates tracking price changes in goods and services",
       icon: TrendingUp,
-      color: "bg-blue-50 border-blue-200"
+      color: "bg-blue-50 border-blue-200",
+      anchor: "cpi"
     },
     {
       ...incomeGapData.meta,
       displayTitle: "Income Gap (P90/P50 Ratio)",
       displayDescription: "Income inequality measured as ratio of 90th percentile to median income",
       icon: Database,
-      color: "bg-green-50 border-green-200"
+      color: "bg-green-50 border-green-200",
+      anchor: "income-gap"
     }
   ]
 }
@@ -63,13 +65,13 @@ export default function DataSourcesPage() {
   const dataSourcesMetadata = getDataSourcesMetadata()
   
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background scroll-smooth">
       <SiteHeader />
       
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Data Sources & Methodology</h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Transparent documentation of all data sources, processing scripts, and methodologies 
             used to create the charts and comparisons in Statmerica.
           </p>
@@ -86,7 +88,7 @@ export default function DataSourcesPage() {
             {dataSourcesMetadata.map((source, index) => {
               const IconComponent = source.icon
               return (
-                <Card key={index} className={`${source.color} transition-all hover:shadow-lg`}>
+                <Card key={index} id={source.anchor} className={`${source.color} transition-all hover:shadow-lg scroll-mt-24`}>
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-2">
                       <IconComponent className="h-6 w-6" />
