@@ -2,6 +2,7 @@
 
 import ThemeToggle from "@/components/ThemeToggle"
 import Image from "next/image"
+import Link from "next/link"
 
 type SiteHeaderProps = {}
 
@@ -16,15 +17,12 @@ export default function SiteHeader({}: SiteHeaderProps) {
             <span className="text-secondary">merica</span>
           </h1>
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
+            <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
               Home
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-              About
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link href="/data-sources" className="text-sm font-medium hover:text-primary transition-colors">
               Data Sources
-            </a>
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">

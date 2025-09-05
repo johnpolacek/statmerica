@@ -14,11 +14,27 @@
       "name": "U.S. Bureau of Labor Statistics",
       "homepage": "https://www.bls.gov/cpi/",
       "api": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      "attribution": "Public domain"
+      "attribution": "Public domain",
+      "credibility": "The BLS is a non-partisan federal statistical agency with over 150 years of independent data collection, widely trusted by economists, policymakers, and researchers across the political spectrum."
     },
     "seriesId": "CUUR0000SA0",
     "seriesLabel": "All items (NSA)",
-    "notes": "Computed as (current / prior - 1) * 100 using December values for 1980–2024, and the latest available month vs the same month prior year for the current year."
+    "notes": "Computed as (current / prior - 1) * 100 using December values for 1980–2024, and the latest available month vs the same month prior year for the current year.",
+    "processing": {
+      "updateScript": "fetch:cpi",
+      "dataFile": "data/cpi.json",
+      "methodology": [
+        "Fetches raw CPI index values from BLS Public API in 10-year chunks",
+        "Computes December-to-December year-over-year percent change",
+        "For current year, uses latest available month vs same month prior year",
+        "Formula: ((current / prior) - 1) × 100"
+      ],
+      "chartUsage": [
+        "Shows inflation rate trends across presidential terms",
+        "Compares average inflation rates between administrations",
+        "Lower inflation rates are considered better performance"
+      ]
+    }
   },
   "data": [
     {

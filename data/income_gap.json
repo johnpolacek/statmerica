@@ -10,7 +10,32 @@
       "end": 2025
     },
     "fetchedAt": "2025-09-05T04:06:52.497Z",
-    "notes": "Raw USD levels stored with p90_usd, p50_usd, ratio per year. YoY value is percent change in ratio. 2024-2025 extrapolated using last 3 years growth."
+    "source": {
+      "name": "World Inequality Database (WID)",
+      "homepage": "https://wid.world/",
+      "api": "https://wid.world/",
+      "attribution": "World Inequality Database",
+      "credibility": "WID is an academic research project led by economists from Paris School of Economics, UC Berkeley, and other leading institutions, providing open-access, peer-reviewed inequality data used by international organizations including the UN and World Bank."
+    },
+    "seriesId": "Average pre-tax income (aptinc)",
+    "seriesLabel": "P90/P50 ratio (YoY %)",
+    "notes": "Raw USD levels stored with p90_usd, p50_usd, ratio per year. YoY value is percent change in ratio. 2024-2025 extrapolated using last 3 years growth.",
+    "processing": {
+      "updateScript": "wid:extract:income → fetch:income-gap",
+      "dataFile": "data/income_gap.json",
+      "methodology": [
+        "Extracts P50 and P90 income levels from WID CSV files",
+        "Prefers age=992 (working age) and population='j' (all) when available", 
+        "Computes P90/P50 ratio for each year",
+        "Calculates year-over-year percent change in the ratio",
+        "2024-2025 extrapolated using last 3 years average growth rate"
+      ],
+      "chartUsage": [
+        "Tracks income inequality trends across administrations",
+        "Shows how fast high earners' income grows relative to median",
+        "Lower YoY growth indicates slowing inequality expansion"
+      ]
+    }
   },
   "data": [
     {
