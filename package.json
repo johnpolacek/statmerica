@@ -7,7 +7,12 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "fetch:cpi": "node scripts/fetch-cpi.mjs --series cuur | cat"
+    "fetch:cpi": "node --env-file=.env scripts/fetch-cpi.mjs --series cuur",
+    "fetch:wealth-gap": "node scripts/fetch-wealth-gap.mjs",
+    "compare:wealth-gap": "node --env-file=.env scripts/compare-wealth-gap.mjs",
+    "wid:extract": "node scripts/wid-extract-us.mjs",
+    "wid:extract:income": "node scripts/wid-extract-income-us.mjs",
+    "fetch:income-gap": "node scripts/fetch-income-gap.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
