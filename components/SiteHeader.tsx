@@ -19,6 +19,9 @@ export default function SiteHeader({}: SiteHeaderProps) {
             </h1>
           </Link>
           <nav className="hidden md:flex items-center gap-6 border-l-2 border-dotted border-foreground/20 pl-6">
+            <Link href="/about" className="text-sm font-mono text-primary/80 hover:text-primary transition-colors">
+              About
+            </Link>
             <Link href="/data-sources" className="text-sm font-mono text-primary/80 hover:text-primary transition-colors">
               Data Sources
             </Link>

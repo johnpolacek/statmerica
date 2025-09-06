@@ -210,12 +210,12 @@ export default function MetricCard({
                 dataKey="year"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
               />
               <YAxis
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                 width={50}
                 domain={["dataMin - 5", "dataMax + 5"]}
                 tickFormatter={(v: number) => (isYoY && isPercent ? `${v.toFixed(1)}%` : v.toFixed(1))}

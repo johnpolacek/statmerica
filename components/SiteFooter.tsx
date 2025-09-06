@@ -4,10 +4,10 @@ export default function SiteFooter() {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               About
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/data-sources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Data Sources
             </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
