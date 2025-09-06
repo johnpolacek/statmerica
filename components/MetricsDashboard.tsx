@@ -197,7 +197,7 @@ export default function MetricsDashboard() {
       dataSourceUrl: "/data-sources#cpi",
     },
     {
-      title: "Income Gap YoY",
+      title: "Weath Gap",
       value: `${latestIg >= 0 ? "+" : ""}${latestIg.toFixed(2)}%`,
       trend: igTrend,
       change: `avg ${igAAvg?.toFixed(2) ?? "–"}% vs ${igBAvg?.toFixed(2) ?? "–"}%`,
