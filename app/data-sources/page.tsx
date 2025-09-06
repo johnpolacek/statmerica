@@ -7,6 +7,8 @@ import cpiData from "@/data/cpi.json"
 import incomeGapData from "@/data/income_gap.json"
 import gasData from "@/data/gas_prices.json"
 import deficitData from "@/data/deficit.json"
+import unemploymentData from "@/data/unemployment.json"
+import sp500Data from "@/data/sp500.json"
 
 // Transform JSON metadata into display format with a unified shape so TS is happy
 type DataSourceMeta = {
@@ -116,6 +118,35 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
       notes: (incomeGapData.meta as any).notes,
     },
     {
+      displayTitle: (sp500Data.meta as any).title || "Stock Index",
+      displayDescription: "December closes and latest close; includes YoY % change",
+      icon: TrendingUp,
+      color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/60",
+      anchor: "nasdaq",
+      source: {
+        name: sp500Data.meta.source?.name,
+        homepage: sp500Data.meta.source?.homepage,
+        api: sp500Data.meta.source?.api,
+        attribution: sp500Data.meta.source?.attribution,
+      },
+      seriesId: (sp500Data.meta as any).seriesId,
+      coverage: sp500Data.meta.coverage,
+      frequency: sp500Data.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:nasdaq",
+        dataFile: "data/sp500.json",
+        methodology: [
+          "Fetch FRED SP500 series (daily)",
+          "Select last trading day in December for 1980–2024",
+          "Append latest close and compute YoY vs ~same date prior year",
+        ],
+        chartUsage: [
+          "NASDAQ Composite card (YoY, Index)",
+        ],
+      },
+      notes: (sp500Data.meta as any).notes,
+    },
+    {
       displayTitle: "Federal Budget Deficit (FY)",
       displayDescription: "Annual deficit = outlays minus receipts; plus current FY-to-date",
       icon: TrendingDown,
@@ -144,10 +175,49 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
       },
       notes: deficitData.meta.notes,
     },
+    {
+      displayTitle: "Unemployment Rate (U-3, SA)",
+      displayDescription: "Monthly unemployment rate stored as December values plus latest month; includes YoY.",
+      icon: TrendingDown,
+      color: "bg-purple-50 border-purple-200 dark:bg-purple-950/30 dark:border-purple-900/60",
+      anchor: "unemployment",
+      source: {
+        name: unemploymentData.meta.source?.name,
+        homepage: unemploymentData.meta.source?.homepage,
+        api: unemploymentData.meta.source?.api,
+        attribution: unemploymentData.meta.source?.attribution,
+      },
+      seriesId: (unemploymentData.meta as any).seriesId,
+      coverage: unemploymentData.meta.coverage,
+      frequency: unemploymentData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:unemployment",
+        dataFile: "data/unemployment.json",
+        methodology: [
+          "Fetch BLS CPS unemployment rate series (LNS14000000, SA)",
+          "Select December values to form annual series (1980–2024)",
+          "Append current-year latest month vs same month prior year",
+        ],
+        chartUsage: [
+          "Unemployment Rate card (YoY, Percent)",
+        ],
+      },
+      notes: unemploymentData.meta.notes,
+    },
   ]
 }
 
 const scriptDocumentation = [
+  {
+    name: "fetch:nasdaq",
+    command: "pnpm run fetch:nasdaq",
+    file: "scripts/fetch-sp500.mjs",
+    description: "Fetches NASDAQ Composite from FRED; builds annual Dec + latest YoY",
+    parameters: ["--series NASDAQCOM (default)", "--series SP500"],
+    envVars: ["FRED_API_KEY (required)"],
+    output: "data/sp500.json",
+    icon: Download
+  },
   {
     name: "fetch:cpi",
     command: "pnpm run fetch:cpi",
@@ -197,6 +267,16 @@ const scriptDocumentation = [
     parameters: [],
     envVars: [],
     output: "data/deficit.json",
+    icon: Download
+  },
+  {
+    name: "fetch:unemployment",
+    command: "pnpm run fetch:unemployment",
+    file: "scripts/fetch-unemployment.mjs",
+    description: "Fetches unemployment rate (BLS CPS) and computes Dec YoY",
+    parameters: [],
+    envVars: ["BLS_API_KEY (optional, increases rate limits)", "--series lns (default)"] ,
+    output: "data/unemployment.json",
     icon: Download
   }
 ]

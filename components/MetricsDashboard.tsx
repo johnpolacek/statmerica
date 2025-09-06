@@ -8,6 +8,8 @@ import cpi from "@/data/cpi.json"
 import incomeGap from "@/data/income_gap.json"
 import gas from "@/data/gas_prices.json"
 import deficit from "@/data/deficit.json"
+import unemployment from "@/data/unemployment.json"
+import sp500 from "@/data/sp500.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -55,6 +57,8 @@ export default function MetricsDashboard() {
   const igJson = incomeGap as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
   const gasJson = gas as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const deficitJson = deficit as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+  const unempJson = unemployment as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+  const sp500Json = sp500 as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -71,6 +75,14 @@ export default function MetricsDashboard() {
   // Build year maps for Deficit: yoy (for plotting) and value (USD billions for tooltip)
   const defYoyByYear = useMemo(() => new Map<number, number>(deficitJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [deficitJson.data])
   const defValueByYear = useMemo(() => new Map<number, number>(deficitJson.data.map(d => [d.year, d.value])), [deficitJson.data])
+
+  // Build year maps for Unemployment: yoy (for plotting) and value (percent for tooltip)
+  const unempYoyByYear = useMemo(() => new Map<number, number>(unempJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [unempJson.data])
+  const unempValueByYear = useMemo(() => new Map<number, number>(unempJson.data.map(d => [d.year, d.value])), [unempJson.data])
+
+  // Build year maps for S&P 500: yoy and raw index level
+  const spYoyByYear = useMemo(() => new Map<number, number>(sp500Json.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [sp500Json.data])
+  const spValueByYear = useMemo(() => new Map<number, number>(sp500Json.data.map(d => [d.year, d.value])), [sp500Json.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -121,6 +133,18 @@ export default function MetricsDashboard() {
   const defRawA = buildSeriesForAdmin(adminA, defValueByYear)
   const defRawB = buildSeriesForAdmin(adminB, defValueByYear)
 
+  // Series for Unemployment (YoY plotted) and raw percent (tooltip)
+  const unempSeriesA = buildSeriesForAdmin(adminA, unempYoyByYear)
+  const unempSeriesB = buildSeriesForAdmin(adminB, unempYoyByYear)
+  const unempRawA = buildSeriesForAdmin(adminA, unempValueByYear)
+  const unempRawB = buildSeriesForAdmin(adminB, unempValueByYear)
+
+  // Series for S&P 500 (YoY plotted) and raw index level (tooltip)
+  const spSeriesA = buildSeriesForAdmin(adminA, spYoyByYear)
+  const spSeriesB = buildSeriesForAdmin(adminB, spYoyByYear)
+  const spRawA = buildSeriesForAdmin(adminA, spValueByYear)
+  const spRawB = buildSeriesForAdmin(adminB, spValueByYear)
+
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
     const start = series.find(v => v != null) as number | undefined
@@ -140,6 +164,10 @@ export default function MetricsDashboard() {
   const gasChangeB = fourYearChange(gasRawB)
   const defChangeA = fourYearChange(defRawA)
   const defChangeB = fourYearChange(defRawB)
+  const unempChangeA = fourYearChange(unempRawA)
+  const unempChangeB = fourYearChange(unempRawB)
+  const spChangeA = fourYearChange(spRawA)
+  const spChangeB = fourYearChange(spRawB)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -197,6 +225,17 @@ export default function MetricsDashboard() {
   const latestDef = deficitJson.data.find(d => d.year === latestDefYearWithYoy)?.yoy ?? 0
   const defTrend: MetricSummary["trend"] = Math.abs(latestDef as number) < 1 ? "stable" : (latestDef as number) > 0 ? "up" : "down"
 
+  // Unemployment YoY current value and trend
+  const latestUnempYearWithYoy = Math.max(...unempJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year))
+  const latestUnemp = unempJson.data.find(d => d.year === latestUnempYearWithYoy)?.yoy ?? 0
+  const unempTrend: MetricSummary["trend"] = Math.abs(latestUnemp as number) < 1 ? "stable" : (latestUnemp as number) > 0 ? "up" : "down"
+
+  // S&P 500 YoY current value and trend (latest available yoy row)
+  const spYoyYears = sp500Json.data.filter(d => typeof d.yoy === 'number').map(d => d.year)
+  const latestSpYearWithYoy = spYoyYears.length ? Math.max(...spYoyYears) : null
+  const latestSp = latestSpYearWithYoy != null ? (sp500Json.data.find(d => d.year === latestSpYearWithYoy)?.yoy ?? 0) : 0
+  const spTrend: MetricSummary["trend"] = Math.abs(latestSp as number) < 1 ? "stable" : (latestSp as number) > 0 ? "up" : "down"
+
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
   const adminBWinsIg = igChangeA != null && igChangeB != null && igChangeB < igChangeA ? 1 : 0
@@ -205,9 +244,16 @@ export default function MetricsDashboard() {
 
   const adminAWinsDef = defChangeA != null && defChangeB != null && defChangeA < defChangeB ? 1 : 0
   const adminBWinsDef = defChangeA != null && defChangeB != null && defChangeB < defChangeA ? 1 : 0
+  // For Unemployment, lower 4-year change is better (lower rate)
+  const adminAWinsUnemp = unempChangeA != null && unempChangeB != null && unempChangeA < unempChangeB ? 1 : 0
+  const adminBWinsUnemp = unempChangeA != null && unempChangeB != null && unempChangeB < unempChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef
+  // For S&P 500, higher 4-year change is better
+  const adminAWinsSp = spChangeA != null && spChangeB != null && spChangeA > spChangeB ? 1 : 0
+  const adminBWinsSp = spChangeA != null && spChangeB != null && spChangeB > spChangeA ? 1 : 0
+
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -219,12 +265,19 @@ export default function MetricsDashboard() {
   if (adminBWinsGas) adminBMetricsList.push("Gas Prices YoY")
   if (adminAWinsDef) adminAMetricsList.push("Deficit YoY")
   if (adminBWinsDef) adminBMetricsList.push("Deficit YoY")
+  if (adminAWinsUnemp) adminAMetricsList.push("Unemployment YoY")
+  if (adminBWinsUnemp) adminBMetricsList.push("Unemployment YoY")
+  const spTitleShort = ((sp500Json.meta as any)?.title || "Stock Index").replace(/ Index$/, "")
+  if (adminAWinsSp) adminAMetricsList.push(`${spTitleShort} YoY`)
+  if (adminBWinsSp) adminBMetricsList.push(`${spTitleShort} YoY`)
 
   // Build card configs to render within metrics.map
   const termLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
   const igChartData = termLabels.map((label, i) => ({ year: label, adminA: igSeriesA[i] ?? null, adminB: igSeriesB[i] ?? null, adminAValue: igRawA[i] ?? null, adminBValue: igRawB[i] ?? null }))
   const gasChartData = termLabels.map((label, i) => ({ year: label, adminA: gasSeriesA[i] ?? null, adminB: gasSeriesB[i] ?? null, adminAValue: gasRawA[i] ?? null, adminBValue: gasRawB[i] ?? null }))
   const defChartData = termLabels.map((label, i) => ({ year: label, adminA: defSeriesA[i] ?? null, adminB: defSeriesB[i] ?? null, adminAValue: defRawA[i] ?? null, adminBValue: defRawB[i] ?? null }))
+  const unempChartData = termLabels.map((label, i) => ({ year: label, adminA: unempSeriesA[i] ?? null, adminB: unempSeriesB[i] ?? null, adminAValue: unempRawA[i] ?? null, adminBValue: unempRawB[i] ?? null }))
+  const spChartData = termLabels.map((label, i) => ({ year: label, adminA: spSeriesA[i] ?? null, adminB: spSeriesB[i] ?? null, adminAValue: spRawA[i] ?? null, adminBValue: spRawB[i] ?? null }))
 
   const cards = [
     {
@@ -245,6 +298,24 @@ export default function MetricsDashboard() {
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
       dataSourceUrl: "/data-sources#cpi",
+    },
+    {
+      title: (sp500Json.meta as any)?.title || "Stock Index",
+      value: `${latestSp >= 0 ? "+" : ""}${(latestSp as number).toFixed(2)}%`,
+      trend: spTrend,
+      change: `4yr ${formatPct(spChangeA)} vs ${formatPct(spChangeB)}`,
+      chartData: spChartData,
+      adminAStart: spRawA.find(v => v != null) ?? null,
+      adminAEnd: [...spRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: spRawB.find(v => v != null) ?? null,
+      adminBEnd: [...spRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(spChangeA),
+      adminBValueLabel: formatPct(spChangeB),
+      methodBadge: `${((sp500Json.meta as any)?.title || 'Stock Index')} YoY`,
+      valueLabel: "Index",
+      explanation: "YoY percent change in the stock index. Higher growth is better.",
+      dataSource: "FRED",
+      dataSourceUrl: "/data-sources#nasdaq",
     },
     {
       title: "Weath Gap",
@@ -299,6 +370,24 @@ export default function MetricsDashboard() {
       explanation: "YoY percent change in the federal budget deficit (outlays minus receipts). Lower is better.",
       dataSource: "U.S. Department of the Treasury — Fiscal Data",
       dataSourceUrl: "/data-sources#deficit",
+    },
+    {
+      title: "Unemployment",
+      value: `${latestUnemp >= 0 ? "+" : ""}${(latestUnemp as number).toFixed(2)}%`,
+      trend: unempTrend,
+      change: `4yr ${formatPct(unempChangeA)} vs ${formatPct(unempChangeB)}`,
+      chartData: unempChartData,
+      adminAStart: unempRawA.find(v => v != null) ?? null,
+      adminAEnd: [...unempRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: unempRawB.find(v => v != null) ?? null,
+      adminBEnd: [...unempRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(unempChangeA),
+      adminBValueLabel: formatPct(unempChangeB),
+      methodBadge: "Unemployment YoY",
+      valueLabel: "Percent",
+      explanation: "YoY percent change in the unemployment rate (U-3, seasonally adjusted). Lower is better.",
+      dataSource: "U.S. Bureau of Labor Statistics (CPS)",
+      dataSourceUrl: "/data-sources#unemployment",
     },
   ]
 
@@ -379,11 +468,6 @@ export default function MetricsDashboard() {
                     ))}
                   </div>
                 </div>
-              </div>
-              <div className="py-6 border-t border-dashed border-foreground/20">
-                <div className="text-base uppercase tracking-wider font-bold text-muted-foreground mb-2">Overall Winner</div>
-                <div className={`text-7xl font-extrabold uppercase ${partyText(overallWinnerParty)}`}>{overallWinnerName}</div>
-                <div className="font-mono text-muted-foreground mt-2">Based on winning {Math.max(adminAWinsTotal, adminBWinsTotal)}/{cards.length} key metrics</div>
               </div>
             </div>
           </div>
