@@ -151,7 +151,7 @@ export default function MetricCard({
     <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70">
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
             <div className="text-3xl pl-8 font-bold flex items-center gap-2">
               <span>{title}</span>
               {methodBadge && (
@@ -165,7 +165,7 @@ export default function MetricCard({
                 </span>
               )}
             </div>
-            <div className={`px-2 py-1 font-mono rounded-full text-xs font-semibold ${badgeClass}`}>
+            <div className={`pl-8 px-2 py-1 font-mono rounded-full text-xs font-semibold ${badgeClass}`}>
               {badgeLabel}
             </div>
           </div>
