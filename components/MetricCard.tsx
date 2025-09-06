@@ -1,11 +1,11 @@
 import { Minus, TrendingDown, TrendingUp, ExternalLink } from "lucide-react"
-import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line } from "recharts"
+import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip } from "recharts"
 import { calculateTrend, generateComparisonData } from "@/lib/metrics"
 import Link from "next/link"
 
 type Party = "D" | "R" | "U"
 
-type ChartDatum = { year: string; adminA: number | null; adminB: number | null }
+type ChartDatum = { year: string; adminA: number | null; adminB: number | null; adminAValue?: number | null; adminBValue?: number | null }
 
 type MetricCardProps = {
   title: string
@@ -27,6 +27,7 @@ type MetricCardProps = {
   methodBadge?: string
   dataSource?: string
   dataSourceUrl?: string
+  valueLabel?: string
 }
 
 export default function MetricCard({
@@ -49,6 +50,7 @@ export default function MetricCard({
   methodBadge,
   dataSource,
   dataSourceUrl,
+  valueLabel,
 }: MetricCardProps) {
   const chartData: ChartDatum[] =
     chartDataOverride ??
@@ -97,6 +99,31 @@ export default function MetricCard({
   const isAggregateParty = winningLabel === "Democrats" || winningLabel === "Republicans"
   const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winningLabel} ${isAggregateParty ? "Win" : "Wins"}`
 
+  const renderTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload || !payload.length) return null
+    return (
+      <div className="rounded-md border border-foreground/10 bg-background/95 backdrop-blur p-2 shadow text-sm">
+        <div className="font-mono text-[12px] text-muted-foreground mb-1">{label}</div>
+        {payload.map((entry: any, idx: number) => {
+          const isA = entry.dataKey === 'adminA'
+          const raw = isA ? entry.payload.adminAValue : entry.payload.adminBValue
+          const yoy = typeof entry.value === 'number' ? `${entry.value.toFixed(2)}%` : entry.value
+          const rawText = raw != null ? (typeof raw === 'number' ? raw.toFixed(2) : raw) : '–'
+          return (
+            <div key={idx} className="mb-1 last:mb-0">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                <span className="font-semibold">{entry.name}</span>
+              </div>
+              <div className="pl-4 text-muted-foreground">YoY Change: {yoy}</div>
+              {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70">
       <div className="pb-4">
@@ -107,6 +134,11 @@ export default function MetricCard({
               {methodBadge && (
                 <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-foreground/60 font-mono">
                   {methodBadge}
+                </span>
+              )}
+              {valueLabel && (
+                <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-foreground/60 font-mono">
+                  {valueLabel}
                 </span>
               )}
             </div>
@@ -154,6 +186,7 @@ export default function MetricCard({
                 domain={["dataMin - 5", "dataMax + 5"]}
                 tickFormatter={isPercent ? (v: number) => `${v.toFixed(2)}%` : undefined}
               />
+              <Tooltip content={renderTooltip} wrapperStyle={{ fontSize: 12 }} />
               <Legend wrapperStyle={{ marginTop: 12 }} />
               <Line
                 type="monotone"

@@ -14,7 +14,7 @@ export default function SiteFooter() {
               Contact
             </a>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center italic">
             Data from BLS, FRED, Census, USDA, CDC, and more
           </p>
         </div>

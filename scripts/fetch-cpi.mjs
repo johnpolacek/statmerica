@@ -2,9 +2,9 @@
 // Usage:
 //   BLS_API_KEY=... node scripts/fetch-cpi.mjs --series cuur|cusr
 // Notes:
-//   - Outputs YoY percent change (not raw index)
-//   - For 1980–2024: December YoY vs prior December (requires 1979 Dec)
-//   - For current year: latest month YoY vs same month previous year
+//   - Outputs both YoY percent change and raw index level
+//   - For 1980–2024: December level and YoY vs prior December (requires 1979 Dec)
+//   - For current year: latest month level and YoY vs same month previous year
 
 import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -105,14 +105,18 @@ async function fetchCPI({ seriesId, apiKey }) {
   // Helper to get value by (year, month)
   const getVal = (y, m) => entries.find((r) => r.year === y && r.month === m)?.value ?? null
 
-  // December YoY for 1980–2024
-  const yoyDec = []
+  // December levels and YoY for 1980–2024
+  const decRows = []
   for (let y = 1980; y <= 2024; y++) {
     const curr = getVal(y, 12)
     const prev = getVal(y - 1, 12) // requires 1979
-    if (curr != null && prev != null && prev !== 0) {
-      const pct = ((curr - prev) / prev) * 100
-      yoyDec.push({ year: y, value: Number(pct.toFixed(2)) })
+    if (curr != null) {
+      const row = { year: y, value: Number(curr.toFixed(2)) }
+      if (prev != null && prev !== 0) {
+        const pct = ((curr - prev) / prev) * 100
+        row.yoy = Number(pct.toFixed(2))
+      }
+      decRows.push(row)
     }
   }
 
@@ -123,13 +127,17 @@ async function fetchCPI({ seriesId, apiKey }) {
     const maxMonth = Math.max(...thisYearMonths)
     const curr = getVal(currentYear, maxMonth)
     const prev = getVal(currentYear - 1, maxMonth)
-    if (curr != null && prev != null && prev !== 0) {
-      const pct = ((curr - prev) / prev) * 100
-      latest = { year: currentYear, value: Number(pct.toFixed(2)) }
+    if (curr != null) {
+      const row = { year: currentYear, value: Number(curr.toFixed(2)), latest: true, month: maxMonth }
+      if (prev != null && prev !== 0) {
+        const pct = ((curr - prev) / prev) * 100
+        row.yoy = Number(pct.toFixed(2))
+      }
+      latest = row
     }
   }
 
-  return { yoyDec, latest }
+  return { decRows, latest }
 }
 
 async function main() {
@@ -138,17 +146,17 @@ async function main() {
   const { id: seriesId, label: seriesLabel } = mapSeriesFlagToId(argv.series)
   const apiKey = process.env.BLS_API_KEY || process.env.BLS_APIKEY || process.env.BLS_KEY
 
-  console.log(`Fetching CPI YoY from BLS in 10-year chunks for series=${seriesId}`)
-  const { yoyDec, latest } = await fetchCPI({ seriesId, apiKey })
+  console.log(`Fetching CPI value+yoy from BLS in 10-year chunks for series=${seriesId}`)
+  const { decRows, latest } = await fetchCPI({ seriesId, apiKey })
 
-  const data = latest ? [...yoyDec, latest] : yoyDec
+  const data = latest ? [...decRows, latest] : decRows
 
   const meta = {
     id: 'cpi',
-    title: 'Consumer Price Index (YoY, CPI-U, All items)',
-    description: 'Year-over-year percent change in CPI-U All items (Dec YoY; current year latest YoY)',
-    units: 'Percent',
-    frequency: 'Annual (Dec YoY), plus current year latest YoY',
+    title: 'Consumer Price Index (CPI-U, All items)',
+    description: 'Rows use value = index level and yoy = percent change. December values; latest row is most recent month.',
+    units: 'Index (value, 1982-84=100), Percent (yoy)',
+    frequency: 'Annual (Dec), plus current-year latest month',
     coverage: { start: 1980, end: now.getFullYear() },
     fetchedAt: new Date().toISOString(),
     source: {
@@ -159,7 +167,7 @@ async function main() {
     },
     seriesId,
     seriesLabel,
-    notes: 'Computed as (current / prior - 1) * 100 using December values for 1980–2024, and the latest available month vs the same month prior year for the current year.',
+    notes: 'yoy = (current / prior - 1) * 100 using December values for 1980–2024, and latest available month vs same month prior year for the current year. value holds the CPI index level.',
   }
 
   const out = { meta, data }
@@ -168,7 +176,7 @@ async function main() {
   await mkdir(outDir, { recursive: true })
   const outFile = path.join(outDir, 'cpi.json')
   await writeFile(outFile, JSON.stringify(out, null, 2), 'utf8')
-  console.log(`Saved ${data.length} YoY rows to data/cpi.json`)
+  console.log(`Saved ${data.length} rows (value + yoy) to data/cpi.json`)
 }
 
 main().catch((err) => {

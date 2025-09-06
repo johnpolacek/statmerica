@@ -181,12 +181,23 @@ async function main() {
   const now = new Date()
   const coverage = annual.length ? { start: annual[0].year, end: annual[annual.length - 1].year } : { start: null, end: null }
 
+  // Compute YoY percent change on level
+  const withYoy = []
+  for (let i = 0; i < annual.length; i++) {
+    const row = { ...annual[i] }
+    const prev = i > 0 ? annual[i - 1] : null
+    if (prev && typeof prev.value === 'number' && prev.value !== 0) {
+      row.yoy = round2(((row.value - prev.value) / prev.value) * 100)
+    }
+    withYoy.push(row)
+  }
+
   const meta = {
     id: 'gas_prices',
     title: 'Gasoline Price (Regular, Retail)',
     description: 'Annual average USD/gal computed from EIA monthly/weekly series; latest is most recent point. Backfilled with BLS average price where needed to reach 1979.',
-    units: 'USD per gallon',
-    frequency: 'Annual (avg), plus latest point',
+    units: 'USD per gallon (value), Percent (yoy)',
+    frequency: 'Annual (avg value + yoy), plus latest point',
     coverage,
     fetchedAt: now.toISOString(),
     source: {
@@ -196,10 +207,10 @@ async function main() {
       attribution: 'Public domain',
     },
     seriesId: argv.series,
-    notes: 'Uses EIA U.S. Regular All Formulations retail gasoline price series (monthly or weekly). Annual values are simple averages of period observations. If EIA does not cover pre-1990 period, fills earlier years using BLS series APU000074714 (monthly average price). The last row may represent the current year latest point.'
+    notes: 'Annual level is average of period observations; YoY computed off those levels. EIA U.S. Regular All Formulations series, with BLS APU000074714 backfill as needed. The last row may represent current year latest point.'
   }
 
-  const data = latest ? [...annual, { year: latest.year, value: latest.value, latest: true, date: latest.date }] : annual
+  const data = latest ? [...withYoy, { year: latest.year, value: latest.value, latest: true, date: latest.date }] : withYoy
 
   const out = { meta, data }
 

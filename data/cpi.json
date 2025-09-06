@@ -1,225 +1,257 @@
 {
   "meta": {
     "id": "cpi",
-    "title": "Consumer Price Index (YoY, CPI-U, All items)",
-    "description": "Year-over-year percent change in CPI-U All items (Dec YoY; current year latest YoY)",
-    "units": "Percent",
-    "frequency": "Annual (Dec YoY), plus current year latest YoY",
+    "title": "Consumer Price Index (CPI-U, All items)",
+    "description": "Rows use value = index level and yoy = percent change. December values; latest row is most recent month.",
+    "units": "Index (value, 1982-84=100), Percent (yoy)",
+    "frequency": "Annual (Dec), plus current-year latest month",
     "coverage": {
       "start": 1980,
       "end": 2025
     },
-    "fetchedAt": "2025-09-03T12:24:15.700Z",
+    "fetchedAt": "2025-09-06T01:11:39.287Z",
     "source": {
       "name": "U.S. Bureau of Labor Statistics",
       "homepage": "https://www.bls.gov/cpi/",
       "api": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      "attribution": "Public domain",
-      "credibility": "The BLS is a non-partisan federal statistical agency with over 150 years of independent data collection, widely trusted by economists, policymakers, and researchers across the political spectrum."
+      "attribution": "Public domain"
     },
     "seriesId": "CUUR0000SA0",
     "seriesLabel": "All items (NSA)",
-    "notes": "Computed as (current / prior - 1) * 100 using December values for 1980–2024, and the latest available month vs the same month prior year for the current year.",
-    "processing": {
-      "updateScript": "fetch:cpi",
-      "dataFile": "data/cpi.json",
-      "methodology": [
-        "Fetches raw CPI index values from BLS Public API in 10-year chunks",
-        "Computes December-to-December year-over-year percent change",
-        "For current year, uses latest available month vs same month prior year",
-        "Formula: ((current / prior) - 1) × 100"
-      ],
-      "chartUsage": [
-        "Shows inflation rate trends across presidential terms",
-        "Compares average inflation rates between administrations",
-        "Lower inflation rates are considered better performance"
-      ]
-    }
+    "notes": "yoy = (current / prior - 1) * 100 using December values for 1980–2024, and latest available month vs same month prior year for the current year. value holds the CPI index level."
   },
   "data": [
     {
       "year": 1980,
-      "value": 12.52
+      "value": 86.3,
+      "yoy": 12.52
     },
     {
       "year": 1981,
-      "value": 8.92
+      "value": 94,
+      "yoy": 8.92
     },
     {
       "year": 1982,
-      "value": 3.83
+      "value": 97.6,
+      "yoy": 3.83
     },
     {
       "year": 1983,
-      "value": 3.79
+      "value": 101.3,
+      "yoy": 3.79
     },
     {
       "year": 1984,
-      "value": 3.95
+      "value": 105.3,
+      "yoy": 3.95
     },
     {
       "year": 1985,
-      "value": 3.8
+      "value": 109.3,
+      "yoy": 3.8
     },
     {
       "year": 1986,
-      "value": 1.1
+      "value": 110.5,
+      "yoy": 1.1
     },
     {
       "year": 1987,
-      "value": 4.43
+      "value": 115.4,
+      "yoy": 4.43
     },
     {
       "year": 1988,
-      "value": 4.42
+      "value": 120.5,
+      "yoy": 4.42
     },
     {
       "year": 1989,
-      "value": 4.65
+      "value": 126.1,
+      "yoy": 4.65
     },
     {
       "year": 1990,
-      "value": 6.11
+      "value": 133.8,
+      "yoy": 6.11
     },
     {
       "year": 1991,
-      "value": 3.06
+      "value": 137.9,
+      "yoy": 3.06
     },
     {
       "year": 1992,
-      "value": 2.9
+      "value": 141.9,
+      "yoy": 2.9
     },
     {
       "year": 1993,
-      "value": 2.75
+      "value": 145.8,
+      "yoy": 2.75
     },
     {
       "year": 1994,
-      "value": 2.67
+      "value": 149.7,
+      "yoy": 2.67
     },
     {
       "year": 1995,
-      "value": 2.54
+      "value": 153.5,
+      "yoy": 2.54
     },
     {
       "year": 1996,
-      "value": 3.32
+      "value": 158.6,
+      "yoy": 3.32
     },
     {
       "year": 1997,
-      "value": 1.7
+      "value": 161.3,
+      "yoy": 1.7
     },
     {
       "year": 1998,
-      "value": 1.61
+      "value": 163.9,
+      "yoy": 1.61
     },
     {
       "year": 1999,
-      "value": 2.68
+      "value": 168.3,
+      "yoy": 2.68
     },
     {
       "year": 2000,
-      "value": 3.39
+      "value": 174,
+      "yoy": 3.39
     },
     {
       "year": 2001,
-      "value": 1.55
+      "value": 176.7,
+      "yoy": 1.55
     },
     {
       "year": 2002,
-      "value": 2.38
+      "value": 180.9,
+      "yoy": 2.38
     },
     {
       "year": 2003,
-      "value": 1.88
+      "value": 184.3,
+      "yoy": 1.88
     },
     {
       "year": 2004,
-      "value": 3.26
+      "value": 190.3,
+      "yoy": 3.26
     },
     {
       "year": 2005,
-      "value": 3.42
+      "value": 196.8,
+      "yoy": 3.42
     },
     {
       "year": 2006,
-      "value": 2.54
+      "value": 201.8,
+      "yoy": 2.54
     },
     {
       "year": 2007,
-      "value": 4.08
+      "value": 210.04,
+      "yoy": 4.08
     },
     {
       "year": 2008,
-      "value": 0.09
+      "value": 210.23,
+      "yoy": 0.09
     },
     {
       "year": 2009,
-      "value": 2.72
+      "value": 215.95,
+      "yoy": 2.72
     },
     {
       "year": 2010,
-      "value": 1.5
+      "value": 219.18,
+      "yoy": 1.5
     },
     {
       "year": 2011,
-      "value": 2.96
+      "value": 225.67,
+      "yoy": 2.96
     },
     {
       "year": 2012,
-      "value": 1.74
+      "value": 229.6,
+      "yoy": 1.74
     },
     {
       "year": 2013,
-      "value": 1.5
+      "value": 233.05,
+      "yoy": 1.5
     },
     {
       "year": 2014,
-      "value": 0.76
+      "value": 234.81,
+      "yoy": 0.76
     },
     {
       "year": 2015,
-      "value": 0.73
+      "value": 236.53,
+      "yoy": 0.73
     },
     {
       "year": 2016,
-      "value": 2.07
+      "value": 241.43,
+      "yoy": 2.07
     },
     {
       "year": 2017,
-      "value": 2.11
+      "value": 246.52,
+      "yoy": 2.11
     },
     {
       "year": 2018,
-      "value": 1.91
+      "value": 251.23,
+      "yoy": 1.91
     },
     {
       "year": 2019,
-      "value": 2.29
+      "value": 256.97,
+      "yoy": 2.29
     },
     {
       "year": 2020,
-      "value": 1.36
+      "value": 260.47,
+      "yoy": 1.36
     },
     {
       "year": 2021,
-      "value": 7.04
+      "value": 278.8,
+      "yoy": 7.04
     },
     {
       "year": 2022,
-      "value": 6.45
+      "value": 296.8,
+      "yoy": 6.45
     },
     {
       "year": 2023,
-      "value": 3.35
+      "value": 306.75,
+      "yoy": 3.35
     },
     {
       "year": 2024,
-      "value": 2.89
+      "value": 315.61,
+      "yoy": 2.89
     },
     {
       "year": 2025,
-      "value": 2.7
+      "value": 323.05,
+      "latest": true,
+      "month": 7,
+      "yoy": 2.7
     }
   ]
 }

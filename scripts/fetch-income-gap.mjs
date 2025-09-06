@@ -1,6 +1,6 @@
 // Build Income Gap (P90 vs P50) from annual USD CSVs, 1979–2025
 // Inputs (default): data/us_income_p50.csv, data/us_income_p90.csv
-// Output: data/income_gap.json with level ratio (P90/P50), YoY %, and coverage
+// Output: data/income_gap.json with ratio level (P90/P50), YoY %, raw USD levels, and coverage
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -68,7 +68,7 @@ async function main() {
   const p90ByYear = new Map(p90.map(r => [r.year, r.value]))
   const years = Array.from(new Set([...p50ByYear.keys(), ...p90ByYear.keys()])).sort((a, b) => a - b)
   
-  // Build levels with ratio, p90_usd, p50_usd, and YoY value
+  // Build levels with value=ratio, p90_usd, p50_usd, and yoy=% change in ratio
   const levels = []
   for (const y of years) {
     if (y < 1980) continue // Start YoY data from 1980
@@ -79,18 +79,18 @@ async function main() {
     
     if (a != null && b != null && b !== 0) {
       const ratio = a / b
-      let value = null
+      let yoy = null
       
       // Compute YoY change in ratio
       if (prevA != null && prevB != null && prevB !== 0) {
         const prevRatio = prevA / prevB
         if (prevRatio !== 0) {
-          value = round2(((ratio - prevRatio) / prevRatio) * 100)
+          yoy = round2(((ratio - prevRatio) / prevRatio) * 100)
         }
       }
       
-      const level = { year: y, ratio: round2(ratio), p90_usd: round2(a), p50_usd: round2(b) }
-      if (value !== null) level.value = value
+      const level = { year: y, value: round2(ratio), p90_usd: round2(a), p50_usd: round2(b) }
+      if (yoy !== null) level.yoy = yoy
       levels.push(level)
     }
   }
@@ -100,13 +100,13 @@ async function main() {
   const out = {
     meta: {
       id: 'income_gap',
-      title: 'Income Gap (YoY %, P90 / P50)',
-      description: 'Year-over-year percent change in the P90/P50 income ratio (average pre-tax income in USD).',
-      units: 'Percent',
-      frequency: 'Annual (YoY)',
+      title: 'Income Gap (P90 / P50)',
+      description: 'Rows use value = ratio level and yoy = percent change; includes raw USD p90_usd and p50_usd.',
+      units: 'Ratio (value), Percent (yoy), USD (p90_usd, p50_usd)',
+      frequency: 'Annual',
       coverage,
       fetchedAt: now.toISOString(),
-      notes: 'Raw USD levels stored with p90_usd, p50_usd, ratio per year. YoY value is percent change in ratio. 2024-2025 extrapolated using last 3 years growth.'
+      notes: 'Contains ratio level, p90_usd, p50_usd and YoY change in ratio. 2024-2025 extrapolated using last 3 years growth.'
     },
     data: levels,
   }

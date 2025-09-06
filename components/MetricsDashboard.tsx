@@ -6,9 +6,10 @@ import AdministrationSelect from "@/components/AdministrationSelect"
 import { administrations, type MetricSummary } from "@/lib/metrics"
 import cpi from "@/data/cpi.json"
 import incomeGap from "@/data/income_gap.json"
+import gas from "@/data/gas_prices.json"
 import { CircleCheckBig } from "lucide-react"
 
-type CpiDataPoint = { year: number; value: number }
+type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
 type CpiJson = { meta: { title: string; units: string; description?: string }; data: CpiDataPoint[] }
 
 type AdminSeries = (number | null)[]
@@ -50,9 +51,20 @@ export default function MetricsDashboard() {
   const [adminB, setAdminB] = useState("biden-1")
 
   const cpiJson = cpi as unknown as CpiJson
-  const igJson = incomeGap as unknown as { data: { year: number; value: number }[]; meta: { title?: string; units?: string } }
-  const byYear = useMemo(() => new Map<number, number>(cpiJson.data.map(d => [d.year, d.value])), [cpiJson.data])
-  const igByYear = useMemo(() => new Map<number, number>(igJson.data.map(d => [d.year, d.value])), [igJson.data])
+  const igJson = incomeGap as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
+  const gasJson = gas as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+
+  // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
+  const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
+  const cpiValueByYear = useMemo(() => new Map<number, number>(cpiJson.data.map(d => [d.year, d.value])), [cpiJson.data])
+
+  // Build year maps for Income Gap: yoy (for plotting) and value (ratio raw for tooltip)
+  const igYoyByYear = useMemo(() => new Map<number, number>(igJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [igJson.data])
+  const igValueByYear = useMemo(() => new Map<number, number>(igJson.data.map(d => [d.year, d.value])), [igJson.data])
+
+  // Build year maps for Gas: yoy (for plotting) and value (USD/gal for tooltip)
+  const gasYoyByYear = useMemo(() => new Map<number, number>(gasJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [gasJson.data])
+  const gasValueByYear = useMemo(() => new Map<number, number>(gasJson.data.map(d => [d.year, d.value])), [gasJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -60,7 +72,7 @@ export default function MetricsDashboard() {
     return administrations.find(a => a.value === value)?.label ?? value
   }
 
-  const buildSeriesForAdmin = (value: string): AdminSeries => {
+  const buildSeriesForAdmin = (value: string, yearToValue: Map<number, number>): AdminSeries => {
     if (value === "party-D" || value === "party-R") {
       const targetParty = value === "party-D" ? "D" : "R"
       const terms = administrations.filter(a => (a as any).party === targetParty).map(a => a.value)
@@ -68,7 +80,7 @@ export default function MetricsDashboard() {
       for (const term of terms) {
         const years = getTermYears(term)
         years.forEach((y, idx) => {
-          const v = byYear.get(y)
+          const v = yearToValue.get(y)
           if (typeof v === "number") yearOfTermValues[idx].push(v)
         })
       }
@@ -76,31 +88,26 @@ export default function MetricsDashboard() {
       return averaged
     }
     const years = getTermYears(value)
-    return years.map(y => byYear.get(y) ?? null)
+    return years.map(y => yearToValue.get(y) ?? null)
   }
 
+  // Series for CPI (YoY plotted) and raw index values (tooltip)
+  const cpiSeriesA = buildSeriesForAdmin(adminA, cpiYoyByYear)
+  const cpiSeriesB = buildSeriesForAdmin(adminB, cpiYoyByYear)
+  const cpiRawA = buildSeriesForAdmin(adminA, cpiValueByYear)
+  const cpiRawB = buildSeriesForAdmin(adminB, cpiValueByYear)
 
-  const buildSeriesForAdminIG = (value: string): AdminSeries => {
-    if (value === "party-D" || value === "party-R") {
-      const targetParty = value === "party-D" ? "D" : "R"
-      const terms = administrations.filter(a => (a as any).party === targetParty).map(a => a.value)
-      const yearOfTermValues: number[][] = [[], [], [], []]
-      for (const term of terms) {
-        const years = getTermYears(term)
-        years.forEach((y, idx) => {
-          const v = igByYear.get(y)
-          if (typeof v === "number") yearOfTermValues[idx].push(v)
-        })
-      }
-      const averaged: AdminSeries = yearOfTermValues.map(arr => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null))
-      return averaged
-    }
-    const years = getTermYears(value)
-    return years.map(y => igByYear.get(y) ?? null)
-  }
+  // Series for Income Gap (YoY plotted) and raw ratio (tooltip)
+  const igSeriesA = buildSeriesForAdmin(adminA, igYoyByYear)
+  const igSeriesB = buildSeriesForAdmin(adminB, igYoyByYear)
+  const igRawA = buildSeriesForAdmin(adminA, igValueByYear)
+  const igRawB = buildSeriesForAdmin(adminB, igValueByYear)
 
-  const seriesA = buildSeriesForAdmin(adminA)
-  const seriesB = buildSeriesForAdmin(adminB)
+  // Series for Gas (YoY plotted) and raw USD/gal (tooltip)
+  const gasSeriesA = buildSeriesForAdmin(adminA, gasYoyByYear)
+  const gasSeriesB = buildSeriesForAdmin(adminB, gasYoyByYear)
+  const gasRawA = buildSeriesForAdmin(adminA, gasValueByYear)
+  const gasRawB = buildSeriesForAdmin(adminB, gasValueByYear)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -109,15 +116,15 @@ export default function MetricsDashboard() {
 
   const adminAComputed: AdminComputed = {
     label: getAdminLabel(adminA),
-    series: seriesA,
-    average: avg(seriesA),
+    series: cpiSeriesA,
+    average: avg(cpiSeriesA),
     party: getParty(adminA),
   }
 
   const adminBComputed: AdminComputed = {
     label: getAdminLabel(adminB),
-    series: seriesB,
-    average: avg(seriesB),
+    series: cpiSeriesB,
+    average: avg(cpiSeriesB),
     party: getParty(adminB),
   }
 
@@ -126,10 +133,12 @@ export default function MetricsDashboard() {
   const adminBName = stripYears(adminBComputed.label)
 
   const termLabelsCpi = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-  const chartData = termLabelsCpi.map((label, i) => ({
+  const cpiChartData = termLabelsCpi.map((label, i) => ({
     year: label,
-    adminA: adminAComputed.series[i] ?? null,
-    adminB: adminBComputed.series[i] ?? null,
+    adminA: cpiSeriesA[i] ?? null,
+    adminB: cpiSeriesB[i] ?? null,
+    adminAValue: cpiRawA[i] ?? null,
+    adminBValue: cpiRawB[i] ?? null,
   }))
 
   // For CPI YoY, lower average is better
@@ -139,31 +148,32 @@ export default function MetricsDashboard() {
   const adminBWinsCpi = aAvg != null && bAvg != null && bAvg < aAvg ? 1 : 0
 
   const latestYear = Math.max(...cpiJson.data.map(d => d.year))
-  const latestVal = cpiJson.data.find(d => d.year === latestYear)?.value ?? 0
-  const yoyLabel = `${latestVal >= 0 ? "+" : ""}${latestVal.toFixed(2)}%`
-  const trend: MetricSummary["trend"] = Math.abs(latestVal) < 1 ? "stable" : latestVal > 0 ? "up" : "down"
+  const latestCpiYoy = cpiJson.data.find(d => d.year === latestYear)?.yoy ?? 0
+  const yoyLabel = `${(latestCpiYoy as number) >= 0 ? "+" : ""}${(latestCpiYoy as number).toFixed(2)}%`
+  const trend: MetricSummary["trend"] = Math.abs(latestCpiYoy as number) < 1 ? "stable" : (latestCpiYoy as number) > 0 ? "up" : "down"
 
   // Income Gap YoY current value and trend
   const latestIgYear = Math.max(...igJson.data.map(d => d.year))
-  const latestIg = igJson.data.find(d => d.year === latestIgYear)?.value ?? 0
-  const igTrend: MetricSummary["trend"] = Math.abs(latestIg) < 1 ? "stable" : latestIg > 0 ? "up" : "down"
+  const latestIg = igJson.data.find(d => d.year === latestIgYear)?.yoy ?? 0
+  const igTrend: MetricSummary["trend"] = Math.abs(latestIg as number) < 1 ? "stable" : (latestIg as number) > 0 ? "up" : "down"
 
-  // Series per admin for Income Gap YoY
-  const igSeriesA = buildSeriesForAdminIG(adminA)
-  const igSeriesB = buildSeriesForAdminIG(adminB)
-  const avgIG = (series: AdminSeries) => {
-    const values = series.filter((v): v is number => v != null)
-    return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
-  }
-  const igAAvg = avgIG(igSeriesA)
-  const igBAvg = avgIG(igSeriesB)
+  // Gas YoY current value and trend
+  const latestGasYearWithYoy = Math.max(...gasJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year))
+  const latestGas = gasJson.data.find(d => d.year === latestGasYearWithYoy)?.yoy ?? 0
+  const gasTrend: MetricSummary["trend"] = Math.abs(latestGas as number) < 1 ? "stable" : (latestGas as number) > 0 ? "up" : "down"
 
-  // Determine wins for CPI and Income Gap (lower is better for both YoY series)
+  // Determine wins for CPI, Income Gap, and Gas (lower is better for YoY series)
+  const igAAvg = avg(igSeriesA)
+  const igBAvg = avg(igSeriesB)
+  const gasAAvg = avg(gasSeriesA)
+  const gasBAvg = avg(gasSeriesB)
   const adminAWinsIg = igAAvg != null && igBAvg != null && igAAvg < igBAvg ? 1 : 0
   const adminBWinsIg = igAAvg != null && igBAvg != null && igBAvg < igAAvg ? 1 : 0
+  const adminAWinsGas = gasAAvg != null && gasBAvg != null && gasAAvg < gasBAvg ? 1 : 0
+  const adminBWinsGas = gasAAvg != null && gasBAvg != null && gasBAvg < gasAAvg ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -171,11 +181,13 @@ export default function MetricsDashboard() {
   if (adminBWinsCpi) adminBMetricsList.push("Inflation (CPI YoY)")
   if (adminAWinsIg) adminAMetricsList.push("Income Gap YoY")
   if (adminBWinsIg) adminBMetricsList.push("Income Gap YoY")
+  if (adminAWinsGas) adminAMetricsList.push("Gas Prices YoY")
+  if (adminBWinsGas) adminBMetricsList.push("Gas Prices YoY")
 
   // Build card configs to render within metrics.map
   const termLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-  const cpiChartData = termLabels.map((label, i) => ({ year: label, adminA: adminAComputed.series[i] ?? null, adminB: adminBComputed.series[i] ?? null }))
-  const igChartData = termLabels.map((label, i) => ({ year: label, adminA: igSeriesA[i] ?? null, adminB: igSeriesB[i] ?? null }))
+  const igChartData = termLabels.map((label, i) => ({ year: label, adminA: igSeriesA[i] ?? null, adminB: igSeriesB[i] ?? null, adminAValue: igRawA[i] ?? null, adminBValue: igRawB[i] ?? null }))
+  const gasChartData = termLabels.map((label, i) => ({ year: label, adminA: gasSeriesA[i] ?? null, adminB: gasSeriesB[i] ?? null, adminAValue: gasRawA[i] ?? null, adminBValue: gasRawB[i] ?? null }))
 
   const cards = [
     {
@@ -184,13 +196,14 @@ export default function MetricsDashboard() {
       trend,
       change: `avg ${aAvg?.toFixed(2) ?? "–"}% vs ${bAvg?.toFixed(2) ?? "–"}%`,
       chartData: cpiChartData,
-      adminAStart: adminAComputed.series.find(v => v != null) ?? null,
-      adminAEnd: [...adminAComputed.series].reverse().find(v => v != null) ?? null,
-      adminBStart: adminBComputed.series.find(v => v != null) ?? null,
-      adminBEnd: [...adminBComputed.series].reverse().find(v => v != null) ?? null,
+      adminAStart: cpiSeriesA.find(v => v != null) ?? null,
+      adminAEnd: [...cpiSeriesA].reverse().find(v => v != null) ?? null,
+      adminBStart: cpiSeriesB.find(v => v != null) ?? null,
+      adminBEnd: [...cpiSeriesB].reverse().find(v => v != null) ?? null,
       adminAValueLabel: aAvg != null ? `${aAvg.toFixed(2)}%` : "–",
       adminBValueLabel: bAvg != null ? `${bAvg.toFixed(2)}%` : "–",
       methodBadge: "CPI YoY",
+      valueLabel: "Index",
       explanation:
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
@@ -198,7 +211,7 @@ export default function MetricsDashboard() {
     },
     {
       title: "Weath Gap",
-      value: `${latestIg >= 0 ? "+" : ""}${latestIg.toFixed(2)}%`,
+      value: `${latestIg >= 0 ? "+" : ""}${(latestIg as number).toFixed(2)}%`,
       trend: igTrend,
       change: `avg ${igAAvg?.toFixed(2) ?? "–"}% vs ${igBAvg?.toFixed(2) ?? "–"}%`,
       chartData: igChartData,
@@ -209,9 +222,28 @@ export default function MetricsDashboard() {
       adminAValueLabel: igAAvg != null ? `${igAAvg.toFixed(2)}%` : "–",
       adminBValueLabel: igBAvg != null ? `${igBAvg.toFixed(2)}%` : "–",
       methodBadge: "Income Gap YoY",
+      valueLabel: "Ratio",
       explanation: "YoY percent change in income gap (P90/P50 ratio). Measures how fast the 90th percentile income grows relative to the median income. 2024-2025 extrapolated using last 3 years growth.",
       dataSource: "World Inequality Database",
       dataSourceUrl: "/data-sources#income-gap",
+    },
+    {
+      title: "Gas Prices",
+      value: `${latestGas >= 0 ? "+" : ""}${(latestGas as number).toFixed(2)}%`,
+      trend: gasTrend,
+      change: `avg ${gasAAvg?.toFixed(2) ?? "–"}% vs ${gasBAvg?.toFixed(2) ?? "–"}%`,
+      chartData: gasChartData,
+      adminAStart: gasSeriesA.find(v => v != null) ?? null,
+      adminAEnd: [...gasSeriesA].reverse().find(v => v != null) ?? null,
+      adminBStart: gasSeriesB.find(v => v != null) ?? null,
+      adminBEnd: [...gasSeriesB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: gasAAvg != null ? `${gasAAvg.toFixed(2)}%` : "–",
+      adminBValueLabel: gasBAvg != null ? `${gasBAvg.toFixed(2)}%` : "–",
+      methodBadge: "Gas YoY",
+      valueLabel: "USD/gal",
+      explanation: "YoY percent change in average retail price of regular gasoline. Lower YoY is better as it indicates slower price increases.",
+      dataSource: "U.S. Energy Information Administration",
+      dataSourceUrl: "/data-sources#gas",
     },
   ]
 
@@ -258,6 +290,7 @@ export default function MetricsDashboard() {
                     methodBadge={metric.methodBadge}
                     dataSource={metric.dataSource}
                     dataSourceUrl={metric.dataSourceUrl}
+                    valueLabel={(metric as any).valueLabel}
                   />
                 </div>
               </div>
