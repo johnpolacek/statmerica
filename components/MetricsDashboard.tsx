@@ -109,6 +109,24 @@ export default function MetricsDashboard() {
   const gasRawA = buildSeriesForAdmin(adminA, gasValueByYear)
   const gasRawB = buildSeriesForAdmin(adminB, gasValueByYear)
 
+  // Helper to compute 4-year percent change from raw series (start -> end)
+  const fourYearChange = (series: AdminSeries): number | null => {
+    const start = series.find(v => v != null) as number | undefined
+    const end = [...series].reverse().find(v => v != null) as number | undefined
+    if (start == null || end == null || start === 0) return null
+    return ((end - start) / start) * 100
+  }
+
+  const formatPct = (v: number | null) => (v == null ? "–" : `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`)
+
+  // Compute 4-year change labels for each metric using raw values
+  const cpiChangeA = fourYearChange(cpiRawA)
+  const cpiChangeB = fourYearChange(cpiRawB)
+  const igChangeA = fourYearChange(igRawA)
+  const igChangeB = fourYearChange(igRawB)
+  const gasChangeA = fourYearChange(gasRawA)
+  const gasChangeB = fourYearChange(gasRawB)
+
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
     return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null
@@ -141,11 +159,9 @@ export default function MetricsDashboard() {
     adminBValue: cpiRawB[i] ?? null,
   }))
 
-  // For CPI YoY, lower average is better
-  const aAvg = adminAComputed.average
-  const bAvg = adminBComputed.average
-  const adminAWinsCpi = aAvg != null && bAvg != null && aAvg < bAvg ? 1 : 0
-  const adminBWinsCpi = aAvg != null && bAvg != null && bAvg < aAvg ? 1 : 0
+  // For CPI level over term, lower 4-year change is better
+  const adminAWinsCpi = cpiChangeA != null && cpiChangeB != null && cpiChangeA < cpiChangeB ? 1 : 0
+  const adminBWinsCpi = cpiChangeA != null && cpiChangeB != null && cpiChangeB < cpiChangeA ? 1 : 0
 
   const latestYear = Math.max(...cpiJson.data.map(d => d.year))
   const latestCpiYoy = cpiJson.data.find(d => d.year === latestYear)?.yoy ?? 0
@@ -162,15 +178,11 @@ export default function MetricsDashboard() {
   const latestGas = gasJson.data.find(d => d.year === latestGasYearWithYoy)?.yoy ?? 0
   const gasTrend: MetricSummary["trend"] = Math.abs(latestGas as number) < 1 ? "stable" : (latestGas as number) > 0 ? "up" : "down"
 
-  // Determine wins for CPI, Income Gap, and Gas (lower is better for YoY series)
-  const igAAvg = avg(igSeriesA)
-  const igBAvg = avg(igSeriesB)
-  const gasAAvg = avg(gasSeriesA)
-  const gasBAvg = avg(gasSeriesB)
-  const adminAWinsIg = igAAvg != null && igBAvg != null && igAAvg < igBAvg ? 1 : 0
-  const adminBWinsIg = igAAvg != null && igBAvg != null && igBAvg < igAAvg ? 1 : 0
-  const adminAWinsGas = gasAAvg != null && gasBAvg != null && gasAAvg < gasBAvg ? 1 : 0
-  const adminBWinsGas = gasAAvg != null && gasBAvg != null && gasBAvg < gasAAvg ? 1 : 0
+  // Determine wins for Income Gap and Gas (lower 4-year change is better)
+  const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
+  const adminBWinsIg = igChangeA != null && igChangeB != null && igChangeB < igChangeA ? 1 : 0
+  const adminAWinsGas = gasChangeA != null && gasChangeB != null && gasChangeA < gasChangeB ? 1 : 0
+  const adminBWinsGas = gasChangeA != null && gasChangeB != null && gasChangeB < gasChangeA ? 1 : 0
 
   const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas
   const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas
@@ -194,14 +206,14 @@ export default function MetricsDashboard() {
       title: "Inflation Rate",
       value: yoyLabel,
       trend,
-      change: `avg ${aAvg?.toFixed(2) ?? "–"}% vs ${bAvg?.toFixed(2) ?? "–"}%`,
+      change: `4yr ${formatPct(cpiChangeA)} vs ${formatPct(cpiChangeB)}`,
       chartData: cpiChartData,
       adminAStart: cpiSeriesA.find(v => v != null) ?? null,
       adminAEnd: [...cpiSeriesA].reverse().find(v => v != null) ?? null,
       adminBStart: cpiSeriesB.find(v => v != null) ?? null,
       adminBEnd: [...cpiSeriesB].reverse().find(v => v != null) ?? null,
-      adminAValueLabel: aAvg != null ? `${aAvg.toFixed(2)}%` : "–",
-      adminBValueLabel: bAvg != null ? `${bAvg.toFixed(2)}%` : "–",
+      adminAValueLabel: formatPct(cpiChangeA),
+      adminBValueLabel: formatPct(cpiChangeB),
       methodBadge: "CPI YoY",
       valueLabel: "Index",
       explanation:
@@ -213,14 +225,14 @@ export default function MetricsDashboard() {
       title: "Weath Gap",
       value: `${latestIg >= 0 ? "+" : ""}${(latestIg as number).toFixed(2)}%`,
       trend: igTrend,
-      change: `avg ${igAAvg?.toFixed(2) ?? "–"}% vs ${igBAvg?.toFixed(2) ?? "–"}%`,
+      change: `4yr ${formatPct(igChangeA)} vs ${formatPct(igChangeB)}`,
       chartData: igChartData,
       adminAStart: igSeriesA.find(v => v != null) ?? null,
       adminAEnd: [...igSeriesA].reverse().find(v => v != null) ?? null,
       adminBStart: igSeriesB.find(v => v != null) ?? null,
       adminBEnd: [...igSeriesB].reverse().find(v => v != null) ?? null,
-      adminAValueLabel: igAAvg != null ? `${igAAvg.toFixed(2)}%` : "–",
-      adminBValueLabel: igBAvg != null ? `${igBAvg.toFixed(2)}%` : "–",
+      adminAValueLabel: formatPct(igChangeA),
+      adminBValueLabel: formatPct(igChangeB),
       methodBadge: "Income Gap YoY",
       valueLabel: "Ratio",
       explanation: "YoY percent change in income gap (P90/P50 ratio). Measures how fast the 90th percentile income grows relative to the median income. 2024-2025 extrapolated using last 3 years growth.",
@@ -231,14 +243,14 @@ export default function MetricsDashboard() {
       title: "Gas Prices",
       value: `${latestGas >= 0 ? "+" : ""}${(latestGas as number).toFixed(2)}%`,
       trend: gasTrend,
-      change: `avg ${gasAAvg?.toFixed(2) ?? "–"}% vs ${gasBAvg?.toFixed(2) ?? "–"}%`,
+      change: `4yr ${formatPct(gasChangeA)} vs ${formatPct(gasChangeB)}`,
       chartData: gasChartData,
       adminAStart: gasSeriesA.find(v => v != null) ?? null,
       adminAEnd: [...gasSeriesA].reverse().find(v => v != null) ?? null,
       adminBStart: gasSeriesB.find(v => v != null) ?? null,
       adminBEnd: [...gasSeriesB].reverse().find(v => v != null) ?? null,
-      adminAValueLabel: gasAAvg != null ? `${gasAAvg.toFixed(2)}%` : "–",
-      adminBValueLabel: gasBAvg != null ? `${gasBAvg.toFixed(2)}%` : "–",
+      adminAValueLabel: formatPct(gasChangeA),
+      adminBValueLabel: formatPct(gasChangeB),
       methodBadge: "Gas YoY",
       valueLabel: "USD/gal",
       explanation: "YoY percent change in average retail price of regular gasoline. Lower YoY is better as it indicates slower price increases.",

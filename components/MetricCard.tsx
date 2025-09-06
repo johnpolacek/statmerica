@@ -2,6 +2,8 @@ import { Minus, TrendingDown, TrendingUp, ExternalLink } from "lucide-react"
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip } from "recharts"
 import { calculateTrend, generateComparisonData } from "@/lib/metrics"
 import Link from "next/link"
+import { useState } from "react"
+import { Switch } from "@/components/ui/switch"
 
 type Party = "D" | "R" | "U"
 
@@ -59,6 +61,17 @@ export default function MetricCard({
   const adminATrend = adminTrendsOverride?.adminA ?? { trend, change }
   const adminBTrend = adminTrendsOverride?.adminB ?? { trend, change }
 
+  const [isYoY, setIsYoY] = useState(true)
+
+  // Build display data mapping to adminA/adminB depending on YoY vs Raw toggle
+  const displayData: ChartDatum[] = chartData.map(d => ({
+    year: d.year,
+    adminA: isYoY ? d.adminA : (d.adminAValue ?? null),
+    adminB: isYoY ? d.adminB : (d.adminBValue ?? null),
+    adminAValue: d.adminAValue,
+    adminBValue: d.adminBValue,
+  }))
+
   const partyStroke = (p: Party) => (p === "R" ? "#dc2626" : p === "D" ? "#2563eb" : "#6b7280")
   const partyLightStroke = (p: Party) => (p === "R" ? "#fca5a5" : p === "D" ? "#93c5fd" : "#9ca3af")
   const partyText = (p: Party) => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
@@ -107,7 +120,8 @@ export default function MetricCard({
         {payload.map((entry: any, idx: number) => {
           const isA = entry.dataKey === 'adminA'
           const raw = isA ? entry.payload.adminAValue : entry.payload.adminBValue
-          const yoy = typeof entry.value === 'number' ? `${entry.value.toFixed(2)}%` : entry.value
+          const yoyNum = typeof entry.value === 'number' ? entry.value : null
+          const yoyText = yoyNum != null ? `${yoyNum.toFixed(2)}%` : entry.value
           const rawText = raw != null ? (typeof raw === 'number' ? raw.toFixed(2) : raw) : '–'
           return (
             <div key={idx} className="mb-1 last:mb-0">
@@ -115,8 +129,17 @@ export default function MetricCard({
                 <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="font-semibold">{entry.name}</span>
               </div>
-              <div className="pl-4 text-muted-foreground">YoY Change: {yoy}</div>
-              {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+              {isYoY ? (
+                <>
+                  <div className="pl-4 text-muted-foreground">YoY Change: {yoyText}</div>
+                  {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+                </>
+              ) : (
+                <>
+                  {valueLabel && <div className="pl-4 text-muted-foreground">{valueLabel}: {rawText}</div>}
+                  <div className="pl-4 text-muted-foreground">YoY Change: {yoyText}</div>
+                </>
+              )}
             </div>
           )
         })}
@@ -147,6 +170,11 @@ export default function MetricCard({
             </div>
           </div>
           <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Raw</span>
+              <Switch checked={isYoY} onCheckedChange={(v) => setIsYoY(v)} aria-label="Toggle YoY mode" />
+              <span>YoY</span>
+            </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">{adminALabel ?? "Admin A"}</div>
               <div className={`flex items-center justify-center gap-1 font-mono text-xl font-extrabold ${partyText(partyA)}`}>
@@ -171,7 +199,7 @@ export default function MetricCard({
       <div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 16, right: 30, left: 20, bottom: 28 }}>
+            <LineChart data={displayData} margin={{ top: 16, right: 30, left: 20, bottom: 28 }}>
               <XAxis
                 dataKey="year"
                 axisLine={false}
@@ -184,7 +212,7 @@ export default function MetricCard({
                 tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
                 width={50}
                 domain={["dataMin - 5", "dataMax + 5"]}
-                tickFormatter={isPercent ? (v: number) => `${v.toFixed(2)}%` : undefined}
+                tickFormatter={(v: number) => (isYoY && isPercent ? `${v.toFixed(1)}%` : v.toFixed(1))}
               />
               <Tooltip content={renderTooltip} wrapperStyle={{ fontSize: 12 }} />
               <Legend wrapperStyle={{ marginTop: 12 }} />
