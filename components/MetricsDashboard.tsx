@@ -324,6 +324,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(cpiChangeB),
       methodBadge: "CPI YoY",
       valueLabel: "Index",
+      winnerSide: adminAWinsCpi ? "A" : adminBWinsCpi ? "B" : "none",
       explanation:
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
@@ -343,6 +344,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(spChangeB),
       methodBadge: `${((sp500Json.meta as any)?.title || 'Stock Index')} YoY`,
       valueLabel: "Index",
+      winnerSide: adminAWinsSp ? "A" : adminBWinsSp ? "B" : "none",
       explanation: "YoY percent change in the stock index. Higher growth is better.",
       dataSource: "FRED",
       dataSourceUrl: "/data-sources#nasdaq",
@@ -361,6 +363,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(igChangeB),
       methodBadge: "Income Gap YoY",
       valueLabel: "Ratio",
+      winnerSide: adminAWinsIg ? "A" : adminBWinsIg ? "B" : "none",
       explanation: "YoY percent change in income gap (P90/P50 ratio). Measures how fast the 90th percentile income grows relative to the median income. 2024-2025 extrapolated using last 3 years growth.",
       dataSource: "World Inequality Database",
       dataSourceUrl: "/data-sources#income-gap",
@@ -379,6 +382,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(gasChangeB),
       methodBadge: "Gas YoY",
       valueLabel: "USD/gal",
+      winnerSide: adminAWinsGas ? "A" : adminBWinsGas ? "B" : "none",
       explanation: "YoY percent change in average retail price of regular gasoline. Lower YoY is better as it indicates slower price increases.",
       dataSource: "U.S. Energy Information Administration",
       dataSourceUrl: "/data-sources#gas",
@@ -397,6 +401,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(defChangeB),
       methodBadge: "Deficit YoY",
       valueLabel: "USD billions",
+      winnerSide: adminAWinsDef ? "A" : adminBWinsDef ? "B" : "none",
       explanation: "YoY percent change in the federal budget deficit (outlays minus receipts). Lower is better.",
       dataSource: "U.S. Department of the Treasury — Fiscal Data",
       dataSourceUrl: "/data-sources#deficit",
@@ -415,6 +420,7 @@ export default function MetricsDashboard() {
       adminBValueLabel: formatPct(unempChangeB),
       methodBadge: "Unemployment YoY",
       valueLabel: "Percent",
+      winnerSide: adminAWinsUnemp ? "A" : adminBWinsUnemp ? "B" : "none",
       explanation: "YoY percent change in the unemployment rate (U-3, seasonally adjusted). Lower is better.",
       dataSource: "U.S. Bureau of Labor Statistics (CPS)",
       dataSourceUrl: "/data-sources#unemployment",
@@ -451,7 +457,7 @@ export default function MetricsDashboard() {
                       adminBStart: metric.adminBStart,
                       adminBEnd: metric.adminBEnd,
                     }}
-                    winnerSide={adminAWinsTotal > adminBWinsTotal ? "A" : adminBWinsTotal > adminAWinsTotal ? "B" : "none"}
+                    winnerSide={(metric as any).winnerSide ?? (adminAWinsTotal > adminBWinsTotal ? "A" : adminBWinsTotal > adminAWinsTotal ? "B" : "none")}
                     isPercent
                     adminAValueLabel={metric.adminAValueLabel}
                     adminBValueLabel={metric.adminBValueLabel}
