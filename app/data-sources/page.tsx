@@ -2,29 +2,148 @@ import SiteHeader from "@/components/SiteHeader"
 import SiteFooter from "@/components/SiteFooter"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "../../components/ui/badge"
-import { ExternalLink, Database, Code, TrendingUp, GitBranch, Download } from "lucide-react"
+import { ExternalLink, Database, Code, TrendingUp, TrendingDown, GitBranch, Download } from "lucide-react"
 import cpiData from "@/data/cpi.json"
 import incomeGapData from "@/data/income_gap.json"
+import gasData from "@/data/gas_prices.json"
+import deficitData from "@/data/deficit.json"
 
-// Transform JSON metadata into display format
-const getDataSourcesMetadata = () => {
+// Transform JSON metadata into display format with a unified shape so TS is happy
+type DataSourceMeta = {
+  displayTitle: string
+  displayDescription: string
+  icon: any
+  color: string
+  anchor: string
+  source: { name?: string; homepage?: string; api?: string; attribution?: string; credibility?: string }
+  seriesId?: string
+  coverage?: { start?: number | null; end?: number | null }
+  frequency?: string
+  processing?: {
+    updateScript?: string
+    dataFile?: string
+    methodology?: string[]
+    chartUsage?: string[]
+  }
+  notes?: string
+}
+
+const getDataSourcesMetadata = (): DataSourceMeta[] => {
   return [
     {
-      ...cpiData.meta,
       displayTitle: "Consumer Price Index (CPI)",
       displayDescription: "Year-over-year inflation rates tracking price changes in goods and services",
       icon: TrendingUp,
-      color: "bg-blue-50 border-blue-200",
-      anchor: "cpi"
+      color: "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900/60",
+      anchor: "cpi",
+      source: {
+        name: cpiData.meta.source?.name,
+        homepage: cpiData.meta.source?.homepage,
+        api: cpiData.meta.source?.api,
+        attribution: cpiData.meta.source?.attribution,
+      },
+      seriesId: (cpiData.meta as any).seriesId,
+      coverage: cpiData.meta.coverage,
+      frequency: cpiData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:cpi",
+        dataFile: "data/cpi.json",
+        methodology: [
+          "Fetch CPI-U series from BLS",
+          "Compute December YoY for 1980–2024",
+          "Append current-year latest month YoY",
+        ],
+        chartUsage: [
+          "Inflation Rate card (YoY)",
+        ],
+      },
+      notes: cpiData.meta.notes,
     },
     {
-      ...incomeGapData.meta,
+      displayTitle: "Gas Prices (Regular, Retail)",
+      displayDescription: "Average retail gasoline price; annual averages with latest observation",
+      icon: Database,
+      color: "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900/60",
+      anchor: "gas",
+      source: {
+        name: gasData.meta.source?.name,
+        homepage: gasData.meta.source?.homepage,
+        api: gasData.meta.source?.api,
+        attribution: gasData.meta.source?.attribution,
+      },
+      seriesId: (gasData.meta as any).seriesId,
+      coverage: gasData.meta.coverage,
+      frequency: gasData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:gas",
+        dataFile: "data/gas_prices.json",
+        methodology: [
+          "Fetch EIA gas price series (monthly/weekly)",
+          "Compute annual averages and YoY",
+          "Backfill early years from BLS if needed",
+        ],
+        chartUsage: [
+          "Gas Prices card (YoY, USD/gal)",
+        ],
+      },
+      notes: gasData.meta.notes,
+    },
+    {
       displayTitle: "Income Gap (P90/P50 Ratio)",
       displayDescription: "Income inequality measured as ratio of 90th percentile to median income",
       icon: Database,
-      color: "bg-green-50 border-green-200",
-      anchor: "income-gap"
-    }
+      color: "bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-900/60",
+      anchor: "income-gap",
+      source: {
+        name: "World Inequality Database (derived)",
+        homepage: "https://wid.world/",
+        attribution: "Derived from WID P50/P90 income series",
+      },
+      coverage: (incomeGapData.meta as any).coverage,
+      frequency: (incomeGapData.meta as any).frequency,
+      processing: {
+        updateScript: "pnpm run fetch:income-gap",
+        dataFile: "data/income_gap.json",
+        methodology: [
+          "Read P50/P90 USD levels",
+          "Extrapolate 2024–2025 using last 3-year growth",
+          "Compute ratio (P90/P50) and YoY",
+        ],
+        chartUsage: [
+          "Wealth/Income Gap card (YoY, Ratio)",
+        ],
+      },
+      notes: (incomeGapData.meta as any).notes,
+    },
+    {
+      displayTitle: "Federal Budget Deficit (FY)",
+      displayDescription: "Annual deficit = outlays minus receipts; plus current FY-to-date",
+      icon: TrendingDown,
+      color: "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/60",
+      anchor: "deficit",
+      source: {
+        name: deficitData.meta.source?.name,
+        homepage: deficitData.meta.source?.homepage,
+        api: deficitData.meta.source?.api,
+        attribution: deficitData.meta.source?.attribution,
+      },
+      coverage: deficitData.meta.coverage,
+      frequency: deficitData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:deficit",
+        dataFile: "data/deficit.json",
+        methodology: [
+          "Fetch Treasury MTS Table 1 monthly receipts/outlays",
+          "Aggregate by fiscal year (Oct–Sep)",
+          "Compute deficit (outlays - receipts), convert to USD billions",
+          "Compute YoY and append latest FYTD row",
+        ],
+        chartUsage: [
+          "Federal Deficit card (YoY, USD billions)",
+        ],
+      },
+      notes: deficitData.meta.notes,
+    },
   ]
 }
 
@@ -37,6 +156,16 @@ const scriptDocumentation = [
     parameters: ["--series cuur|cusr (default: cuur)"],
     envVars: ["BLS_API_KEY (optional, increases rate limits)"],
     output: "data/cpi.json",
+    icon: Download
+  },
+  {
+    name: "fetch:gas",
+    command: "pnpm run fetch:gas",
+    file: "scripts/fetch-gas-prices.mjs",
+    description: "Fetches U.S. regular gasoline prices from EIA (with BLS backfill)",
+    parameters: [],
+    envVars: ["EIA_API_KEY (required)", "BLS_API_KEY (optional for backfill)"],
+    output: "data/gas_prices.json",
     icon: Download
   },
   {
@@ -58,6 +187,17 @@ const scriptDocumentation = [
     envVars: [],
     output: "data/income_gap.json", 
     icon: GitBranch
+  }
+  ,
+  {
+    name: "fetch:deficit",
+    command: "pnpm run fetch:deficit",
+    file: "scripts/fetch-deficit.mjs",
+    description: "Aggregates Treasury MTS receipts/outlays into annual federal deficit",
+    parameters: [],
+    envVars: [],
+    output: "data/deficit.json",
+    icon: Download
   }
 ]
 
@@ -114,7 +254,7 @@ export default function DataSourcesPage() {
                                 href={source.source?.homepage} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
                               >
                                 {source.source?.homepage?.replace('https://', '')}
                                 <ExternalLink className="h-3 w-3" />

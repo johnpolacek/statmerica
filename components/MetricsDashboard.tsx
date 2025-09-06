@@ -7,6 +7,7 @@ import { administrations, type MetricSummary } from "@/lib/metrics"
 import cpi from "@/data/cpi.json"
 import incomeGap from "@/data/income_gap.json"
 import gas from "@/data/gas_prices.json"
+import deficit from "@/data/deficit.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -53,6 +54,7 @@ export default function MetricsDashboard() {
   const cpiJson = cpi as unknown as CpiJson
   const igJson = incomeGap as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
   const gasJson = gas as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+  const deficitJson = deficit as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -65,6 +67,10 @@ export default function MetricsDashboard() {
   // Build year maps for Gas: yoy (for plotting) and value (USD/gal for tooltip)
   const gasYoyByYear = useMemo(() => new Map<number, number>(gasJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [gasJson.data])
   const gasValueByYear = useMemo(() => new Map<number, number>(gasJson.data.map(d => [d.year, d.value])), [gasJson.data])
+
+  // Build year maps for Deficit: yoy (for plotting) and value (USD billions for tooltip)
+  const defYoyByYear = useMemo(() => new Map<number, number>(deficitJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [deficitJson.data])
+  const defValueByYear = useMemo(() => new Map<number, number>(deficitJson.data.map(d => [d.year, d.value])), [deficitJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -109,6 +115,12 @@ export default function MetricsDashboard() {
   const gasRawA = buildSeriesForAdmin(adminA, gasValueByYear)
   const gasRawB = buildSeriesForAdmin(adminB, gasValueByYear)
 
+  // Series for Deficit (YoY plotted) and raw USD billions (tooltip)
+  const defSeriesA = buildSeriesForAdmin(adminA, defYoyByYear)
+  const defSeriesB = buildSeriesForAdmin(adminB, defYoyByYear)
+  const defRawA = buildSeriesForAdmin(adminA, defValueByYear)
+  const defRawB = buildSeriesForAdmin(adminB, defValueByYear)
+
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
     const start = series.find(v => v != null) as number | undefined
@@ -126,6 +138,8 @@ export default function MetricsDashboard() {
   const igChangeB = fourYearChange(igRawB)
   const gasChangeA = fourYearChange(gasRawA)
   const gasChangeB = fourYearChange(gasRawB)
+  const defChangeA = fourYearChange(defRawA)
+  const defChangeB = fourYearChange(defRawB)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -178,14 +192,22 @@ export default function MetricsDashboard() {
   const latestGas = gasJson.data.find(d => d.year === latestGasYearWithYoy)?.yoy ?? 0
   const gasTrend: MetricSummary["trend"] = Math.abs(latestGas as number) < 1 ? "stable" : (latestGas as number) > 0 ? "up" : "down"
 
+  // Deficit YoY current value and trend
+  const latestDefYearWithYoy = Math.max(...deficitJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year))
+  const latestDef = deficitJson.data.find(d => d.year === latestDefYearWithYoy)?.yoy ?? 0
+  const defTrend: MetricSummary["trend"] = Math.abs(latestDef as number) < 1 ? "stable" : (latestDef as number) > 0 ? "up" : "down"
+
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
   const adminBWinsIg = igChangeA != null && igChangeB != null && igChangeB < igChangeA ? 1 : 0
   const adminAWinsGas = gasChangeA != null && gasChangeB != null && gasChangeA < gasChangeB ? 1 : 0
   const adminBWinsGas = gasChangeA != null && gasChangeB != null && gasChangeB < gasChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas
+  const adminAWinsDef = defChangeA != null && defChangeB != null && defChangeA < defChangeB ? 1 : 0
+  const adminBWinsDef = defChangeA != null && defChangeB != null && defChangeB < defChangeA ? 1 : 0
+
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -195,11 +217,14 @@ export default function MetricsDashboard() {
   if (adminBWinsIg) adminBMetricsList.push("Income Gap YoY")
   if (adminAWinsGas) adminAMetricsList.push("Gas Prices YoY")
   if (adminBWinsGas) adminBMetricsList.push("Gas Prices YoY")
+  if (adminAWinsDef) adminAMetricsList.push("Deficit YoY")
+  if (adminBWinsDef) adminBMetricsList.push("Deficit YoY")
 
   // Build card configs to render within metrics.map
   const termLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
   const igChartData = termLabels.map((label, i) => ({ year: label, adminA: igSeriesA[i] ?? null, adminB: igSeriesB[i] ?? null, adminAValue: igRawA[i] ?? null, adminBValue: igRawB[i] ?? null }))
   const gasChartData = termLabels.map((label, i) => ({ year: label, adminA: gasSeriesA[i] ?? null, adminB: gasSeriesB[i] ?? null, adminAValue: gasRawA[i] ?? null, adminBValue: gasRawB[i] ?? null }))
+  const defChartData = termLabels.map((label, i) => ({ year: label, adminA: defSeriesA[i] ?? null, adminB: defSeriesB[i] ?? null, adminAValue: defRawA[i] ?? null, adminBValue: defRawB[i] ?? null }))
 
   const cards = [
     {
@@ -256,6 +281,24 @@ export default function MetricsDashboard() {
       explanation: "YoY percent change in average retail price of regular gasoline. Lower YoY is better as it indicates slower price increases.",
       dataSource: "U.S. Energy Information Administration",
       dataSourceUrl: "/data-sources#gas",
+    },
+    {
+      title: "Federal Deficit",
+      value: `${latestDef >= 0 ? "+" : ""}${(latestDef as number).toFixed(2)}%`,
+      trend: defTrend,
+      change: `4yr ${formatPct(defChangeA)} vs ${formatPct(defChangeB)}`,
+      chartData: defChartData,
+      adminAStart: defRawA.find(v => v != null) ?? null,
+      adminAEnd: [...defRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: defRawB.find(v => v != null) ?? null,
+      adminBEnd: [...defRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(defChangeA),
+      adminBValueLabel: formatPct(defChangeB),
+      methodBadge: "Deficit YoY",
+      valueLabel: "USD billions",
+      explanation: "YoY percent change in the federal budget deficit (outlays minus receipts). Lower is better.",
+      dataSource: "U.S. Department of the Treasury — Fiscal Data",
+      dataSourceUrl: "/data-sources#deficit",
     },
   ]
 

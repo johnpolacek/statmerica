@@ -11,7 +11,8 @@
     "fetch:gas": "node --env-file=.env scripts/fetch-gas-prices.mjs",
     "wid:extract": "node scripts/wid-extract-us.mjs",
     "wid:extract:income": "node scripts/wid-extract-income-us.mjs",
-    "fetch:income-gap": "node scripts/fetch-income-gap.mjs"
+    "fetch:income-gap": "node scripts/fetch-income-gap.mjs",
+    "fetch:deficit": "node --env-file=.env scripts/fetch-deficit.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
