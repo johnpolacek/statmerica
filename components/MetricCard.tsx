@@ -103,7 +103,7 @@ export default function MetricCard({
 
   const formatRange = (v: number | null | undefined) => {
     if (v == null) return "–"
-    return isPercent ? `${v.toFixed(2)}%` : v.toFixed(2)
+    return v.toFixed(1)
   }
 
   const winningParty: Party = winnerSide === "A" ? partyA : winnerSide === "B" ? partyB : "U"
@@ -183,6 +183,9 @@ export default function MetricCard({
               <div className={`text-xs scale-x-90 tracking-tighter opacity-70 font-semibold font-mono ${partyText(partyA)}`}>
                 {formatRange(adminRanges.adminAStart)} → {formatRange(adminRanges.adminAEnd)}
               </div>
+              {valueLabel && (
+                <div className="text-[10px] text-muted-foreground font-mono -mt-px">{valueLabel}</div>
+              )}
             </div>
             <div className="text-center">
               <div className="text-xs text-muted-foreground mb-1">{adminBLabel ?? "Admin B"}</div>
@@ -192,6 +195,9 @@ export default function MetricCard({
               <div className={`text-xs scale-x-90 tracking-titter opacity-70 font-semibold font-mono ${partyText(partyB)} ${sameParty ? "opacity-80" : ""}`}>
                 {formatRange(adminRanges.adminBStart)} → {formatRange(adminRanges.adminBEnd)}
               </div>
+              {valueLabel && (
+                <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{valueLabel}</div>
+              )}
             </div>
           </div>
         </div>
