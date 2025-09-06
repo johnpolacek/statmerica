@@ -271,6 +271,10 @@ export default function MetricsDashboard() {
   if (adminAWinsSp) adminAMetricsList.push(`${spTitleShort} YoY`)
   if (adminBWinsSp) adminBMetricsList.push(`${spTitleShort} YoY`)
 
+  // Sort Final Scorecard metrics by character count (descending)
+  adminAMetricsList.sort((a, b) => b.length - a.length)
+  adminBMetricsList.sort((a, b) => b.length - a.length)
+
   // Build card configs to render within metrics.map
   const termLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
   const igChartData = termLabels.map((label, i) => ({ year: label, adminA: igSeriesA[i] ?? null, adminB: igSeriesB[i] ?? null, adminAValue: igRawA[i] ?? null, adminBValue: igRawB[i] ?? null }))
