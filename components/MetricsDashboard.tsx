@@ -266,8 +266,16 @@ export default function MetricsDashboard() {
 
   const formatNumber = (v: number | null, digits = 1) => (v == null ? "–" : v.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits }))
   const formatCurrency = (v: number | null, digits = 2) => (v == null ? "–" : `$${v.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })}`)
-  const formatInteger = (v: number | null) => (v == null ? "–" : v.toLocaleString())
+  const formatInteger = (v: number | null) => (v == null ? "–" : v.toLocaleString(undefined, { maximumFractionDigits: 0, minimumFractionDigits: 0 }))
   const formatPercentRaw = (v: number | null, digits = 1) => (v == null ? "–" : `${v.toFixed(digits)}%`)
+  const formatUsdBillionsCompact = (v: number | null): string => {
+    if (v == null || !Number.isFinite(v as number)) return "–"
+    const num = v as number // value is already in billions
+    if (Math.abs(num) >= 1000) {
+      return `${(num / 1000).toFixed(1)}Tn`
+    }
+    return `${num.toFixed(1)}Bn`
+  }
 
   // Income Gap YoY current value and trend
   const latestIgYear = Math.max(...igJson.data.map(d => d.year))
@@ -445,9 +453,9 @@ export default function MetricsDashboard() {
       value: `${latestDef >= 0 ? "+" : ""}${(latestDef as number).toFixed(2)}%`,
       trend: defTrend,
       change: `4yr ${formatPct(defChangeA)} vs ${formatPct(defChangeB)}`,
-      summaryRaw: `$${latestDefRaw == null ? "–" : latestDefRaw.toLocaleString()}`,
-      collapsedRawA: `$${((([...defRawA].reverse().find(v => v != null) as number | null) ?? null) == null) ? "–" : (([...defRawA].reverse().find(v => v != null) as number).toLocaleString())}`,
-      collapsedRawB: `$${((([...defRawB].reverse().find(v => v != null) as number | null) ?? null) == null) ? "–" : (([...defRawB].reverse().find(v => v != null) as number).toLocaleString())}`,
+      summaryRaw: `$${formatUsdBillionsCompact(latestDefRaw)}`,
+      collapsedRawA: `$${formatUsdBillionsCompact((([...defRawA].reverse().find(v => v != null) as number | null) ?? null))}`,
+      collapsedRawB: `$${formatUsdBillionsCompact((([...defRawB].reverse().find(v => v != null) as number | null) ?? null))}`,
       collapsedYoyA: formatPct((([...defSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
       collapsedYoyB: formatPct((([...defSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: defChartData,
@@ -458,7 +466,7 @@ export default function MetricsDashboard() {
       adminAValueLabel: formatPct(defChangeA),
       adminBValueLabel: formatPct(defChangeB),
       methodBadge: "Deficit YoY",
-      valueLabel: "USD billions",
+      valueLabel: "USD",
       winnerSide: adminAWinsDef ? "A" : adminBWinsDef ? "B" : "none",
       explanation: "YoY percent change in the federal budget deficit (outlays minus receipts). Lower is better.",
       dataSource: "U.S. Department of the Treasury — Fiscal Data",
@@ -541,7 +549,7 @@ export default function MetricsDashboard() {
                 </div>
               </div>
               {index !== cards.length - 1 && (
-                <div className="w-full max-w-6xl h-6 mx-auto border-x border-dashed border-foreground/20"></div>
+                <div className="w-full max-w-6xl h-6 mx-auto border-x border-dashed border-foreground/20 bg-gradient-to-tl from-background/50 via-transparent to-background/50"></div>
               )}
             </div>
           ))}

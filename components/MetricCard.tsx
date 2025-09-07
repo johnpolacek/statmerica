@@ -89,7 +89,7 @@ export default function MetricCard({
   const partyStroke = (p: Party) => (p === "R" ? "#dc2626" : p === "D" ? "#2563eb" : "#6b7280")
   const partyLightStroke = (p: Party) => (p === "R" ? "#fca5a5" : p === "D" ? "#93c5fd" : "#9ca3af")
   const partyText = (p: Party) => (p === "R" ? "text-red-600" : p === "D" ? "text-blue-600" : "text-muted-foreground")
-  const partyBadge = (p: Party) => (p === "R" ? "bg-red-100 text-red-800/70 dark:bg-red-900 dark:text-red-200" : p === "D" ? "bg-blue-100 text-blue-800/70 dark:bg-blue-900 dark:text-blue-200" : "bg-muted text-foreground/70")
+  const partyBadge = (p: Party) => (p === "R" ? "bg-red-600/90 text-white/90" : p === "D" ? "bg-blue-600/90 text-white/90" : "bg-muted text-foreground/70")
 
   const sameParty = partyA === partyB && partyA !== "U"
 
@@ -121,10 +121,18 @@ export default function MetricCard({
   }
 
   const winningParty: Party = winnerSide === "A" ? partyA : winnerSide === "B" ? partyB : "U"
-  const badgeClass = sameParty || winnerSide === "none" ? "bg-muted text-foreground/70" : partyBadge(winningParty)
+  const badgeClass = sameParty || winnerSide === "none" ? "bg-background/50 text-white" : partyBadge(winningParty)
   const winningLabel = winnerSide === "A" ? (adminALabel ?? "Admin A") : (winnerSide === "B" ? (adminBLabel ?? "Admin B") : "")
   const isAggregateParty = winningLabel === "Democrats" || winningLabel === "Republicans"
   const badgeLabel = sameParty || winnerSide === "none" ? "Comparison" : `${winningLabel} ${isAggregateParty ? "Win" : "Wins"}`
+
+  const formatCompactUsd = (n: number | null | undefined): string => {
+    if (n == null || !Number.isFinite(n)) return "–"
+    const abs = Math.abs(n)
+    if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}T`
+    if (abs >= 1_000) return `${(n / 1_000).toFixed(1)}B`
+    return n.toFixed(0)
+  }
 
   const renderTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload || !payload.length) return null
@@ -136,7 +144,21 @@ export default function MetricCard({
           const raw = isA ? entry.payload.adminAValue : entry.payload.adminBValue
           const yoyNum = typeof entry.value === 'number' ? entry.value : null
           const yoyText = yoyNum != null ? `${yoyNum.toFixed(2)}%` : entry.value
-          const rawText = raw != null ? (typeof raw === 'number' ? raw.toFixed(2) : raw) : '–'
+          // Choose raw number formatting:
+          // - If valueLabel mentions USD, show compact billions/trillions with no currency sign
+          // - Else, show whole numbers for index-like series; keep one decimal for small numbers
+          let rawText: string
+          if (raw == null) {
+            rawText = '–'
+          } else if (typeof raw === 'number') {
+            if ((valueLabel || '').toLowerCase().includes('usd')) {
+              rawText = formatCompactUsd(raw)
+            } else {
+              rawText = Math.abs(raw) >= 10 ? raw.toFixed(0) : raw.toFixed(1)
+            }
+          } else {
+            rawText = String(raw)
+          }
           return (
             <div key={idx} className="mb-1 last:mb-0">
               <div className="flex items-center gap-2">
@@ -163,24 +185,30 @@ export default function MetricCard({
 
   if (isCollapsed) {
     return (
-      <div className="pl-8 pr-0 py-4">
+      <div className="pl-8 pr-4 py-4">
         <div className="w-full flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
               <div className="text-xl sm:text-2xl font-bold truncate">{title}</div>
-              <span className={`px-2 py-0.5 inline-block font-mono rounded text-[10px] font-semibold shrink-0 ${badgeClass}`}>{badgeLabel}</span>
+              <span className={`px-2 py-0.5 inline-block font-mono rounded text-xs font-semibold shrink-0 ${badgeClass}`}>{badgeLabel}</span>
             </div>
           </div>
           <div className="flex items-center gap-6">
-            <div className="text-xs text-muted-foreground text-right">
+            <div className="text-xs text-muted-foreground text-left">
               <div className="font-semibold">{adminALabel ?? "Admin A"}</div>
-              <div className={`font-mono text-sm font-semibold ${partyText(partyA)}`}>{collapsedRawA ?? "–"}</div>
-              <div className={`font-mono text-xs ${partyText(partyA)}`}>YoY {collapsedYoyA ?? "–"}</div>
+              <div className={`font-mono text-xs ${partyText(partyA)} whitespace-nowrap`}>
+                <span className="mr-2 text-sm font-bold">{collapsedYoyA ?? "–"}</span>
+                <span>{collapsedRawA ?? "–"}</span>
+                {valueLabel && !(String(collapsedRawA ?? "").includes("$")) && <span className="ml-2">{valueLabel}</span>}
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground text-right">
+            <div className="text-xs text-muted-foreground text-left">
               <div className="font-semibold">{adminBLabel ?? "Admin B"}</div>
-              <div className={`font-mono text-sm font-semibold ${partyText(partyB)}`}>{collapsedRawB ?? "–"}</div>
-              <div className={`font-mono text-xs ${partyText(partyB)}`}>YoY {collapsedYoyB ?? "–"}</div>
+              <div className={`font-mono text-xs ${partyText(partyB)} whitespace-nowrap`}>
+                <span className="mr-2 text-sm font-bold">{collapsedYoyB ?? "–"}</span>
+                <span>{collapsedRawB ?? "–"}</span>
+                {valueLabel && !(String(collapsedRawB ?? "").includes("$")) && <span className="ml-2">{valueLabel}</span>}
+              </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => setIsCollapsed(false)} aria-label={`View data for ${title}`}>
               <ChevronsDown />
@@ -193,7 +221,7 @@ export default function MetricCard({
   }
 
   return (
-    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70 relative -mb-8">
+    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70 relative">
       <div className="pb-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-0">
           <div className="flex flex-col gap-2">
