@@ -28,6 +28,9 @@ function extractRowFields(row) {
   let fiscalMonth = toNumber(row.record_fiscal_month ?? row.fiscal_month ?? row.month)
   const recordDate = row.record_date || row.date || null
 
+  // Classification description (e.g., "Total: Receipts", "Total: Outlays")
+  const classificationDesc = String(row.classification_desc || row.classification || '').toLowerCase()
+
   // Monthly receipts/outlays
   // Prefer explicit current_month_* fields; fall back to other likely variants if present
   const lc = Object.fromEntries(Object.entries(row).map(([k, v]) => [k.toLowerCase(), v]))
@@ -48,7 +51,7 @@ function extractRowFields(row) {
 
   // Fallback: map classification_desc month names to fiscal month number (Oct=1, ... , Sep=12)
   if (!Number.isFinite(fiscalMonth)) {
-    const desc = String(row.classification_desc || '').toLowerCase()
+    const desc = classificationDesc
     const map = {
       'october': 1, 'november': 2, 'december': 3, 'january': 4, 'february': 5, 'march': 6,
       'april': 7, 'may': 8, 'june': 9, 'july': 10, 'august': 11, 'september': 12,
@@ -56,7 +59,7 @@ function extractRowFields(row) {
     if (desc in map) fiscalMonth = map[desc]
   }
 
-  return { fiscalYear, fiscalMonth, recordDate, currMonthReceipts, currMonthOutlays, fytdReceipts, fytdOutlays }
+  return { fiscalYear, fiscalMonth, recordDate, currMonthReceipts, currMonthOutlays, fytdReceipts, fytdOutlays, classificationDesc }
 }
 
 async function fetchAllMtsRows() {
@@ -66,7 +69,7 @@ async function fetchAllMtsRows() {
   const rows = []
   // Request only from 1980 onward for consistent coverage
   const base = new URL(API_URL)
-  base.searchParams.set('filter', 'record_fiscal_year:gte:1980,record_type_cd:eq:MTH,table_nbr:eq:1')
+  base.searchParams.set('filter', 'record_fiscal_year:gte:1979,record_type_cd:eq:MTH,table_nbr:eq:1')
   base.searchParams.set('sort', 'record_fiscal_year,src_line_nbr')
   base.searchParams.set('page[size]', String(pageSize))
 
@@ -96,10 +99,25 @@ function buildAnnualDeficit(rows) {
     if (!Number.isFinite(r.fiscalYear) || !Number.isFinite(r.fiscalMonth)) continue
     if (!byFy.has(r.fiscalYear)) byFy.set(r.fiscalYear, { receipts: 0, outlays: 0, months: new Set(), monthly: [] })
     const fy = byFy.get(r.fiscalYear)
-    if (Number.isFinite(r.currMonthReceipts)) fy.receipts += r.currMonthReceipts
-    if (Number.isFinite(r.currMonthOutlays)) fy.outlays += r.currMonthOutlays
-    fy.months.add(r.fiscalMonth)
-    fy.monthly.push({ month: r.fiscalMonth, receipts: r.currMonthReceipts ?? null, outlays: r.currMonthOutlays ?? null })
+
+    const isTotalReceipts = r.classificationDesc.includes('total') && r.classificationDesc.includes('receipt')
+    const isTotalOutlays = r.classificationDesc.includes('total') && r.classificationDesc.includes('outlay')
+
+    // Only aggregate totals rows
+    if (isTotalReceipts && Number.isFinite(r.currMonthReceipts)) fy.receipts += r.currMonthReceipts
+    if (isTotalOutlays && Number.isFinite(r.currMonthOutlays)) fy.outlays += r.currMonthOutlays
+
+    // Keep per-month entries for FYTD computation (only totals rows)
+    if (isTotalReceipts || isTotalOutlays) {
+      fy.months.add(r.fiscalMonth)
+      fy.monthly.push({
+        month: r.fiscalMonth,
+        receipts: isTotalReceipts ? (r.currMonthReceipts ?? null) : null,
+        outlays: isTotalOutlays ? (r.currMonthOutlays ?? null) : null,
+        fytdReceipts: isTotalReceipts ? (r.fytdReceipts ?? null) : null,
+        fytdOutlays: isTotalOutlays ? (r.fytdOutlays ?? null) : null,
+      })
+    }
   }
 
   // Build annual series (value in USD billions)
@@ -140,29 +158,17 @@ function computeLatestFytd(rows, byFy) {
   if (monthsPresent.length === 0) return null
   const latestMonth = Math.max(...monthsPresent)
 
-  // Prefer FYTD fields if present on any row for that latest month
-  let fytdReceipts = null
-  let fytdOutlays = null
+  // Sum monthly up to latest month
+  let rSum = 0
+  let oSum = 0
   for (const m of aggLatest.monthly) {
-    if (m.month === latestMonth && Number.isFinite(m.fytdReceipts) && Number.isFinite(m.fytdOutlays)) {
-      fytdReceipts = m.fytdReceipts
-      fytdOutlays = m.fytdOutlays
-      break
+    if (m.month <= latestMonth) {
+      if (Number.isFinite(m.receipts)) rSum += m.receipts
+      if (Number.isFinite(m.outlays)) oSum += m.outlays
     }
   }
-  // Otherwise sum monthly up to latest month
-  if (!Number.isFinite(fytdReceipts) || !Number.isFinite(fytdOutlays)) {
-    let rSum = 0
-    let oSum = 0
-    for (const m of aggLatest.monthly) {
-      if (m.month <= latestMonth) {
-        if (Number.isFinite(m.receipts)) rSum += m.receipts
-        if (Number.isFinite(m.outlays)) oSum += m.outlays
-      }
-    }
-    fytdReceipts = rSum
-    fytdOutlays = oSum
-  }
+  const fytdReceipts = rSum
+  const fytdOutlays = oSum
 
   if (!Number.isFinite(fytdReceipts) || !Number.isFinite(fytdOutlays)) return null
   const deficitFytd = fytdOutlays - fytdReceipts
@@ -181,7 +187,7 @@ function computeLatestFytd(rows, byFy) {
       }
     }
     const priorDeficit = oSum - rSum
-    const priorValueBillions = priorDeficit / 1000
+    const priorValueBillions = priorDeficit / 1e9
     if (priorValueBillions !== 0) {
       yoy = round2(((valueBillions - priorValueBillions) / priorValueBillions) * 100)
     }

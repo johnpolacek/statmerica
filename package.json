@@ -12,7 +12,7 @@
     "wid:extract": "node scripts/wid-extract-us.mjs",
     "wid:extract:income": "node scripts/wid-extract-income-us.mjs",
     "fetch:income-gap": "node scripts/fetch-income-gap.mjs",
-    "fetch:deficit": "node --env-file=.env scripts/fetch-deficit.mjs",
+    "fetch:deficit": "node --env-file=.env scripts/fetch-deficit-fred.mjs",
     "fetch:unemployment": "node --env-file=.env scripts/fetch-unemployment.mjs",
     "fetch:sp500": "node --env-file=.env scripts/fetch-sp500.mjs --series NASDAQCOM",
     "fetch:nasdaq": "node --env-file=.env scripts/fetch-sp500.mjs --series NASDAQCOM"

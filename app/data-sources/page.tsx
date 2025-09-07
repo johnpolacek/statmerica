@@ -148,7 +148,7 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
     },
     {
       displayTitle: "Federal Budget Deficit (FY)",
-      displayDescription: "Annual deficit = outlays minus receipts; plus current FY-to-date",
+      displayDescription: "Annual deficit magnitude (outlays minus receipts), fiscal year",
       icon: TrendingDown,
       color: "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900/60",
       anchor: "deficit",
@@ -164,10 +164,9 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
         updateScript: "pnpm run fetch:deficit",
         dataFile: "data/deficit.json",
         methodology: [
-          "Fetch Treasury MTS Table 1 monthly receipts/outlays",
-          "Aggregate by fiscal year (Oct–Sep)",
-          "Compute deficit (outlays - receipts), convert to USD billions",
-          "Compute YoY and append latest FYTD row",
+          "Fetch FRED FYFSD annual surplus/deficit (fiscal year, billions)",
+          "Convert to positive deficit magnitudes (absolute value)",
+          "Compute YoY on deficit level",
         ],
         chartUsage: [
           "Federal Deficit card (YoY, USD billions)",

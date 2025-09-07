@@ -2,83 +2,251 @@
   "meta": {
     "id": "deficit",
     "title": "Federal Budget Deficit (Fiscal Year)",
-    "description": "Annual deficit computed as outlays minus receipts, aggregated by fiscal year (Oct–Sep). Latest row is current FY to date.",
+    "description": "Annual deficit level from FRED FYFSD (surplus/deficit), transformed to positive deficit magnitudes. YoY computed on deficit level.",
     "units": "USD (billions) for value, Percent for yoy",
-    "frequency": "Annual (FY), plus current FY-to-date latest month",
+    "frequency": "Annual (FY)",
     "coverage": {
-      "start": 2015,
-      "end": 2025
+      "start": 1979,
+      "end": 2024
     },
-    "fetchedAt": "2025-09-06T04:10:40.113Z",
+    "fetchedAt": "2025-09-07T22:44:00.318Z",
     "source": {
-      "name": "U.S. Department of the Treasury — Fiscal Data (MTS Table 1)",
-      "homepage": "https://fiscaldata.treasury.gov/",
-      "api": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_1",
-      "attribution": "Public domain"
+      "name": "FRED (FYFSD) — Federal Surplus or Deficit (-), Fiscal Year",
+      "homepage": "https://fred.stlouisfed.org/series/FYFSD",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FYFSD",
+      "attribution": "Federal Reserve Bank of St. Louis"
     },
-    "notes": "API amounts are in US dollars; values converted to billions. YoY computed on deficit level. Latest is FYTD vs prior FY same month when available."
+    "notes": "FYFSD is negative for deficits; values converted to positive deficit magnitudes in billions. YoY computed on level. Coverage begins in 1947; filtered to 1979+."
   },
   "data": [
     {
+      "year": 1979,
+      "value": 40726
+    },
+    {
+      "year": 1980,
+      "value": 73830,
+      "yoy": 81.28
+    },
+    {
+      "year": 1981,
+      "value": 78968,
+      "yoy": 6.96
+    },
+    {
+      "year": 1982,
+      "value": 127977,
+      "yoy": 62.06
+    },
+    {
+      "year": 1983,
+      "value": 207802,
+      "yoy": 62.37
+    },
+    {
+      "year": 1984,
+      "value": 185367,
+      "yoy": -10.8
+    },
+    {
+      "year": 1985,
+      "value": 212308,
+      "yoy": 14.53
+    },
+    {
+      "year": 1986,
+      "value": 221227,
+      "yoy": 4.2
+    },
+    {
+      "year": 1987,
+      "value": 149730,
+      "yoy": -32.32
+    },
+    {
+      "year": 1988,
+      "value": 155178,
+      "yoy": 3.64
+    },
+    {
+      "year": 1989,
+      "value": 152639,
+      "yoy": -1.64
+    },
+    {
+      "year": 1990,
+      "value": 221036,
+      "yoy": 44.81
+    },
+    {
+      "year": 1991,
+      "value": 269238,
+      "yoy": 21.81
+    },
+    {
+      "year": 1992,
+      "value": 290321,
+      "yoy": 7.83
+    },
+    {
+      "year": 1993,
+      "value": 255051,
+      "yoy": -12.15
+    },
+    {
+      "year": 1994,
+      "value": 203186,
+      "yoy": -20.34
+    },
+    {
+      "year": 1995,
+      "value": 163952,
+      "yoy": -19.31
+    },
+    {
+      "year": 1996,
+      "value": 107431,
+      "yoy": -34.47
+    },
+    {
+      "year": 1997,
+      "value": 21884,
+      "yoy": -79.63
+    },
+    {
+      "year": 1998,
+      "value": 69270,
+      "yoy": 216.53
+    },
+    {
+      "year": 1999,
+      "value": 125610,
+      "yoy": 81.33
+    },
+    {
+      "year": 2000,
+      "value": 236241,
+      "yoy": 88.07
+    },
+    {
+      "year": 2001,
+      "value": 128236,
+      "yoy": -45.72
+    },
+    {
+      "year": 2002,
+      "value": 157758,
+      "yoy": 23.02
+    },
+    {
+      "year": 2003,
+      "value": 377585,
+      "yoy": 139.34
+    },
+    {
+      "year": 2004,
+      "value": 412727,
+      "yoy": 9.31
+    },
+    {
+      "year": 2005,
+      "value": 318346,
+      "yoy": -22.87
+    },
+    {
+      "year": 2006,
+      "value": 248181,
+      "yoy": -22.04
+    },
+    {
+      "year": 2007,
+      "value": 160701,
+      "yoy": -35.25
+    },
+    {
+      "year": 2008,
+      "value": 458553,
+      "yoy": 185.35
+    },
+    {
+      "year": 2009,
+      "value": 1412688,
+      "yoy": 208.08
+    },
+    {
+      "year": 2010,
+      "value": 1294373,
+      "yoy": -8.38
+    },
+    {
+      "year": 2011,
+      "value": 1299599,
+      "yoy": 0.4
+    },
+    {
+      "year": 2012,
+      "value": 1076573,
+      "yoy": -17.16
+    },
+    {
+      "year": 2013,
+      "value": 679775,
+      "yoy": -36.86
+    },
+    {
+      "year": 2014,
+      "value": 484793,
+      "yoy": -28.68
+    },
+    {
       "year": 2015,
-      "value": 6218.69
+      "value": 441960,
+      "yoy": -8.84
     },
     {
       "year": 2016,
-      "value": 9680.44,
-      "yoy": 55.67
+      "value": 584650,
+      "yoy": 32.29
     },
     {
       "year": 2017,
-      "value": 11706.45,
-      "yoy": 20.93
+      "value": 665450,
+      "yoy": 13.82
     },
     {
       "year": 2018,
-      "value": 13531.79,
-      "yoy": 15.59
+      "value": 779074,
+      "yoy": 17.07
     },
     {
       "year": 2019,
-      "value": 16553.41,
-      "yoy": 22.33
+      "value": 983588,
+      "yoy": 26.25
     },
     {
       "year": 2020,
-      "value": 29456.8,
-      "yoy": 77.95
+      "value": 3132456,
+      "yoy": 218.47
     },
     {
       "year": 2021,
-      "value": 56614.33,
-      "yoy": 92.19
+      "value": 2775350,
+      "yoy": -11.4
     },
     {
       "year": 2022,
-      "value": 39950.71,
-      "yoy": -29.43
+      "value": 1375920,
+      "yoy": -50.42
     },
     {
       "year": 2023,
-      "value": 27949.61,
-      "yoy": -30.04
+      "value": 1695240,
+      "yoy": 23.21
     },
     {
       "year": 2024,
-      "value": 32297.15,
-      "yoy": 15.55
-    },
-    {
-      "year": 2025,
-      "value": 28589.18,
-      "yoy": -11.48
-    },
-    {
-      "year": 2025,
-      "value": 28589.18,
-      "latest": true,
-      "month": 12,
-      "yoy": -100
+      "value": 1832816,
+      "yoy": 8.12
     }
   ]
 }
