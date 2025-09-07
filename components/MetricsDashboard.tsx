@@ -179,7 +179,7 @@ export default function MetricsDashboard() {
     return ((end - baseline) / baseline) * 100
   }
 
-  const formatPct = (v: number | null) => (v == null ? "–" : `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`)
+  const formatPct = (v: number | null) => (v == null ? "–" : `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`)
 
   // Compute 4-year change labels for each metric using raw values
   const cpiChangeA = rangeChangeWithBaseline(adminA, cpiRawA, cpiValueByYear)
@@ -359,8 +359,8 @@ export default function MetricsDashboard() {
       summaryRaw: formatNumber(latestCpiRaw, 1),
       collapsedRawA: formatNumber(([...cpiRawA].reverse().find(v => v != null) as number | null) ?? null, 1),
       collapsedRawB: formatNumber(([...cpiRawB].reverse().find(v => v != null) as number | null) ?? null, 1),
-      collapsedYoyA: formatPct((([...cpiSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...cpiSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(cpiChangeA),
+      collapsedYoyB: formatPct(cpiChangeB),
       chartData: cpiChartData,
       adminAStart: cpiRawA.find(v => v != null) ?? null,
       adminAEnd: [...cpiRawA].reverse().find(v => v != null) ?? null,
@@ -384,8 +384,8 @@ export default function MetricsDashboard() {
       summaryRaw: formatInteger(latestSpRaw),
       collapsedRawA: formatInteger((([...spRawA].reverse().find(v => v != null) as number | null) ?? null)),
       collapsedRawB: formatInteger((([...spRawB].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyA: formatPct((([...spSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...spSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(spChangeA),
+      collapsedYoyB: formatPct(spChangeB),
       chartData: spChartData,
       adminAStart: spRawA.find(v => v != null) ?? null,
       adminAEnd: [...spRawA].reverse().find(v => v != null) ?? null,
@@ -408,8 +408,8 @@ export default function MetricsDashboard() {
       summaryRaw: formatNumber(latestIgRaw, 2),
       collapsedRawA: formatNumber((([...igRawA].reverse().find(v => v != null) as number | null) ?? null), 2),
       collapsedRawB: formatNumber((([...igRawB].reverse().find(v => v != null) as number | null) ?? null), 2),
-      collapsedYoyA: formatPct((([...igSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...igSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(igChangeA),
+      collapsedYoyB: formatPct(igChangeB),
       chartData: igChartData,
       adminAStart: igRawA.find(v => v != null) ?? null,
       adminAEnd: [...igRawA].reverse().find(v => v != null) ?? null,
@@ -432,8 +432,8 @@ export default function MetricsDashboard() {
       summaryRaw: formatCurrency(latestGasRaw, 2),
       collapsedRawA: formatCurrency((([...gasRawA].reverse().find(v => v != null) as number | null) ?? null), 2),
       collapsedRawB: formatCurrency((([...gasRawB].reverse().find(v => v != null) as number | null) ?? null), 2),
-      collapsedYoyA: formatPct((([...gasSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...gasSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(gasChangeA),
+      collapsedYoyB: formatPct(gasChangeB),
       chartData: gasChartData,
       adminAStart: gasRawA.find(v => v != null) ?? null,
       adminAEnd: [...gasRawA].reverse().find(v => v != null) ?? null,
@@ -456,8 +456,8 @@ export default function MetricsDashboard() {
       summaryRaw: `$${formatUsdBillionsCompact(latestDefRaw)}`,
       collapsedRawA: `$${formatUsdBillionsCompact((([...defRawA].reverse().find(v => v != null) as number | null) ?? null))}`,
       collapsedRawB: `$${formatUsdBillionsCompact((([...defRawB].reverse().find(v => v != null) as number | null) ?? null))}`,
-      collapsedYoyA: formatPct((([...defSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...defSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(defChangeA),
+      collapsedYoyB: formatPct(defChangeB),
       chartData: defChartData,
       adminAStart: defRawA.find(v => v != null) ?? null,
       adminAEnd: [...defRawA].reverse().find(v => v != null) ?? null,
@@ -480,8 +480,8 @@ export default function MetricsDashboard() {
       summaryRaw: formatPercentRaw(latestUnempRaw, 1),
       collapsedRawA: formatPercentRaw((([...unempRawA].reverse().find(v => v != null) as number | null) ?? null), 1),
       collapsedRawB: formatPercentRaw((([...unempRawB].reverse().find(v => v != null) as number | null) ?? null), 1),
-      collapsedYoyA: formatPct((([...unempSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
-      collapsedYoyB: formatPct((([...unempSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct(unempChangeA),
+      collapsedYoyB: formatPct(unempChangeB),
       chartData: unempChartData,
       adminAStart: unempRawA.find(v => v != null) ?? null,
       adminAEnd: [...unempRawA].reverse().find(v => v != null) ?? null,

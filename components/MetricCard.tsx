@@ -143,7 +143,7 @@ export default function MetricCard({
           const isA = entry.dataKey === 'adminA'
           const raw = isA ? entry.payload.adminAValue : entry.payload.adminBValue
           const yoyNum = typeof entry.value === 'number' ? entry.value : null
-          const yoyText = yoyNum != null ? `${yoyNum.toFixed(2)}%` : entry.value
+          const yoyText = yoyNum != null ? `${yoyNum.toFixed(1)}%` : entry.value
           // Choose raw number formatting:
           // - If valueLabel mentions USD, show compact billions/trillions with no currency sign
           // - Else, show whole numbers for index-like series; keep one decimal for small numbers
