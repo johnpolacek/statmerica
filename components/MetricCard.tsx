@@ -1,9 +1,10 @@
-import { Minus, TrendingDown, TrendingUp, ExternalLink } from "lucide-react"
+import { Minus, TrendingDown, TrendingUp, ExternalLink, ChevronsDown, ChevronsUp } from "lucide-react"
 import { ResponsiveContainer, LineChart, XAxis, YAxis, Legend, Line, Tooltip } from "recharts"
 import { calculateTrend, generateComparisonData } from "@/lib/metrics"
 import Link from "next/link"
 import { useState } from "react"
 import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
 
 type Party = "D" | "R" | "U"
 
@@ -14,6 +15,12 @@ type MetricCardProps = {
   value: string
   trend: string
   change: string
+  summaryRaw?: string
+  defaultCollapsed?: boolean
+  collapsedRawA?: string
+  collapsedRawB?: string
+  collapsedYoyA?: string
+  collapsedYoyB?: string
   adminALabel?: string
   adminBLabel?: string
   chartDataOverride?: ChartDatum[]
@@ -37,6 +44,12 @@ export default function MetricCard({
   value,
   trend,
   change,
+  summaryRaw,
+  defaultCollapsed,
+  collapsedRawA,
+  collapsedRawB,
+  collapsedYoyA,
+  collapsedYoyB,
   adminALabel,
   adminBLabel,
   chartDataOverride,
@@ -62,6 +75,7 @@ export default function MetricCard({
   const adminBTrend = adminTrendsOverride?.adminB ?? { trend, change }
 
   const [isYoY, setIsYoY] = useState(true)
+  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed ?? true)
 
   // Build display data mapping to adminA/adminB depending on YoY vs Raw toggle
   const displayData: ChartDatum[] = chartData.map(d => ({
@@ -147,8 +161,39 @@ export default function MetricCard({
     )
   }
 
+  if (isCollapsed) {
+    return (
+      <div className="pl-8 pr-0 py-4">
+        <div className="w-full flex items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="text-xl sm:text-2xl font-bold truncate">{title}</div>
+              <span className={`px-2 py-0.5 inline-block font-mono rounded text-[10px] font-semibold shrink-0 ${badgeClass}`}>{badgeLabel}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="text-xs text-muted-foreground text-right">
+              <div className="font-semibold">{adminALabel ?? "Admin A"}</div>
+              <div className={`font-mono text-sm font-semibold ${partyText(partyA)}`}>{collapsedRawA ?? "–"}</div>
+              <div className={`font-mono text-xs ${partyText(partyA)}`}>YoY {collapsedYoyA ?? "–"}</div>
+            </div>
+            <div className="text-xs text-muted-foreground text-right">
+              <div className="font-semibold">{adminBLabel ?? "Admin B"}</div>
+              <div className={`font-mono text-sm font-semibold ${partyText(partyB)}`}>{collapsedRawB ?? "–"}</div>
+              <div className={`font-mono text-xs ${partyText(partyB)}`}>YoY {collapsedYoyB ?? "–"}</div>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => setIsCollapsed(false)} aria-label={`View data for ${title}`}>
+              <ChevronsDown />
+              View Data
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70">
+    <div className="p-8 bg-gradient-to-tl from-transparent via-background/30 to-background/70 relative -mb-8">
       <div className="pb-4">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-0">
           <div className="flex flex-col gap-2">
@@ -171,7 +216,10 @@ export default function MetricCard({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center lg:justify-end gap-4 sm:gap-6 lg:gap-8 flex-wrap">
+          <div className="flex items-center justify-center lg:justify-end gap-4 sm:gap-6 lg:gap-8 flex-wrap lg:pr-8">
+            <Button className="absolute top-2 right-2 !px-2" size="sm" variant="outline" onClick={() => setIsCollapsed(true)} aria-label={`Close ${title}`}>
+              <ChevronsUp />
+            </Button>
             <div className="w-full lg:w-auto flex items-center justify-center gap-2 text-[11px] sm:text-xs text-muted-foreground">
               <span>Raw</span>
               <Switch checked={isYoY} onCheckedChange={(v) => setIsYoY(v)} aria-label="Toggle YoY mode" />

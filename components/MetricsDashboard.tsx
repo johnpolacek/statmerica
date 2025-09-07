@@ -236,6 +236,39 @@ export default function MetricsDashboard() {
   const yoyLabel = `${(latestCpiYoy as number) >= 0 ? "+" : ""}${(latestCpiYoy as number).toFixed(2)}%`
   const trend: MetricSummary["trend"] = Math.abs(latestCpiYoy as number) < 1 ? "stable" : (latestCpiYoy as number) > 0 ? "up" : "down"
 
+  // Latest raw values for collapsed summaries
+  const latestCpiRaw = cpiValueByYear.get(latestYear) ?? null
+  const latestSpRaw = (() => {
+    const years = sp500Json.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? spValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestIgRaw = (() => {
+    const years = igJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? igValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestGasRaw = (() => {
+    const years = gasJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? gasValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestDefRaw = (() => {
+    const years = deficitJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? defValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestUnempRaw = (() => {
+    const years = unempJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? unempValueByYear.get(maxYear) ?? null : null
+  })()
+
+  const formatNumber = (v: number | null, digits = 1) => (v == null ? "–" : v.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits }))
+  const formatCurrency = (v: number | null, digits = 2) => (v == null ? "–" : `$${v.toLocaleString(undefined, { maximumFractionDigits: digits, minimumFractionDigits: digits })}`)
+  const formatInteger = (v: number | null) => (v == null ? "–" : v.toLocaleString())
+  const formatPercentRaw = (v: number | null, digits = 1) => (v == null ? "–" : `${v.toFixed(digits)}%`)
+
   // Income Gap YoY current value and trend
   const latestIgYear = Math.max(...igJson.data.map(d => d.year))
   const latestIg = igJson.data.find(d => d.year === latestIgYear)?.yoy ?? 0
@@ -315,6 +348,11 @@ export default function MetricsDashboard() {
       value: yoyLabel,
       trend,
       change: `4yr ${formatPct(cpiChangeA)} vs ${formatPct(cpiChangeB)}`,
+      summaryRaw: formatNumber(latestCpiRaw, 1),
+      collapsedRawA: formatNumber(([...cpiRawA].reverse().find(v => v != null) as number | null) ?? null, 1),
+      collapsedRawB: formatNumber(([...cpiRawB].reverse().find(v => v != null) as number | null) ?? null, 1),
+      collapsedYoyA: formatPct((([...cpiSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...cpiSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: cpiChartData,
       adminAStart: cpiRawA.find(v => v != null) ?? null,
       adminAEnd: [...cpiRawA].reverse().find(v => v != null) ?? null,
@@ -335,6 +373,11 @@ export default function MetricsDashboard() {
       value: `${latestSp >= 0 ? "+" : ""}${(latestSp as number).toFixed(2)}%`,
       trend: spTrend,
       change: `4yr ${formatPct(spChangeA)} vs ${formatPct(spChangeB)}`,
+      summaryRaw: formatInteger(latestSpRaw),
+      collapsedRawA: formatInteger((([...spRawA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedRawB: formatInteger((([...spRawB].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyA: formatPct((([...spSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...spSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: spChartData,
       adminAStart: spRawA.find(v => v != null) ?? null,
       adminAEnd: [...spRawA].reverse().find(v => v != null) ?? null,
@@ -354,6 +397,11 @@ export default function MetricsDashboard() {
       value: `${latestIg >= 0 ? "+" : ""}${(latestIg as number).toFixed(2)}%`,
       trend: igTrend,
       change: `4yr ${formatPct(igChangeA)} vs ${formatPct(igChangeB)}`,
+      summaryRaw: formatNumber(latestIgRaw, 2),
+      collapsedRawA: formatNumber((([...igRawA].reverse().find(v => v != null) as number | null) ?? null), 2),
+      collapsedRawB: formatNumber((([...igRawB].reverse().find(v => v != null) as number | null) ?? null), 2),
+      collapsedYoyA: formatPct((([...igSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...igSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: igChartData,
       adminAStart: igRawA.find(v => v != null) ?? null,
       adminAEnd: [...igRawA].reverse().find(v => v != null) ?? null,
@@ -373,6 +421,11 @@ export default function MetricsDashboard() {
       value: `${latestGas >= 0 ? "+" : ""}${(latestGas as number).toFixed(2)}%`,
       trend: gasTrend,
       change: `4yr ${formatPct(gasChangeA)} vs ${formatPct(gasChangeB)}`,
+      summaryRaw: formatCurrency(latestGasRaw, 2),
+      collapsedRawA: formatCurrency((([...gasRawA].reverse().find(v => v != null) as number | null) ?? null), 2),
+      collapsedRawB: formatCurrency((([...gasRawB].reverse().find(v => v != null) as number | null) ?? null), 2),
+      collapsedYoyA: formatPct((([...gasSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...gasSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: gasChartData,
       adminAStart: gasRawA.find(v => v != null) ?? null,
       adminAEnd: [...gasRawA].reverse().find(v => v != null) ?? null,
@@ -392,6 +445,11 @@ export default function MetricsDashboard() {
       value: `${latestDef >= 0 ? "+" : ""}${(latestDef as number).toFixed(2)}%`,
       trend: defTrend,
       change: `4yr ${formatPct(defChangeA)} vs ${formatPct(defChangeB)}`,
+      summaryRaw: `$${latestDefRaw == null ? "–" : latestDefRaw.toLocaleString()}`,
+      collapsedRawA: `$${((([...defRawA].reverse().find(v => v != null) as number | null) ?? null) == null) ? "–" : (([...defRawA].reverse().find(v => v != null) as number).toLocaleString())}`,
+      collapsedRawB: `$${((([...defRawB].reverse().find(v => v != null) as number | null) ?? null) == null) ? "–" : (([...defRawB].reverse().find(v => v != null) as number).toLocaleString())}`,
+      collapsedYoyA: formatPct((([...defSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...defSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: defChartData,
       adminAStart: defRawA.find(v => v != null) ?? null,
       adminAEnd: [...defRawA].reverse().find(v => v != null) ?? null,
@@ -411,6 +469,11 @@ export default function MetricsDashboard() {
       value: `${latestUnemp >= 0 ? "+" : ""}${(latestUnemp as number).toFixed(2)}%`,
       trend: unempTrend,
       change: `4yr ${formatPct(unempChangeA)} vs ${formatPct(unempChangeB)}`,
+      summaryRaw: formatPercentRaw(latestUnempRaw, 1),
+      collapsedRawA: formatPercentRaw((([...unempRawA].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedRawB: formatPercentRaw((([...unempRawB].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedYoyA: formatPct((([...unempSeriesA].reverse().find(v => v != null) as number | null) ?? null)),
+      collapsedYoyB: formatPct((([...unempSeriesB].reverse().find(v => v != null) as number | null) ?? null)),
       chartData: unempChartData,
       adminAStart: unempRawA.find(v => v != null) ?? null,
       adminAEnd: [...unempRawA].reverse().find(v => v != null) ?? null,
@@ -447,6 +510,12 @@ export default function MetricsDashboard() {
                     value={metric.value}
                     trend={metric.trend}
                     change={metric.change}
+                    summaryRaw={(metric as any).summaryRaw}
+                    defaultCollapsed
+                    collapsedRawA={(metric as any).collapsedRawA}
+                    collapsedRawB={(metric as any).collapsedRawB}
+                    collapsedYoyA={(metric as any).collapsedYoyA}
+                    collapsedYoyB={(metric as any).collapsedYoyB}
                     adminALabel={adminAComputed.label}
                     adminBLabel={adminBComputed.label}
                     chartDataOverride={metric.chartData as any}
@@ -472,7 +541,7 @@ export default function MetricsDashboard() {
                 </div>
               </div>
               {index !== cards.length - 1 && (
-                <div className="w-full max-w-6xl h-12 mx-auto border-x border-dashed border-foreground/20"></div>
+                <div className="w-full max-w-6xl h-6 mx-auto border-x border-dashed border-foreground/20"></div>
               )}
             </div>
           ))}
