@@ -712,13 +712,13 @@ export default function MetricsDashboard() {
         </div>
 
         <div className="mt-12 border-y border-dashed border-foreground/20">
-          <div className="max-w-4xl mx-auto border-x border-dashed border-foreground/20 py-4 bg-background">
+          <div className="max-w-4xl mx-auto border-x border-dashed border-foreground/20 pt-4 bg-background">
             <div className="text-center border-b border-dashed border-foreground/20 pb-4">
               <div className="text-lg font-mono">Final Scorecard</div>
             </div>
             <div className="text-center">
               <div className="grid sm:grid-cols-2">
-                <div className="border-b sm:border-r border-dashed border-foreground/20 p-4 sm:p-8">
+                <div className="border-b sm:border-b-0 sm:border-r border-dashed border-foreground/20 p-4 sm:p-8">
                   <div className={`text-2xl sm:text-3xl font-bold ${partyText(adminAComputed.party)}`}>{adminAName}</div>
                   <div className="text-sm sm:text-base text-center py-2 space-y-1">
                     {adminAMetricsList.map((metric, index) => (
