@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "id": "debt_to_gdp",
+    "title": "Federal Debt / GDP Ratio",
+    "description": "Q4 levels (percent of GDP) with YoY vs prior Q4 for 1980–2024; latest row is most recent quarter with YoY vs same quarter prior year.",
+    "units": "Percent (value), Percent (yoy)",
+    "frequency": "Annual (Q4), plus current-year latest quarter",
+    "coverage": {
+      "start": 1980,
+      "end": 2025
+    },
+    "fetchedAt": "2025-09-08T00:30:43.029Z",
+    "source": {
+      "name": "Federal Reserve Bank of St. Louis (FRED)",
+      "homepage": "https://fred.stlouisfed.org/series/GFDEGDQ188S",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=GFDEGDQ188S",
+      "attribution": "Public domain"
+    },
+    "seriesId": "GFDEGDQ188S",
+    "notes": "YoY computed as percent change vs same quarter previous year. Annual points use Q4 values."
+  },
+  "data": [
+    {
+      "year": 1980,
+      "value": 31.16,
+      "yoy": 0.42
+    },
+    {
+      "year": 1981,
+      "value": 31.36,
+      "yoy": 0.64
+    },
+    {
+      "year": 1982,
+      "value": 35.18,
+      "yoy": 12.18
+    },
+    {
+      "year": 1983,
+      "value": 37.18,
+      "yoy": 5.69
+    },
+    {
+      "year": 1984,
+      "value": 40.09,
+      "yoy": 7.83
+    },
+    {
+      "year": 1985,
+      "value": 43.79,
+      "yoy": 9.23
+    },
+    {
+      "year": 1986,
+      "value": 47.55,
+      "yoy": 8.59
+    },
+    {
+      "year": 1987,
+      "value": 48.56,
+      "yoy": 2.12
+    },
+    {
+      "year": 1988,
+      "value": 49.72,
+      "yoy": 2.39
+    },
+    {
+      "year": 1989,
+      "value": 51.38,
+      "yoy": 3.34
+    },
+    {
+      "year": 1990,
+      "value": 56.04,
+      "yoy": 9.07
+    },
+    {
+      "year": 1991,
+      "value": 60.69,
+      "yoy": 8.3
+    },
+    {
+      "year": 1992,
+      "value": 62.52,
+      "yoy": 3.02
+    },
+    {
+      "year": 1993,
+      "value": 64.67,
+      "yoy": 3.44
+    },
+    {
+      "year": 1994,
+      "value": 64.39,
+      "yoy": -0.43
+    },
+    {
+      "year": 1995,
+      "value": 64.18,
+      "yoy": -0.33
+    },
+    {
+      "year": 1996,
+      "value": 64.45,
+      "yoy": 0.42
+    },
+    {
+      "year": 1997,
+      "value": 62.77,
+      "yoy": -2.61
+    },
+    {
+      "year": 1998,
+      "value": 60.41,
+      "yoy": -3.76
+    },
+    {
+      "year": 1999,
+      "value": 58.34,
+      "yoy": -3.43
+    },
+    {
+      "year": 2000,
+      "value": 54.26,
+      "yoy": -6.99
+    },
+    {
+      "year": 2001,
+      "value": 55.75,
+      "yoy": 2.75
+    },
+    {
+      "year": 2002,
+      "value": 57.91,
+      "yoy": 3.87
+    },
+    {
+      "year": 2003,
+      "value": 59.44,
+      "yoy": 2.64
+    },
+    {
+      "year": 2004,
+      "value": 60.64,
+      "yoy": 2.02
+    },
+    {
+      "year": 2005,
+      "value": 61.32,
+      "yoy": 1.12
+    },
+    {
+      "year": 2006,
+      "value": 61.83,
+      "yoy": 0.83
+    },
+    {
+      "year": 2007,
+      "value": 62.72,
+      "yoy": 1.44
+    },
+    {
+      "year": 2008,
+      "value": 73.25,
+      "yoy": 16.79
+    },
+    {
+      "year": 2009,
+      "value": 84.03,
+      "yoy": 14.72
+    },
+    {
+      "year": 2010,
+      "value": 91.61,
+      "yoy": 9.02
+    },
+    {
+      "year": 2011,
+      "value": 96.09,
+      "yoy": 4.89
+    },
+    {
+      "year": 2012,
+      "value": 100.07,
+      "yoy": 4.14
+    },
+    {
+      "year": 2013,
+      "value": 99.79,
+      "yoy": -0.28
+    },
+    {
+      "year": 2014,
+      "value": 101.28,
+      "yoy": 1.49
+    },
+    {
+      "year": 2015,
+      "value": 102.64,
+      "yoy": 1.34
+    },
+    {
+      "year": 2016,
+      "value": 104.65,
+      "yoy": 1.96
+    },
+    {
+      "year": 2017,
+      "value": 102.27,
+      "yoy": -2.27
+    },
+    {
+      "year": 2018,
+      "value": 105.05,
+      "yoy": 2.72
+    },
+    {
+      "year": 2019,
+      "value": 105.78,
+      "yoy": 0.69
+    },
+    {
+      "year": 2020,
+      "value": 125.73,
+      "yoy": 18.86
+    },
+    {
+      "year": 2021,
+      "value": 119.53,
+      "yoy": -4.93
+    },
+    {
+      "year": 2022,
+      "value": 117.53,
+      "yoy": -1.67
+    },
+    {
+      "year": 2023,
+      "value": 120.16,
+      "yoy": 2.24
+    },
+    {
+      "year": 2024,
+      "value": 121.85,
+      "yoy": 1.41
+    },
+    {
+      "year": 2025,
+      "value": 119.3,
+      "latest": true,
+      "quarter": 2,
+      "yoy": -0.62
+    }
+  ]
+}

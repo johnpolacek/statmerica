@@ -194,7 +194,7 @@ export default function MetricCard({
             </div>
           </div>
           <div className="flex items-center gap-6">
-            <div className="text-xs text-muted-foreground text-left">
+            <div className="text-xs text-muted-foreground text-left w-[180px]">
               <div className="font-semibold">{adminALabel ?? "Admin A"}</div>
               <div className={`font-mono text-xs ${partyText(partyA)} whitespace-nowrap`}>
                 <span className="mr-2 text-sm font-bold">{collapsedYoyA ?? "–"}</span>
@@ -202,7 +202,7 @@ export default function MetricCard({
                 {valueLabel && !(String(collapsedRawA ?? "").includes("$")) && <span className="ml-2">{valueLabel}</span>}
               </div>
             </div>
-            <div className="text-xs text-muted-foreground text-left">
+            <div className="text-xs text-muted-foreground text-left w-[180px]">
               <div className="font-semibold">{adminBLabel ?? "Admin B"}</div>
               <div className={`font-mono text-xs ${partyText(partyB)} whitespace-nowrap`}>
                 <span className="mr-2 text-sm font-bold">{collapsedYoyB ?? "–"}</span>

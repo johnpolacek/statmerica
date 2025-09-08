@@ -11,6 +11,7 @@ import deficit from "@/data/deficit.json"
 import unemployment from "@/data/unemployment.json"
 import sp500 from "@/data/sp500.json"
 import gdp from "@/data/gdp.json"
+import debtToGdp from "@/data/debt_to_gdp.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -61,6 +62,7 @@ export default function MetricsDashboard() {
   const unempJson = unemployment as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const sp500Json = sp500 as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const gdpJson = gdp as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+  const d2gJson = debtToGdp as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -88,6 +90,9 @@ export default function MetricsDashboard() {
   // Build year maps for GDP: yoy and raw billions (SAAR)
   const gdpYoyByYear = useMemo(() => new Map<number, number>(gdpJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [gdpJson.data])
   const gdpValueByYear = useMemo(() => new Map<number, number>(gdpJson.data.map(d => [d.year, d.value])), [gdpJson.data])
+  // Debt / GDP (value is already percent)
+  const d2gYoyByYear = useMemo(() => new Map<number, number>(d2gJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [d2gJson.data])
+  const d2gValueByYear = useMemo(() => new Map<number, number>(d2gJson.data.map(d => [d.year, d.value])), [d2gJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -154,6 +159,11 @@ export default function MetricsDashboard() {
   const gdpSeriesB = buildSeriesForAdmin(adminB, gdpYoyByYear)
   const gdpRawA = buildSeriesForAdmin(adminA, gdpValueByYear)
   const gdpRawB = buildSeriesForAdmin(adminB, gdpValueByYear)
+  // Series for Debt / GDP (YoY plotted) and raw percent (tooltip)
+  const d2gSeriesA = buildSeriesForAdmin(adminA, d2gYoyByYear)
+  const d2gSeriesB = buildSeriesForAdmin(adminB, d2gYoyByYear)
+  const d2gRawA = buildSeriesForAdmin(adminA, d2gValueByYear)
+  const d2gRawB = buildSeriesForAdmin(adminB, d2gValueByYear)
 
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
@@ -206,6 +216,9 @@ export default function MetricsDashboard() {
   const spChangeB = rangeChangeWithBaseline(adminB, spRawB, spValueByYear)
   const gdpChangeA = rangeChangeWithBaseline(adminA, gdpRawA, gdpValueByYear)
   const gdpChangeB = rangeChangeWithBaseline(adminB, gdpRawB, gdpValueByYear)
+  // For Debt / GDP, lower change is better
+  const d2gChangeA = rangeChangeWithBaseline(adminA, d2gRawA, d2gValueByYear)
+  const d2gChangeB = rangeChangeWithBaseline(adminB, d2gRawB, d2gValueByYear)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -264,6 +277,11 @@ export default function MetricsDashboard() {
     const years = gdpJson.data.map(d => d.year)
     const maxYear = years.length ? Math.max(...years) : null
     return maxYear != null ? gdpValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestD2gRaw = (() => {
+    const years = d2gJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? d2gValueByYear.get(maxYear) ?? null : null
   })()
   const latestGasRaw = (() => {
     const years = gasJson.data.map(d => d.year)
@@ -324,6 +342,11 @@ export default function MetricsDashboard() {
   const latestGdpYearWithYoy = gdpYoyYears.length ? Math.max(...gdpYoyYears) : null
   const latestGdp = latestGdpYearWithYoy != null ? (gdpJson.data.find(d => d.year === latestGdpYearWithYoy)?.yoy ?? 0) : 0
   const gdpTrend: MetricSummary["trend"] = Math.abs(latestGdp as number) < 1 ? "stable" : (latestGdp as number) > 0 ? "up" : "down"
+  // Debt / GDP YoY and trend
+  const d2gYoyYears = d2gJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year)
+  const latestD2gYearWithYoy = d2gYoyYears.length ? Math.max(...d2gYoyYears) : null
+  const latestD2g = latestD2gYearWithYoy != null ? (d2gJson.data.find(d => d.year === latestD2gYearWithYoy)?.yoy ?? 0) : 0
+  const d2gTrend: MetricSummary["trend"] = Math.abs(latestD2g as number) < 1 ? "stable" : (latestD2g as number) > 0 ? "up" : "down"
 
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
@@ -343,27 +366,31 @@ export default function MetricsDashboard() {
   // For GDP, higher 4-year change is better
   const adminAWinsGdp = gdpChangeA != null && gdpChangeB != null && gdpChangeA > gdpChangeB ? 1 : 0
   const adminBWinsGdp = gdpChangeA != null && gdpChangeB != null && gdpChangeB > gdpChangeA ? 1 : 0
+  const adminAWinsD2g = d2gChangeA != null && d2gChangeB != null && d2gChangeA < d2gChangeB ? 1 : 0
+  const adminBWinsD2g = d2gChangeA != null && d2gChangeB != null && d2gChangeB < d2gChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp + adminAWinsD2g
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp + adminBWinsD2g
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
-  if (adminAWinsCpi) adminAMetricsList.push("Inflation (CPI YoY)")
-  if (adminBWinsCpi) adminBMetricsList.push("Inflation (CPI YoY)")
-  if (adminAWinsIg) adminAMetricsList.push("Income Gap YoY")
-  if (adminBWinsIg) adminBMetricsList.push("Income Gap YoY")
-  if (adminAWinsGas) adminAMetricsList.push("Gas Prices YoY")
-  if (adminBWinsGas) adminBMetricsList.push("Gas Prices YoY")
-  if (adminAWinsDef) adminAMetricsList.push("Deficit YoY")
-  if (adminBWinsDef) adminBMetricsList.push("Deficit YoY")
-  if (adminAWinsUnemp) adminAMetricsList.push("Unemployment YoY")
-  if (adminBWinsUnemp) adminBMetricsList.push("Unemployment YoY")
+  if (adminAWinsCpi) adminAMetricsList.push("Inflation")
+  if (adminBWinsCpi) adminBMetricsList.push("Inflation")
+  if (adminAWinsIg) adminAMetricsList.push("Income Gap")
+  if (adminBWinsIg) adminBMetricsList.push("Income Gap")
+  if (adminAWinsGas) adminAMetricsList.push("Gas Prices")
+  if (adminBWinsGas) adminBMetricsList.push("Gas Prices")
+  if (adminAWinsDef) adminAMetricsList.push("Deficit")
+  if (adminBWinsDef) adminBMetricsList.push("Deficit")
+  if (adminAWinsUnemp) adminAMetricsList.push("Unemployment")
+  if (adminBWinsUnemp) adminBMetricsList.push("Unemployment")
   const spTitleShort = ((sp500Json.meta as any)?.title || "Stock Index").replace(/ Index$/, "")
-  if (adminAWinsSp) adminAMetricsList.push(`${spTitleShort} YoY`)
-  if (adminBWinsSp) adminBMetricsList.push(`${spTitleShort} YoY`)
-  if (adminAWinsGdp) adminAMetricsList.push("GDP YoY")
-  if (adminBWinsGdp) adminBMetricsList.push("GDP YoY")
+  if (adminAWinsSp) adminAMetricsList.push(`${spTitleShort}`)
+  if (adminBWinsSp) adminBMetricsList.push(`${spTitleShort}`)
+  if (adminAWinsGdp) adminAMetricsList.push("GDP")
+  if (adminBWinsGdp) adminBMetricsList.push("GDP")
+  if (adminAWinsD2g) adminAMetricsList.push("Debt/GDP Ratio")
+  if (adminBWinsD2g) adminBMetricsList.push("Debt/GDP Ratio")
 
   // Sort Final Scorecard metrics by character count (descending)
   adminAMetricsList.sort((a, b) => b.length - a.length)
@@ -377,6 +404,7 @@ export default function MetricsDashboard() {
   const unempChartData = termLabels.map((label, i) => ({ year: label, adminA: unempSeriesA[i] ?? null, adminB: unempSeriesB[i] ?? null, adminAValue: unempRawA[i] ?? null, adminBValue: unempRawB[i] ?? null }))
   const spChartData = termLabels.map((label, i) => ({ year: label, adminA: spSeriesA[i] ?? null, adminB: spSeriesB[i] ?? null, adminAValue: spRawA[i] ?? null, adminBValue: spRawB[i] ?? null }))
   const gdpChartData = termLabels.map((label, i) => ({ year: label, adminA: gdpSeriesA[i] ?? null, adminB: gdpSeriesB[i] ?? null, adminAValue: gdpRawA[i] ?? null, adminBValue: gdpRawB[i] ?? null }))
+  const d2gChartData = termLabels.map((label, i) => ({ year: label, adminA: d2gSeriesA[i] ?? null, adminB: d2gSeriesB[i] ?? null, adminAValue: d2gRawA[i] ?? null, adminBValue: d2gRawB[i] ?? null }))
 
   const cards = [
     {
@@ -403,6 +431,30 @@ export default function MetricsDashboard() {
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
       dataSourceUrl: "/data-sources#cpi",
+    },
+    {
+      title: "Debt / GDP Ratio",
+      value: `${latestD2g >= 0 ? "+" : ""}${(latestD2g as number).toFixed(2)}%`,
+      trend: d2gTrend,
+      change: `4yr ${formatPct(d2gChangeA)} vs ${formatPct(d2gChangeB)}`,
+      summaryRaw: formatPercentRaw(latestD2gRaw, 1),
+      collapsedRawA: formatPercentRaw((([...d2gRawA].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedRawB: formatPercentRaw((([...d2gRawB].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedYoyA: formatPct(d2gChangeA),
+      collapsedYoyB: formatPct(d2gChangeB),
+      chartData: d2gChartData,
+      adminAStart: d2gRawA.find(v => v != null) ?? null,
+      adminAEnd: [...d2gRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: d2gRawB.find(v => v != null) ?? null,
+      adminBEnd: [...d2gRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(d2gChangeA),
+      adminBValueLabel: formatPct(d2gChangeB),
+      methodBadge: "Debt / GDP YoY",
+      valueLabel: "Percent",
+      winnerSide: adminAWinsD2g ? "A" : adminBWinsD2g ? "B" : "none",
+      explanation: "YoY percent change in the federal Debt / GDP ratio. Lower is better.",
+      dataSource: "FRED",
+      dataSourceUrl: "/data-sources#debt-to-gdp",
     },
     {
       title: (sp500Json.meta as any)?.title || "Stock Index",
