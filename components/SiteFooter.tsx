@@ -10,7 +10,7 @@ export default function SiteFooter() {
             <a href="/data-sources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Data Sources
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://github.com/johnpolacek/statmerica/discussions" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Contact
             </a>
           </div>
