@@ -186,15 +186,15 @@ export default function MetricCard({
   if (isCollapsed) {
     return (
       <div className="pl-8 pr-4 py-4">
-        <div className="w-full flex items-center justify-between gap-4">
+        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 min-w-0">
               <div className="text-xl sm:text-2xl font-bold truncate">{title}</div>
               <span className={`px-2 py-0.5 inline-block font-mono rounded text-xs font-semibold shrink-0 ${badgeClass}`}>{badgeLabel}</span>
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="text-xs text-muted-foreground text-left w-[180px]">
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-6">
+            <div className="sm:text-xs text-muted-foreground text-center sm:text-left w-[180px]">
               <div className="font-semibold">{adminALabel ?? "Admin A"}</div>
               <div className={`font-mono text-xs ${partyText(partyA)} whitespace-nowrap`}>
                 <span className="mr-2 text-sm font-bold">{collapsedYoyA ?? "–"}</span>
@@ -202,7 +202,7 @@ export default function MetricCard({
                 {valueLabel && !(String(collapsedRawA ?? "").includes("$")) && <span className="ml-2">{valueLabel}</span>}
               </div>
             </div>
-            <div className="text-xs text-muted-foreground text-left w-[180px]">
+            <div className="sm:text-xs text-muted-foreground text-center sm:text-left w-[180px]">
               <div className="font-semibold">{adminBLabel ?? "Admin B"}</div>
               <div className={`font-mono text-xs ${partyText(partyB)} whitespace-nowrap`}>
                 <span className="mr-2 text-sm font-bold">{collapsedYoyB ?? "–"}</span>
@@ -210,10 +210,12 @@ export default function MetricCard({
                 {valueLabel && !(String(collapsedRawB ?? "").includes("$")) && <span className="ml-2">{valueLabel}</span>}
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setIsCollapsed(false)} aria-label={`View data for ${title}`}>
-              <ChevronsDown />
-              View Data
-            </Button>
+            <div className="py-2 sm:py-0">
+              <Button variant="outline" size="sm" onClick={() => setIsCollapsed(false)} aria-label={`View data for ${title}`}>
+                <ChevronsDown />
+                View Data
+              </Button>
+            </div>
           </div>
         </div>
       </div>
