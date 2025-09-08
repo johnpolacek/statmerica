@@ -14,6 +14,7 @@ import debtToGdpData from "@/data/debt_to_gdp.json"
 import householdIncomeData from "@/data/household_income.json"
 import wagesData from "@/data/wages.json"
 import lifeExpectancyData from "@/data/life_expectancy.json"
+import homeownershipData from "@/data/homeownership.json"
 
 // Transform JSON metadata into display format with a unified shape so TS is happy
 type DataSourceMeta = {
@@ -65,6 +66,35 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
         ],
       },
       notes: cpiData.meta.notes,
+    },
+    {
+      displayTitle: "Homeownership",
+      displayDescription: "Quarterly Census homeownership rate; annualized with Q4 and latest quarter",
+      icon: TrendingUp,
+      color: "bg-stone-50 border-stone-200 dark:bg-stone-950/30 dark:border-stone-900/60",
+      anchor: "homeownership",
+      source: {
+        name: homeownershipData.meta.source?.name,
+        homepage: homeownershipData.meta.source?.homepage,
+        api: homeownershipData.meta.source?.api,
+        attribution: homeownershipData.meta.source?.attribution,
+      },
+      seriesId: (homeownershipData.meta as any).seriesId,
+      coverage: homeownershipData.meta.coverage,
+      frequency: homeownershipData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:homeownership",
+        dataFile: "data/homeownership.json",
+        methodology: [
+          "Fetch FRED RHORUSQ156N (quarterly)",
+          "Select Q4 values for 1980–2024 and compute YoY",
+          "Append latest quarter and YoY vs same quarter prior year",
+        ],
+        chartUsage: [
+          "Homeownership Rate card (YoY, Percent)",
+        ],
+      },
+      notes: (homeownershipData.meta as any).notes,
     },
     {
       displayTitle: "Life Expectancy at Birth (US)",
@@ -463,6 +493,16 @@ const scriptDocumentation = [
     parameters: [],
     envVars: ["FRED_API_KEY (optional)"],
     output: "data/wages.json",
+    icon: Download
+  },
+  {
+    name: "fetch:homeownership",
+    command: "pnpm run fetch:homeownership",
+    file: "scripts/fetch-homeownership.mjs",
+    description: "Fetches Homeownership Rate (RHORUSQ156N), annualizes by Q4, adds latest quarter",
+    parameters: [],
+    envVars: [],
+    output: "data/homeownership.json",
     icon: Download
   },
   {

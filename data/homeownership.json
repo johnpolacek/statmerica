@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "id": "homeownership",
+    "title": "Homeownership",
+    "description": "U.S. Homeownership Rate (percent). Annual uses Q4 values; current year uses latest quarter. YoY computed vs prior Q4/same quarter previous year.",
+    "units": "Percent (value), Percent (yoy)",
+    "frequency": "Annual (Q4), plus latest quarter",
+    "coverage": {
+      "start": 1980,
+      "end": 2025
+    },
+    "fetchedAt": "2025-09-08T02:35:19.285Z",
+    "source": {
+      "name": "Federal Reserve Bank of St. Louis (FRED)",
+      "homepage": "https://fred.stlouisfed.org/series/RHORUSQ156N",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=RHORUSQ156N",
+      "attribution": "Public domain"
+    },
+    "seriesId": "RHORUSQ156N",
+    "notes": "Quarterly series from FRED (Census). Annualized by Q4 for historical comparison; latest quarter appended with YoY vs same quarter previous year."
+  },
+  "data": [
+    {
+      "year": 1980,
+      "value": 65.5,
+      "yoy": 0.15
+    },
+    {
+      "year": 1981,
+      "value": 65.2,
+      "yoy": -0.46
+    },
+    {
+      "year": 1982,
+      "value": 64.5,
+      "yoy": -1.07
+    },
+    {
+      "year": 1983,
+      "value": 64.4,
+      "yoy": -0.16
+    },
+    {
+      "year": 1984,
+      "value": 64.1,
+      "yoy": -0.47
+    },
+    {
+      "year": 1985,
+      "value": 63.5,
+      "yoy": -0.94
+    },
+    {
+      "year": 1986,
+      "value": 63.9,
+      "yoy": 0.63
+    },
+    {
+      "year": 1987,
+      "value": 64.1,
+      "yoy": 0.31
+    },
+    {
+      "year": 1988,
+      "value": 63.8,
+      "yoy": -0.47
+    },
+    {
+      "year": 1989,
+      "value": 63.8,
+      "yoy": 0
+    },
+    {
+      "year": 1990,
+      "value": 64.1,
+      "yoy": 0.47
+    },
+    {
+      "year": 1991,
+      "value": 64.2,
+      "yoy": 0.16
+    },
+    {
+      "year": 1992,
+      "value": 64.4,
+      "yoy": 0.31
+    },
+    {
+      "year": 1993,
+      "value": 64.6,
+      "yoy": 0.31
+    },
+    {
+      "year": 1994,
+      "value": 64.2,
+      "yoy": -0.62
+    },
+    {
+      "year": 1995,
+      "value": 65.1,
+      "yoy": 1.4
+    },
+    {
+      "year": 1996,
+      "value": 65.4,
+      "yoy": 0.46
+    },
+    {
+      "year": 1997,
+      "value": 65.7,
+      "yoy": 0.46
+    },
+    {
+      "year": 1998,
+      "value": 66.4,
+      "yoy": 1.07
+    },
+    {
+      "year": 1999,
+      "value": 66.9,
+      "yoy": 0.75
+    },
+    {
+      "year": 2000,
+      "value": 67.5,
+      "yoy": 0.9
+    },
+    {
+      "year": 2001,
+      "value": 68,
+      "yoy": 0.74
+    },
+    {
+      "year": 2002,
+      "value": 68.3,
+      "yoy": 0.44
+    },
+    {
+      "year": 2003,
+      "value": 68.6,
+      "yoy": 0.44
+    },
+    {
+      "year": 2004,
+      "value": 69.2,
+      "yoy": 0.87
+    },
+    {
+      "year": 2005,
+      "value": 69,
+      "yoy": -0.29
+    },
+    {
+      "year": 2006,
+      "value": 68.9,
+      "yoy": -0.14
+    },
+    {
+      "year": 2007,
+      "value": 67.8,
+      "yoy": -1.6
+    },
+    {
+      "year": 2008,
+      "value": 67.5,
+      "yoy": -0.44
+    },
+    {
+      "year": 2009,
+      "value": 67.2,
+      "yoy": -0.44
+    },
+    {
+      "year": 2010,
+      "value": 66.5,
+      "yoy": -1.04
+    },
+    {
+      "year": 2011,
+      "value": 66,
+      "yoy": -0.75
+    },
+    {
+      "year": 2012,
+      "value": 65.4,
+      "yoy": -0.91
+    },
+    {
+      "year": 2013,
+      "value": 65.2,
+      "yoy": -0.31
+    },
+    {
+      "year": 2014,
+      "value": 64,
+      "yoy": -1.84
+    },
+    {
+      "year": 2015,
+      "value": 63.8,
+      "yoy": -0.31
+    },
+    {
+      "year": 2016,
+      "value": 63.7,
+      "yoy": -0.16
+    },
+    {
+      "year": 2017,
+      "value": 64.2,
+      "yoy": 0.78
+    },
+    {
+      "year": 2018,
+      "value": 64.8,
+      "yoy": 0.93
+    },
+    {
+      "year": 2019,
+      "value": 65.1,
+      "yoy": 0.46
+    },
+    {
+      "year": 2020,
+      "value": 65.8,
+      "yoy": 1.08
+    },
+    {
+      "year": 2021,
+      "value": 65.5,
+      "yoy": -0.46
+    },
+    {
+      "year": 2022,
+      "value": 65.9,
+      "yoy": 0.61
+    },
+    {
+      "year": 2023,
+      "value": 65.7,
+      "yoy": -0.3
+    },
+    {
+      "year": 2024,
+      "value": 65.7,
+      "yoy": 0
+    },
+    {
+      "year": 2025,
+      "value": 65,
+      "latest": true,
+      "quarter": 2,
+      "yoy": -0.91
+    }
+  ]
+}

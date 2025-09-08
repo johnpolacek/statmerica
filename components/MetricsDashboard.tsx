@@ -15,6 +15,7 @@ import debtToGdp from "@/data/debt_to_gdp.json"
 import hhIncome from "@/data/household_income.json"
 import wages from "@/data/wages.json"
 import lifeExpectancy from "@/data/life_expectancy.json"
+import homeownership from "@/data/homeownership.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -69,6 +70,7 @@ export default function MetricsDashboard() {
   const hhJson = hhIncome as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
   const wagesJson = wages as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean; month?: number }[]; meta: { title?: string; units?: string } }
   const lifeJson = lifeExpectancy as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
+  const homeJson = homeownership as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean; quarter?: number }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -108,6 +110,9 @@ export default function MetricsDashboard() {
   // Life Expectancy (years)
   const lifeYoyByYear = useMemo(() => new Map<number, number>(lifeJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [lifeJson.data])
   const lifeValueByYear = useMemo(() => new Map<number, number>(lifeJson.data.map(d => [d.year, d.value])), [lifeJson.data])
+  // Homeownership (percent)
+  const homeYoyByYear = useMemo(() => new Map<number, number>(homeJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [homeJson.data])
+  const homeValueByYear = useMemo(() => new Map<number, number>(homeJson.data.map(d => [d.year, d.value])), [homeJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -194,6 +199,11 @@ export default function MetricsDashboard() {
   const lifeSeriesB = buildSeriesForAdmin(adminB, lifeYoyByYear)
   const lifeRawA = buildSeriesForAdmin(adminA, lifeValueByYear)
   const lifeRawB = buildSeriesForAdmin(adminB, lifeValueByYear)
+  // Series for Homeownership (YoY plotted) and raw percent (tooltip)
+  const homeSeriesA = buildSeriesForAdmin(adminA, homeYoyByYear)
+  const homeSeriesB = buildSeriesForAdmin(adminB, homeYoyByYear)
+  const homeRawA = buildSeriesForAdmin(adminA, homeValueByYear)
+  const homeRawB = buildSeriesForAdmin(adminB, homeValueByYear)
 
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
@@ -258,6 +268,9 @@ export default function MetricsDashboard() {
   // For Life Expectancy, higher change is better
   const lifeChangeA = rangeChangeWithBaseline(adminA, lifeRawA, lifeValueByYear)
   const lifeChangeB = rangeChangeWithBaseline(adminB, lifeRawB, lifeValueByYear)
+  // For Homeownership, higher change is better
+  const homeChangeA = rangeChangeWithBaseline(adminA, homeRawA, homeValueByYear)
+  const homeChangeB = rangeChangeWithBaseline(adminB, homeRawB, homeValueByYear)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -336,6 +349,11 @@ export default function MetricsDashboard() {
     const years = lifeJson.data.map(d => d.year)
     const maxYear = years.length ? Math.max(...years) : null
     return maxYear != null ? lifeValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestHomeRaw = (() => {
+    const years = homeJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? homeValueByYear.get(maxYear) ?? null : null
   })()
   const latestGasRaw = (() => {
     const years = gasJson.data.map(d => d.year)
@@ -416,6 +434,11 @@ export default function MetricsDashboard() {
   const latestLifeYearWithYoy = lifeYoyYears.length ? Math.max(...lifeYoyYears) : null
   const latestLife = latestLifeYearWithYoy != null ? (lifeJson.data.find(d => d.year === latestLifeYearWithYoy)?.yoy ?? 0) : 0
   const lifeTrend: MetricSummary["trend"] = Math.abs(latestLife as number) < 1 ? "stable" : (latestLife as number) > 0 ? "up" : "down"
+  // Homeownership YoY and trend
+  const homeYoyYears = homeJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year)
+  const latestHomeYearWithYoy = homeYoyYears.length ? Math.max(...homeYoyYears) : null
+  const latestHome = latestHomeYearWithYoy != null ? (homeJson.data.find(d => d.year === latestHomeYearWithYoy)?.yoy ?? 0) : 0
+  const homeTrend: MetricSummary["trend"] = Math.abs(latestHome as number) < 1 ? "stable" : (latestHome as number) > 0 ? "up" : "down"
 
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
@@ -443,9 +466,11 @@ export default function MetricsDashboard() {
   const adminBWinsWages = wagesChangeA != null && wagesChangeB != null && wagesChangeB > wagesChangeA ? 1 : 0
   const adminAWinsLife = lifeChangeA != null && lifeChangeB != null && lifeChangeA > lifeChangeB ? 1 : 0
   const adminBWinsLife = lifeChangeA != null && lifeChangeB != null && lifeChangeB > lifeChangeA ? 1 : 0
+  const adminAWinsHome = homeChangeA != null && homeChangeB != null && homeChangeA > homeChangeB ? 1 : 0
+  const adminBWinsHome = homeChangeA != null && homeChangeB != null && homeChangeB > homeChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp + adminAWinsD2g + adminAWinsHh + adminAWinsWages + adminAWinsLife
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp + adminBWinsD2g + adminBWinsHh + adminBWinsWages + adminBWinsLife
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp + adminAWinsD2g + adminAWinsHh + adminAWinsWages + adminAWinsLife + adminAWinsHome
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp + adminBWinsD2g + adminBWinsHh + adminBWinsWages + adminBWinsLife + adminBWinsHome
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -472,6 +497,8 @@ export default function MetricsDashboard() {
   if (adminBWinsWages) adminBMetricsList.push("Wages")
   if (adminAWinsLife) adminAMetricsList.push("Life Expectancy")
   if (adminBWinsLife) adminBMetricsList.push("Life Expectancy")
+  if (adminAWinsHome) adminAMetricsList.push("Homeownership")
+  if (adminBWinsHome) adminBMetricsList.push("Homeownership")
 
   // Sort Final Scorecard metrics by character count (descending)
   adminAMetricsList.sort((a, b) => b.length - a.length)
@@ -489,6 +516,7 @@ export default function MetricsDashboard() {
   const hhChartData = termLabels.map((label, i) => ({ year: label, adminA: hhSeriesA[i] ?? null, adminB: hhSeriesB[i] ?? null, adminAValue: hhRawA[i] ?? null, adminBValue: hhRawB[i] ?? null }))
   const wagesChartData = termLabels.map((label, i) => ({ year: label, adminA: wagesSeriesA[i] ?? null, adminB: wagesSeriesB[i] ?? null, adminAValue: wagesRawA[i] ?? null, adminBValue: wagesRawB[i] ?? null }))
   const lifeChartData = termLabels.map((label, i) => ({ year: label, adminA: lifeSeriesA[i] ?? null, adminB: lifeSeriesB[i] ?? null, adminAValue: lifeRawA[i] ?? null, adminBValue: lifeRawB[i] ?? null }))
+  const homeChartData = termLabels.map((label, i) => ({ year: label, adminA: homeSeriesA[i] ?? null, adminB: homeSeriesB[i] ?? null, adminAValue: homeRawA[i] ?? null, adminBValue: homeRawB[i] ?? null }))
 
   const cards = [
     {
@@ -515,6 +543,30 @@ export default function MetricsDashboard() {
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
       dataSourceUrl: "/data-sources#cpi",
+    },
+    {
+      title: "Homeownership",
+      value: `${latestHome >= 0 ? "+" : ""}${(latestHome as number).toFixed(2)}%`,
+      trend: homeTrend,
+      change: `4yr ${formatPct(homeChangeA)} vs ${formatPct(homeChangeB)}`,
+      summaryRaw: formatPercentRaw(latestHomeRaw, 1),
+      collapsedRawA: formatPercentRaw((([...homeRawA].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedRawB: formatPercentRaw((([...homeRawB].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedYoyA: formatPct(homeChangeA),
+      collapsedYoyB: formatPct(homeChangeB),
+      chartData: homeChartData,
+      adminAStart: homeRawA.find(v => v != null) ?? null,
+      adminAEnd: [...homeRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: homeRawB.find(v => v != null) ?? null,
+      adminBEnd: [...homeRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(homeChangeA),
+      adminBValueLabel: formatPct(homeChangeB),
+      methodBadge: "Homeownership YoY",
+      valueLabel: "Percent",
+      winnerSide: adminAWinsHome ? "A" : adminBWinsHome ? "B" : "none",
+      explanation: "YoY percent change in the U.S. homeownership rate (Census via FRED). Higher is better.",
+      dataSource: "FRED / Census",
+      dataSourceUrl: "/data-sources#homeownership",
     },
     {
       title: "Life Expectancy",
