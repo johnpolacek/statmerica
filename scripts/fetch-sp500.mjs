@@ -9,16 +9,7 @@
 import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 
-const API_URL = 'https://api.stlouisfed.org/fred/series/observations'
-
-function parseArgs(argv) {
-  const args = { series: 'SP500' }
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i]
-    if (a === '--series' && argv[i + 1]) args.series = argv[++i]
-  }
-  return args
-}
+function parseArgs(argv) { return {} }
 
 function round2(n) { return Number(n.toFixed(2)) }
 
@@ -29,34 +20,37 @@ function toISO(d) {
   return `${y}-${m}-${day}`
 }
 
-async function fetchFredObservations({ seriesId, apiKey, start }) {
-  const url = new URL(API_URL)
-  url.searchParams.set('series_id', seriesId)
-  url.searchParams.set('api_key', apiKey)
-  url.searchParams.set('file_type', 'json')
-  if (start) url.searchParams.set('observation_start', start)
+function toUnix(dateStr) {
+  return Math.floor(new Date(dateStr).getTime() / 1000)
+}
 
+// Remove FRED/Yahoo complexity; use Stooq as single canonical source for S&P 500
+
+async function fetchStooqObservations() {
+  // Stooq S&P 500 daily CSV
+  const url = 'https://stooq.com/q/d/l/?s=^spx&i=d'
   const res = await fetch(url)
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(`FRED API request failed: ${res.status} ${res.statusText} ${text}`)
+    throw new Error(`Stooq request failed: ${res.status} ${res.statusText} ${text}`)
   }
-  const json = await res.json()
-  if (!Array.isArray(json.observations)) {
-    throw new Error('FRED API returned unexpected shape (no observations)')
-  }
-
+  const csv = await res.text()
+  const lines = csv.trim().split(/\r?\n/)
+  // header: Date,Open,High,Low,Close,Volume
   const rows = []
-  for (const o of json.observations) {
-    const value = Number(o.value)
-    if (!Number.isFinite(value)) continue
-    const date = o.date // YYYY-MM-DD
+  for (let i = 1; i < lines.length; i++) {
+    const [date, open, high, low, close] = lines[i].split(',')
+    if (!date || !close) continue
+    const val = Number(close)
+    if (!Number.isFinite(val)) continue
     const year = Number(date.slice(0, 4))
-    rows.push({ date, year, value })
+    rows.push({ date, year, value: val })
   }
   rows.sort((a, b) => a.date.localeCompare(b.date))
   return rows
 }
+
+// Yahoo removed (auth required). FRED removed (licensing/coverage limits here). Stooq is sufficient.
 
 function pickLastTradingDayOfDecember(observations, year) {
   // Find last observation in December of given year
@@ -83,16 +77,12 @@ function findNearestOnOrBefore(observations, targetIso) {
 }
 
 async function main() {
-  const argv = parseArgs(process.argv.slice(2))
+  parseArgs(process.argv.slice(2))
   const now = new Date()
-  const apiKey = process.env.FRED_API_KEY || process.env.FRED_KEY
-  if (!apiKey) {
-    throw new Error('Missing FRED_API_KEY environment variable')
-  }
-
   const start = '1979-01-01' // need 1979 Dec for 1980 YoY base
-  console.log(`Fetching stock index from FRED series=${argv.series}`)
-  const obs = await fetchFredObservations({ seriesId: argv.series, apiKey, start })
+  console.log('Fetching S&P 500 (daily) from Stooq...')
+  let obs = await fetchStooqObservations()
+  let sourceTag = 'Stooq'
 
   const getVal = (iso) => obs.find(r => r.date === iso)?.value ?? null
 
@@ -143,7 +133,7 @@ async function main() {
       homepage: 'https://fred.stlouisfed.org/series/DJIA',
     },
   }
-  const seriesInfo = SERIES_META[argv.series] || { title: argv.series, homepage: 'https://fred.stlouisfed.org' }
+  const seriesInfo = { title: 'S&P 500 Index', homepage: 'https://stooq.com' }
 
   const meta = {
     id: 'sp500',
@@ -154,12 +144,12 @@ async function main() {
     coverage,
     fetchedAt: new Date().toISOString(),
     source: {
-      name: 'Federal Reserve Bank of St. Louis (FRED)',
-      homepage: seriesInfo.homepage,
-      api: 'https://api.stlouisfed.org/fred/series/observations',
-      attribution: 'Public domain',
+      name: 'Stooq',
+      homepage: 'https://stooq.com',
+      api: 'https://stooq.com/q/d/l/',
+      attribution: 'Stooq free data',
     },
-    seriesId: argv.series,
+    seriesId: '^spx',
     notes: 'Annual points are last trading day in December. Latest is most recent close. YoY for latest is computed vs nearest available date one year earlier.'
   }
 

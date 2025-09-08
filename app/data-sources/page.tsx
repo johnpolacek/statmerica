@@ -265,7 +265,7 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
     },
     {
       displayTitle: "S&P 500 Index",
-      displayDescription: "December closes and latest close; includes YoY % change (SP500)",
+      displayDescription: "December closes and latest close; includes YoY % change (Stooq ^spx)",
       icon: TrendingUp,
       color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/60",
       anchor: "sp500",
@@ -282,7 +282,7 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
         updateScript: "pnpm run fetch:sp500",
         dataFile: "data/sp500.json",
         methodology: [
-          "Fetch FRED SP500 series (daily)",
+          "Fetch Stooq ^spx (daily)",
           "Select last trading day in December for 1980–2024",
           "Append latest close and compute YoY vs ~same date prior year",
         ],
