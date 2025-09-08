@@ -719,16 +719,16 @@ export default function MetricsDashboard() {
             <div className="text-center">
               <div className="grid grid-cols-2">
                 <div className="border-r border-dashed border-foreground/20 p-8">
-                  <div className={`text-3xl font-bold ${partyText(adminAComputed.party)}`}>{adminAName}</div>
-                  <div className="text-center py-2 space-y-1">
+                  <div className={`text-2xl sm:text-3xl font-bold ${partyText(adminAComputed.party)}`}>{adminAName}</div>
+                  <div className="text-sm sm:text-base text-center py-2 space-y-1">
                     {adminAMetricsList.map((metric, index) => (
                       <div key={index} className="w-full flex items-center justify-center gap-2 font-bold"><CircleCheckBig className={partyText(adminAComputed.party)} /> {metric}</div>
                     ))}
                   </div>
                 </div>
                 <div className="p-8">
-                  <div className={`text-3xl font-bold ${partyText(adminBComputed.party)}`}>{adminBName}</div>
-                  <div className="text-center py-2 space-y-1">
+                  <div className={`text-2xl sm:text-3xl font-bold ${partyText(adminBComputed.party)}`}>{adminBName}</div>
+                  <div className="text-sm sm:text-base text-center py-2 space-y-1">
                     {adminBMetricsList.map((metric, index) => (
                       <div key={index} className="w-full flex items-center justify-center gap-2 font-bold"><CircleCheckBig className={partyText(adminBComputed.party)} /> {metric}</div>
                     ))}
