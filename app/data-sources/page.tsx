@@ -9,6 +9,10 @@ import gasData from "@/data/gas_prices.json"
 import deficitData from "@/data/deficit.json"
 import unemploymentData from "@/data/unemployment.json"
 import sp500Data from "@/data/sp500.json"
+import gdpData from "@/data/gdp.json"
+import debtToGdpData from "@/data/debt_to_gdp.json"
+import householdIncomeData from "@/data/household_income.json"
+import wagesData from "@/data/wages.json"
 
 // Transform JSON metadata into display format with a unified shape so TS is happy
 type DataSourceMeta = {
@@ -60,6 +64,120 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
         ],
       },
       notes: cpiData.meta.notes,
+    },
+    {
+      displayTitle: (gdpData.meta as any).title || "Real GDP",
+      displayDescription: "Q4 real GDP levels with YoY vs prior Q4; includes latest quarter",
+      icon: TrendingUp,
+      color: "bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-900/60",
+      anchor: "gdp",
+      source: {
+        name: gdpData.meta.source?.name,
+        homepage: gdpData.meta.source?.homepage,
+        api: gdpData.meta.source?.api,
+        attribution: gdpData.meta.source?.attribution,
+      },
+      seriesId: (gdpData.meta as any).seriesId,
+      coverage: gdpData.meta.coverage,
+      frequency: gdpData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:gdp",
+        dataFile: "data/gdp.json",
+        methodology: [
+          "Fetch FRED GDPC1 quarterly real GDP",
+          "Select Q4 values for 1980–2024 and compute YoY",
+          "Append latest quarter and YoY vs same quarter prior year",
+        ],
+        chartUsage: [
+          "GDP Growth card (YoY, USD billions SAAR)",
+        ],
+      },
+      notes: (gdpData.meta as any).notes,
+    },
+    {
+      displayTitle: (debtToGdpData.meta as any).title || "Debt / GDP Ratio",
+      displayDescription: "Q4 federal Debt / GDP ratio (%), YoY vs prior Q4; includes latest quarter",
+      icon: TrendingDown,
+      color: "bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-900/60",
+      anchor: "debt-to-gdp",
+      source: {
+        name: debtToGdpData.meta.source?.name,
+        homepage: debtToGdpData.meta.source?.homepage,
+        api: debtToGdpData.meta.source?.api,
+        attribution: debtToGdpData.meta.source?.attribution,
+      },
+      seriesId: (debtToGdpData.meta as any).seriesId,
+      coverage: debtToGdpData.meta.coverage,
+      frequency: debtToGdpData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:debt-to-gdp",
+        dataFile: "data/debt_to_gdp.json",
+        methodology: [
+          "Fetch FRED GFDEGDQ188S quarterly Debt/GDP %",
+          "Select Q4 values for 1980–2024 and compute YoY",
+          "Append latest quarter and YoY vs same quarter prior year",
+        ],
+        chartUsage: [
+          "Debt / GDP Ratio card (YoY, Percent)",
+        ],
+      },
+      notes: (debtToGdpData.meta as any).notes,
+    },
+    {
+      displayTitle: (householdIncomeData.meta as any).title || "Household Income",
+      displayDescription: "Real median household income (constant dollars) with YoY",
+      icon: TrendingUp,
+      color: "bg-teal-50 border-teal-200 dark:bg-teal-950/30 dark:border-teal-900/60",
+      anchor: "household-income",
+      source: {
+        name: householdIncomeData.meta.source?.name,
+        homepage: householdIncomeData.meta.source?.homepage,
+        api: householdIncomeData.meta.source?.api,
+        attribution: householdIncomeData.meta.source?.attribution,
+      },
+      coverage: householdIncomeData.meta.coverage,
+      frequency: householdIncomeData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:household-income",
+        dataFile: "data/household_income.json",
+        methodology: [
+          "Fetch FRED real median household income (1984+)",
+          "Backfill 1979–1983 chaining P50 growth",
+          "Compute YoY on real income level",
+        ],
+        chartUsage: [
+          "Household Income card (YoY, USD)",
+        ],
+      },
+      notes: (householdIncomeData.meta as any).notes,
+    },
+    {
+      displayTitle: (wagesData.meta as any).title || "Wages",
+      displayDescription: "Real average hourly earnings (production & nonsupervisory), CPI-adjusted",
+      icon: TrendingUp,
+      color: "bg-sky-50 border-sky-200 dark:bg-sky-950/30 dark:border-sky-900/60",
+      anchor: "wages",
+      source: {
+        name: wagesData.meta.source?.name,
+        homepage: wagesData.meta.source?.homepage,
+        api: wagesData.meta.source?.api,
+        attribution: wagesData.meta.source?.attribution,
+      },
+      coverage: wagesData.meta.coverage,
+      frequency: wagesData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:wages",
+        dataFile: "data/wages.json",
+        methodology: [
+          "Fetch FRED AHETPI and CPIAUCSL (monthly)",
+          "Deflate AHE by CPI to get real hourly earnings",
+          "Use December values for 1980–2024 and compute YoY; append latest month",
+        ],
+        chartUsage: [
+          "Wages card (YoY, USD/hr)",
+        ],
+      },
+      notes: (wagesData.meta as any).notes,
     },
     {
       displayTitle: "Gas Prices (Regular, Retail)",
@@ -276,6 +394,47 @@ const scriptDocumentation = [
     parameters: [],
     envVars: ["BLS_API_KEY (optional, increases rate limits)", "--series lns (default)"] ,
     output: "data/unemployment.json",
+    icon: Download
+  }
+  ,
+  {
+    name: "fetch:gdp",
+    command: "pnpm run fetch:gdp",
+    file: "scripts/fetch-gdp.mjs",
+    description: "Fetches real GDP (GDPC1) and builds annual Q4 + latest quarter",
+    parameters: [],
+    envVars: [],
+    output: "data/gdp.json",
+    icon: Download
+  },
+  {
+    name: "fetch:debt-to-gdp",
+    command: "pnpm run fetch:debt-to-gdp",
+    file: "scripts/fetch-debt-to-gdp.mjs",
+    description: "Fetches Debt/GDP ratio (GFDEGDQ188S) and builds annual Q4 + latest",
+    parameters: [],
+    envVars: [],
+    output: "data/debt_to_gdp.json",
+    icon: Download
+  },
+  {
+    name: "fetch:household-income",
+    command: "pnpm run fetch:household-income",
+    file: "scripts/fetch-household-income.mjs",
+    description: "Builds Household Income: real median HH income with 1979–83 backfill",
+    parameters: [],
+    envVars: [],
+    output: "data/household_income.json",
+    icon: Download
+  },
+  {
+    name: "fetch:wages",
+    command: "pnpm run fetch:wages",
+    file: "scripts/fetch-wages.mjs",
+    description: "Computes Real Wages: deflates AHETPI by CPI; Dec + latest YoY",
+    parameters: [],
+    envVars: ["FRED_API_KEY (optional)"],
+    output: "data/wages.json",
     icon: Download
   }
 ]
