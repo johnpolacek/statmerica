@@ -28,13 +28,13 @@ export default function AdministrationSelect({ value, onChange, className }: Adm
           value="party-R"
           className={`${itemHighlightClass("R")} cursor-pointer transition-colors duration-200`}
         >
-          Republicans
+          Republicans (1980-present)
         </SelectItem>
         <SelectItem
           value="party-D"
           className={`${itemHighlightClass("D")} cursor-pointer transition-colors duration-200`}
         >
-          Democrats
+          Democrats (1980-present)
         </SelectItem>
         {administrations.map((admin) => (
           <SelectItem

@@ -13,6 +13,7 @@ import gdpData from "@/data/gdp.json"
 import debtToGdpData from "@/data/debt_to_gdp.json"
 import householdIncomeData from "@/data/household_income.json"
 import wagesData from "@/data/wages.json"
+import lifeExpectancyData from "@/data/life_expectancy.json"
 
 // Transform JSON metadata into display format with a unified shape so TS is happy
 type DataSourceMeta = {
@@ -64,6 +65,33 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
         ],
       },
       notes: cpiData.meta.notes,
+    },
+    {
+      displayTitle: "Life Expectancy at Birth (US)",
+      displayDescription: "Annual life expectancy in years; includes YoY percent change",
+      icon: TrendingUp,
+      color: "bg-fuchsia-50 border-fuchsia-200 dark:bg-fuchsia-950/30 dark:border-fuchsia-900/60",
+      anchor: "life-expectancy",
+      source: {
+        name: lifeExpectancyData.meta.source?.name,
+        homepage: lifeExpectancyData.meta.source?.homepage,
+        api: lifeExpectancyData.meta.source?.api,
+        attribution: lifeExpectancyData.meta.source?.attribution,
+      },
+      coverage: lifeExpectancyData.meta.coverage,
+      frequency: lifeExpectancyData.meta.frequency,
+      processing: {
+        updateScript: "pnpm run fetch:life-expectancy",
+        dataFile: "data/life_expectancy.json",
+        methodology: [
+          "Fetch World Bank SP.DYN.LE00.IN (USA)",
+          "Filter to 1979+ and compute YoY",
+        ],
+        chartUsage: [
+          "Life Expectancy card (YoY, Years)",
+        ],
+      },
+      notes: (lifeExpectancyData.meta as any).notes,
     },
     {
       displayTitle: (gdpData.meta as any).title || "Real GDP",
@@ -435,6 +463,16 @@ const scriptDocumentation = [
     parameters: [],
     envVars: ["FRED_API_KEY (optional)"],
     output: "data/wages.json",
+    icon: Download
+  },
+  {
+    name: "fetch:life-expectancy",
+    command: "pnpm run fetch:life-expectancy",
+    file: "scripts/fetch-life-expectancy.mjs",
+    description: "Fetches Life Expectancy at birth (World Bank) and computes YoY",
+    parameters: [],
+    envVars: [],
+    output: "data/life_expectancy.json",
     icon: Download
   }
 ]

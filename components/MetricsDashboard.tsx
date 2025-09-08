@@ -14,6 +14,7 @@ import gdp from "@/data/gdp.json"
 import debtToGdp from "@/data/debt_to_gdp.json"
 import hhIncome from "@/data/household_income.json"
 import wages from "@/data/wages.json"
+import lifeExpectancy from "@/data/life_expectancy.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -67,6 +68,7 @@ export default function MetricsDashboard() {
   const d2gJson = debtToGdp as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const hhJson = hhIncome as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
   const wagesJson = wages as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean; month?: number }[]; meta: { title?: string; units?: string } }
+  const lifeJson = lifeExpectancy as unknown as { data: { year: number; value: number; yoy?: number }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -103,6 +105,9 @@ export default function MetricsDashboard() {
   // Wages (real AHE)
   const wagesYoyByYear = useMemo(() => new Map<number, number>(wagesJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [wagesJson.data])
   const wagesValueByYear = useMemo(() => new Map<number, number>(wagesJson.data.map(d => [d.year, d.value])), [wagesJson.data])
+  // Life Expectancy (years)
+  const lifeYoyByYear = useMemo(() => new Map<number, number>(lifeJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [lifeJson.data])
+  const lifeValueByYear = useMemo(() => new Map<number, number>(lifeJson.data.map(d => [d.year, d.value])), [lifeJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -184,6 +189,11 @@ export default function MetricsDashboard() {
   const wagesSeriesB = buildSeriesForAdmin(adminB, wagesYoyByYear)
   const wagesRawA = buildSeriesForAdmin(adminA, wagesValueByYear)
   const wagesRawB = buildSeriesForAdmin(adminB, wagesValueByYear)
+  // Series for Life Expectancy (YoY plotted) and raw years (tooltip)
+  const lifeSeriesA = buildSeriesForAdmin(adminA, lifeYoyByYear)
+  const lifeSeriesB = buildSeriesForAdmin(adminB, lifeYoyByYear)
+  const lifeRawA = buildSeriesForAdmin(adminA, lifeValueByYear)
+  const lifeRawB = buildSeriesForAdmin(adminB, lifeValueByYear)
 
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
@@ -245,6 +255,9 @@ export default function MetricsDashboard() {
   // For Wages, higher change is better
   const wagesChangeA = rangeChangeWithBaseline(adminA, wagesRawA, wagesValueByYear)
   const wagesChangeB = rangeChangeWithBaseline(adminB, wagesRawB, wagesValueByYear)
+  // For Life Expectancy, higher change is better
+  const lifeChangeA = rangeChangeWithBaseline(adminA, lifeRawA, lifeValueByYear)
+  const lifeChangeB = rangeChangeWithBaseline(adminB, lifeRawB, lifeValueByYear)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -318,6 +331,11 @@ export default function MetricsDashboard() {
     const years = wagesJson.data.map(d => d.year)
     const maxYear = years.length ? Math.max(...years) : null
     return maxYear != null ? wagesValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestLifeRaw = (() => {
+    const years = lifeJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? lifeValueByYear.get(maxYear) ?? null : null
   })()
   const latestGasRaw = (() => {
     const years = gasJson.data.map(d => d.year)
@@ -393,6 +411,11 @@ export default function MetricsDashboard() {
   const latestWagesYearWithYoy = wagesYoyYears.length ? Math.max(...wagesYoyYears) : null
   const latestWages = latestWagesYearWithYoy != null ? (wagesJson.data.find(d => d.year === latestWagesYearWithYoy)?.yoy ?? 0) : 0
   const wagesTrend: MetricSummary["trend"] = Math.abs(latestWages as number) < 1 ? "stable" : (latestWages as number) > 0 ? "up" : "down"
+  // Life Expectancy YoY and trend
+  const lifeYoyYears = lifeJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year)
+  const latestLifeYearWithYoy = lifeYoyYears.length ? Math.max(...lifeYoyYears) : null
+  const latestLife = latestLifeYearWithYoy != null ? (lifeJson.data.find(d => d.year === latestLifeYearWithYoy)?.yoy ?? 0) : 0
+  const lifeTrend: MetricSummary["trend"] = Math.abs(latestLife as number) < 1 ? "stable" : (latestLife as number) > 0 ? "up" : "down"
 
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
@@ -418,9 +441,11 @@ export default function MetricsDashboard() {
   const adminBWinsHh = hhChangeA != null && hhChangeB != null && hhChangeB > hhChangeA ? 1 : 0
   const adminAWinsWages = wagesChangeA != null && wagesChangeB != null && wagesChangeA > wagesChangeB ? 1 : 0
   const adminBWinsWages = wagesChangeA != null && wagesChangeB != null && wagesChangeB > wagesChangeA ? 1 : 0
+  const adminAWinsLife = lifeChangeA != null && lifeChangeB != null && lifeChangeA > lifeChangeB ? 1 : 0
+  const adminBWinsLife = lifeChangeA != null && lifeChangeB != null && lifeChangeB > lifeChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp + adminAWinsD2g + adminAWinsHh + adminAWinsWages
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp + adminBWinsD2g + adminBWinsHh + adminBWinsWages
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp + adminAWinsD2g + adminAWinsHh + adminAWinsWages + adminAWinsLife
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp + adminBWinsD2g + adminBWinsHh + adminBWinsWages + adminBWinsLife
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -445,6 +470,8 @@ export default function MetricsDashboard() {
   if (adminBWinsHh) adminBMetricsList.push("Household Income")
   if (adminAWinsWages) adminAMetricsList.push("Wages")
   if (adminBWinsWages) adminBMetricsList.push("Wages")
+  if (adminAWinsLife) adminAMetricsList.push("Life Expectancy")
+  if (adminBWinsLife) adminBMetricsList.push("Life Expectancy")
 
   // Sort Final Scorecard metrics by character count (descending)
   adminAMetricsList.sort((a, b) => b.length - a.length)
@@ -461,6 +488,7 @@ export default function MetricsDashboard() {
   const d2gChartData = termLabels.map((label, i) => ({ year: label, adminA: d2gSeriesA[i] ?? null, adminB: d2gSeriesB[i] ?? null, adminAValue: d2gRawA[i] ?? null, adminBValue: d2gRawB[i] ?? null }))
   const hhChartData = termLabels.map((label, i) => ({ year: label, adminA: hhSeriesA[i] ?? null, adminB: hhSeriesB[i] ?? null, adminAValue: hhRawA[i] ?? null, adminBValue: hhRawB[i] ?? null }))
   const wagesChartData = termLabels.map((label, i) => ({ year: label, adminA: wagesSeriesA[i] ?? null, adminB: wagesSeriesB[i] ?? null, adminAValue: wagesRawA[i] ?? null, adminBValue: wagesRawB[i] ?? null }))
+  const lifeChartData = termLabels.map((label, i) => ({ year: label, adminA: lifeSeriesA[i] ?? null, adminB: lifeSeriesB[i] ?? null, adminAValue: lifeRawA[i] ?? null, adminBValue: lifeRawB[i] ?? null }))
 
   const cards = [
     {
@@ -487,6 +515,30 @@ export default function MetricsDashboard() {
         "The Consumer Price Index (CPI) tracks price changes in a typical basket of goods and services change over time. High CPI growth means prices are rising faster, eroding wages and savings. Lower CPI growth is better and indicates easing inflation and improved affordability.",
       dataSource: "U.S. Bureau of Labor Statistics",
       dataSourceUrl: "/data-sources#cpi",
+    },
+    {
+      title: "Life Expectancy",
+      value: `${latestLife >= 0 ? "+" : ""}${(latestLife as number).toFixed(2)}%`,
+      trend: lifeTrend,
+      change: `4yr ${formatPct(lifeChangeA)} vs ${formatPct(lifeChangeB)}`,
+      summaryRaw: formatNumber(latestLifeRaw, 1),
+      collapsedRawA: formatNumber((([...lifeRawA].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedRawB: formatNumber((([...lifeRawB].reverse().find(v => v != null) as number | null) ?? null), 1),
+      collapsedYoyA: formatPct(lifeChangeA),
+      collapsedYoyB: formatPct(lifeChangeB),
+      chartData: lifeChartData,
+      adminAStart: lifeRawA.find(v => v != null) ?? null,
+      adminAEnd: [...lifeRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: lifeRawB.find(v => v != null) ?? null,
+      adminBEnd: [...lifeRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(lifeChangeA),
+      adminBValueLabel: formatPct(lifeChangeB),
+      methodBadge: "Life Expectancy YoY",
+      valueLabel: "Years",
+      winnerSide: adminAWinsLife ? "A" : adminBWinsLife ? "B" : "none",
+      explanation: "YoY percent change in life expectancy at birth (World Bank). Higher is better.",
+      dataSource: "World Bank",
+      dataSourceUrl: "/data-sources#life-expectancy",
     },
     {
       title: "Wages",
@@ -719,7 +771,7 @@ export default function MetricsDashboard() {
         <div>
           {cards.map((metric, index) => (
             <div key={index}>
-              <div className="border-y border-dashed border-foreground/20 bg-gradient-to-t from-background/70 to-transparent">
+              <div className="border-y border-dashed border-foreground/20 bg-gradient-to-t from-background/30 to-transparent">
                 <div className="max-w-6xl mx-auto border-x border-dashed border-foreground/20 relative z-50">
                   <MetricCard
                     title={metric.title}

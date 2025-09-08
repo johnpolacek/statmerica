@@ -1,0 +1,247 @@
+{
+  "meta": {
+    "id": "life_expectancy",
+    "title": "Life Expectancy at Birth (US)",
+    "description": "World Bank SP.DYN.LE00.IN. Annual life expectancy in years; YoY computed as percent change.",
+    "units": "Years (value), Percent (yoy)",
+    "frequency": "Annual",
+    "coverage": {
+      "start": 1979,
+      "end": 2023
+    },
+    "fetchedAt": "2025-09-08T01:39:10.464Z",
+    "source": {
+      "name": "World Bank",
+      "homepage": "https://data.worldbank.org/indicator/SP.DYN.LE00.IN",
+      "api": "https://api.worldbank.org/v2/country/USA/indicator/SP.DYN.LE00.IN?format=json&per_page=1000",
+      "attribution": "World Bank Open Data"
+    },
+    "notes": "Filtered to 1979+. YoY = ((current - previous) / previous) * 100."
+  },
+  "data": [
+    {
+      "year": 1979,
+      "value": 73.8
+    },
+    {
+      "year": 1980,
+      "value": 73.61,
+      "yoy": -0.26
+    },
+    {
+      "year": 1981,
+      "value": 74.01,
+      "yoy": 0.54
+    },
+    {
+      "year": 1982,
+      "value": 74.36,
+      "yoy": 0.47
+    },
+    {
+      "year": 1983,
+      "value": 74.46,
+      "yoy": 0.13
+    },
+    {
+      "year": 1984,
+      "value": 74.56,
+      "yoy": 0.13
+    },
+    {
+      "year": 1985,
+      "value": 74.56,
+      "yoy": 0
+    },
+    {
+      "year": 1986,
+      "value": 74.61,
+      "yoy": 0.07
+    },
+    {
+      "year": 1987,
+      "value": 74.77,
+      "yoy": 0.21
+    },
+    {
+      "year": 1988,
+      "value": 74.77,
+      "yoy": 0
+    },
+    {
+      "year": 1989,
+      "value": 75.02,
+      "yoy": 0.33
+    },
+    {
+      "year": 1990,
+      "value": 75.21,
+      "yoy": 0.25
+    },
+    {
+      "year": 1991,
+      "value": 75.37,
+      "yoy": 0.21
+    },
+    {
+      "year": 1992,
+      "value": 75.62,
+      "yoy": 0.33
+    },
+    {
+      "year": 1993,
+      "value": 75.42,
+      "yoy": -0.26
+    },
+    {
+      "year": 1994,
+      "value": 75.62,
+      "yoy": 0.27
+    },
+    {
+      "year": 1995,
+      "value": 75.62,
+      "yoy": 0
+    },
+    {
+      "year": 1996,
+      "value": 76.03,
+      "yoy": 0.54
+    },
+    {
+      "year": 1997,
+      "value": 76.43,
+      "yoy": 0.53
+    },
+    {
+      "year": 1998,
+      "value": 76.58,
+      "yoy": 0.2
+    },
+    {
+      "year": 1999,
+      "value": 76.58,
+      "yoy": 0
+    },
+    {
+      "year": 2000,
+      "value": 76.64,
+      "yoy": 0.08
+    },
+    {
+      "year": 2001,
+      "value": 76.84,
+      "yoy": 0.26
+    },
+    {
+      "year": 2002,
+      "value": 76.94,
+      "yoy": 0.13
+    },
+    {
+      "year": 2003,
+      "value": 77.04,
+      "yoy": 0.13
+    },
+    {
+      "year": 2004,
+      "value": 77.49,
+      "yoy": 0.58
+    },
+    {
+      "year": 2005,
+      "value": 77.49,
+      "yoy": 0
+    },
+    {
+      "year": 2006,
+      "value": 77.69,
+      "yoy": 0.26
+    },
+    {
+      "year": 2007,
+      "value": 77.99,
+      "yoy": 0.39
+    },
+    {
+      "year": 2008,
+      "value": 78.04,
+      "yoy": 0.06
+    },
+    {
+      "year": 2009,
+      "value": 78.39,
+      "yoy": 0.45
+    },
+    {
+      "year": 2010,
+      "value": 78.54,
+      "yoy": 0.19
+    },
+    {
+      "year": 2011,
+      "value": 78.64,
+      "yoy": 0.13
+    },
+    {
+      "year": 2012,
+      "value": 78.74,
+      "yoy": 0.13
+    },
+    {
+      "year": 2013,
+      "value": 78.74,
+      "yoy": 0
+    },
+    {
+      "year": 2014,
+      "value": 78.84,
+      "yoy": 0.13
+    },
+    {
+      "year": 2015,
+      "value": 78.69,
+      "yoy": -0.19
+    },
+    {
+      "year": 2016,
+      "value": 78.54,
+      "yoy": -0.19
+    },
+    {
+      "year": 2017,
+      "value": 78.54,
+      "yoy": 0
+    },
+    {
+      "year": 2018,
+      "value": 78.64,
+      "yoy": 0.13
+    },
+    {
+      "year": 2019,
+      "value": 78.79,
+      "yoy": 0.19
+    },
+    {
+      "year": 2020,
+      "value": 76.98,
+      "yoy": -2.3
+    },
+    {
+      "year": 2021,
+      "value": 76.33,
+      "yoy": -0.84
+    },
+    {
+      "year": 2022,
+      "value": 77.43,
+      "yoy": 1.44
+    },
+    {
+      "year": 2023,
+      "value": 78.39,
+      "yoy": 1.24
+    }
+  ]
+}
