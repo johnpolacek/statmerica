@@ -10,6 +10,7 @@ import gas from "@/data/gas_prices.json"
 import deficit from "@/data/deficit.json"
 import unemployment from "@/data/unemployment.json"
 import sp500 from "@/data/sp500.json"
+import gdp from "@/data/gdp.json"
 import { CircleCheckBig } from "lucide-react"
 
 type CpiDataPoint = { year: number; value: number; yoy?: number; month?: number; latest?: boolean }
@@ -59,6 +60,7 @@ export default function MetricsDashboard() {
   const deficitJson = deficit as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const unempJson = unemployment as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
   const sp500Json = sp500 as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
+  const gdpJson = gdp as unknown as { data: { year: number; value: number; yoy?: number; latest?: boolean }[]; meta: { title?: string; units?: string } }
 
   // Build year maps for CPI: yoy (for plotting) and value (raw index for tooltip)
   const cpiYoyByYear = useMemo(() => new Map<number, number>(cpiJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [cpiJson.data])
@@ -83,6 +85,9 @@ export default function MetricsDashboard() {
   // Build year maps for S&P 500: yoy and raw index level
   const spYoyByYear = useMemo(() => new Map<number, number>(sp500Json.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [sp500Json.data])
   const spValueByYear = useMemo(() => new Map<number, number>(sp500Json.data.map(d => [d.year, d.value])), [sp500Json.data])
+  // Build year maps for GDP: yoy and raw billions (SAAR)
+  const gdpYoyByYear = useMemo(() => new Map<number, number>(gdpJson.data.filter(d => typeof d.yoy === 'number').map(d => [d.year, d.yoy as number])), [gdpJson.data])
+  const gdpValueByYear = useMemo(() => new Map<number, number>(gdpJson.data.map(d => [d.year, d.value])), [gdpJson.data])
 
   const getAdminLabel = (value: string) => {
     if (value === "party-D") return "Democrats"
@@ -144,6 +149,11 @@ export default function MetricsDashboard() {
   const spSeriesB = buildSeriesForAdmin(adminB, spYoyByYear)
   const spRawA = buildSeriesForAdmin(adminA, spValueByYear)
   const spRawB = buildSeriesForAdmin(adminB, spValueByYear)
+  // Series for GDP (YoY plotted) and raw USD billions SAAR (tooltip)
+  const gdpSeriesA = buildSeriesForAdmin(adminA, gdpYoyByYear)
+  const gdpSeriesB = buildSeriesForAdmin(adminB, gdpYoyByYear)
+  const gdpRawA = buildSeriesForAdmin(adminA, gdpValueByYear)
+  const gdpRawB = buildSeriesForAdmin(adminB, gdpValueByYear)
 
   // Helper to compute 4-year percent change from raw series (start -> end)
   const fourYearChange = (series: AdminSeries): number | null => {
@@ -194,6 +204,8 @@ export default function MetricsDashboard() {
   const unempChangeB = rangeChangeWithBaseline(adminB, unempRawB, unempValueByYear)
   const spChangeA = rangeChangeWithBaseline(adminA, spRawA, spValueByYear)
   const spChangeB = rangeChangeWithBaseline(adminB, spRawB, spValueByYear)
+  const gdpChangeA = rangeChangeWithBaseline(adminA, gdpRawA, gdpValueByYear)
+  const gdpChangeB = rangeChangeWithBaseline(adminB, gdpRawB, gdpValueByYear)
 
   const avg = (series: AdminSeries) => {
     const values = series.filter((v): v is number => v != null)
@@ -247,6 +259,11 @@ export default function MetricsDashboard() {
     const years = igJson.data.map(d => d.year)
     const maxYear = years.length ? Math.max(...years) : null
     return maxYear != null ? igValueByYear.get(maxYear) ?? null : null
+  })()
+  const latestGdpRaw = (() => {
+    const years = gdpJson.data.map(d => d.year)
+    const maxYear = years.length ? Math.max(...years) : null
+    return maxYear != null ? gdpValueByYear.get(maxYear) ?? null : null
   })()
   const latestGasRaw = (() => {
     const years = gasJson.data.map(d => d.year)
@@ -302,6 +319,11 @@ export default function MetricsDashboard() {
   const latestSpYearWithYoy = spYoyYears.length ? Math.max(...spYoyYears) : null
   const latestSp = latestSpYearWithYoy != null ? (sp500Json.data.find(d => d.year === latestSpYearWithYoy)?.yoy ?? 0) : 0
   const spTrend: MetricSummary["trend"] = Math.abs(latestSp as number) < 1 ? "stable" : (latestSp as number) > 0 ? "up" : "down"
+  // GDP YoY current value and trend (latest available yoy row)
+  const gdpYoyYears = gdpJson.data.filter(d => typeof d.yoy === 'number').map(d => d.year)
+  const latestGdpYearWithYoy = gdpYoyYears.length ? Math.max(...gdpYoyYears) : null
+  const latestGdp = latestGdpYearWithYoy != null ? (gdpJson.data.find(d => d.year === latestGdpYearWithYoy)?.yoy ?? 0) : 0
+  const gdpTrend: MetricSummary["trend"] = Math.abs(latestGdp as number) < 1 ? "stable" : (latestGdp as number) > 0 ? "up" : "down"
 
   // Determine wins for Income Gap and Gas (lower 4-year change is better)
   const adminAWinsIg = igChangeA != null && igChangeB != null && igChangeA < igChangeB ? 1 : 0
@@ -318,9 +340,12 @@ export default function MetricsDashboard() {
   // For S&P 500, higher 4-year change is better
   const adminAWinsSp = spChangeA != null && spChangeB != null && spChangeA > spChangeB ? 1 : 0
   const adminBWinsSp = spChangeA != null && spChangeB != null && spChangeB > spChangeA ? 1 : 0
+  // For GDP, higher 4-year change is better
+  const adminAWinsGdp = gdpChangeA != null && gdpChangeB != null && gdpChangeA > gdpChangeB ? 1 : 0
+  const adminBWinsGdp = gdpChangeA != null && gdpChangeB != null && gdpChangeB > gdpChangeA ? 1 : 0
 
-  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp
-  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp
+  const adminAWinsTotal = adminAWinsCpi + adminAWinsIg + adminAWinsGas + adminAWinsDef + adminAWinsUnemp + adminAWinsSp + adminAWinsGdp
+  const adminBWinsTotal = adminBWinsCpi + adminBWinsIg + adminBWinsGas + adminBWinsDef + adminBWinsUnemp + adminBWinsSp + adminBWinsGdp
 
   const adminAMetricsList: string[] = []
   const adminBMetricsList: string[] = []
@@ -337,6 +362,8 @@ export default function MetricsDashboard() {
   const spTitleShort = ((sp500Json.meta as any)?.title || "Stock Index").replace(/ Index$/, "")
   if (adminAWinsSp) adminAMetricsList.push(`${spTitleShort} YoY`)
   if (adminBWinsSp) adminBMetricsList.push(`${spTitleShort} YoY`)
+  if (adminAWinsGdp) adminAMetricsList.push("GDP YoY")
+  if (adminBWinsGdp) adminBMetricsList.push("GDP YoY")
 
   // Sort Final Scorecard metrics by character count (descending)
   adminAMetricsList.sort((a, b) => b.length - a.length)
@@ -349,6 +376,7 @@ export default function MetricsDashboard() {
   const defChartData = termLabels.map((label, i) => ({ year: label, adminA: defSeriesA[i] ?? null, adminB: defSeriesB[i] ?? null, adminAValue: defRawA[i] ?? null, adminBValue: defRawB[i] ?? null }))
   const unempChartData = termLabels.map((label, i) => ({ year: label, adminA: unempSeriesA[i] ?? null, adminB: unempSeriesB[i] ?? null, adminAValue: unempRawA[i] ?? null, adminBValue: unempRawB[i] ?? null }))
   const spChartData = termLabels.map((label, i) => ({ year: label, adminA: spSeriesA[i] ?? null, adminB: spSeriesB[i] ?? null, adminAValue: spRawA[i] ?? null, adminBValue: spRawB[i] ?? null }))
+  const gdpChartData = termLabels.map((label, i) => ({ year: label, adminA: gdpSeriesA[i] ?? null, adminB: gdpSeriesB[i] ?? null, adminAValue: gdpRawA[i] ?? null, adminBValue: gdpRawB[i] ?? null }))
 
   const cards = [
     {
@@ -399,6 +427,30 @@ export default function MetricsDashboard() {
       explanation: "YoY percent change in the stock index. Higher growth is better.",
       dataSource: "FRED",
       dataSourceUrl: "/data-sources#nasdaq",
+    },
+    {
+      title: "GDP Growth",
+      value: `${latestGdp >= 0 ? "+" : ""}${(latestGdp as number).toFixed(2)}%`,
+      trend: gdpTrend,
+      change: `4yr ${formatPct(gdpChangeA)} vs ${formatPct(gdpChangeB)}`,
+      summaryRaw: `$${formatUsdBillionsCompact(latestGdpRaw)}`,
+      collapsedRawA: `$${formatUsdBillionsCompact((([...gdpRawA].reverse().find(v => v != null) as number | null) ?? null))}`,
+      collapsedRawB: `$${formatUsdBillionsCompact((([...gdpRawB].reverse().find(v => v != null) as number | null) ?? null))}`,
+      collapsedYoyA: formatPct(gdpChangeA),
+      collapsedYoyB: formatPct(gdpChangeB),
+      chartData: gdpChartData,
+      adminAStart: gdpRawA.find(v => v != null) ?? null,
+      adminAEnd: [...gdpRawA].reverse().find(v => v != null) ?? null,
+      adminBStart: gdpRawB.find(v => v != null) ?? null,
+      adminBEnd: [...gdpRawB].reverse().find(v => v != null) ?? null,
+      adminAValueLabel: formatPct(gdpChangeA),
+      adminBValueLabel: formatPct(gdpChangeB),
+      methodBadge: "GDP YoY",
+      valueLabel: "USD (SAAR)",
+      winnerSide: adminAWinsGdp ? "A" : adminBWinsGdp ? "B" : "none",
+      explanation: "YoY percent change in real GDP (chained 2017 dollars, SAAR). Higher growth is better.",
+      dataSource: "FRED / BEA",
+      dataSourceUrl: "/data-sources#gdp",
     },
     {
       title: "Weath Gap",
