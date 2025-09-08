@@ -613,7 +613,7 @@ export default function MetricsDashboard() {
       dataSourceUrl: "/data-sources#debt-to-gdp",
     },
     {
-      title: (sp500Json.meta as any)?.title || "Stock Index",
+      title: "S&P 500",
       value: `${latestSp >= 0 ? "+" : ""}${(latestSp as number).toFixed(2)}%`,
       trend: spTrend,
       change: `4yr ${formatPct(spChangeA)} vs ${formatPct(spChangeB)}`,

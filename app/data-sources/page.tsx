@@ -264,11 +264,11 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
       notes: (incomeGapData.meta as any).notes,
     },
     {
-      displayTitle: (sp500Data.meta as any).title || "Stock Index",
-      displayDescription: "December closes and latest close; includes YoY % change",
+      displayTitle: "S&P 500 Index",
+      displayDescription: "December closes and latest close; includes YoY % change (SP500)",
       icon: TrendingUp,
       color: "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900/60",
-      anchor: "nasdaq",
+      anchor: "sp500",
       source: {
         name: sp500Data.meta.source?.name,
         homepage: sp500Data.meta.source?.homepage,
@@ -279,7 +279,7 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
       coverage: sp500Data.meta.coverage,
       frequency: sp500Data.meta.frequency,
       processing: {
-        updateScript: "pnpm run fetch:nasdaq",
+        updateScript: "pnpm run fetch:sp500",
         dataFile: "data/sp500.json",
         methodology: [
           "Fetch FRED SP500 series (daily)",
@@ -287,7 +287,7 @@ const getDataSourcesMetadata = (): DataSourceMeta[] => {
           "Append latest close and compute YoY vs ~same date prior year",
         ],
         chartUsage: [
-          "NASDAQ Composite card (YoY, Index)",
+          "S&P 500 Index Growth card (YoY, Index)",
         ],
       },
       notes: (sp500Data.meta as any).notes,
