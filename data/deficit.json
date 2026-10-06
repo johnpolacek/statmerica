@@ -1,252 +1,264 @@
 {
   "meta": {
     "id": "deficit",
-    "title": "Federal Budget Deficit (Fiscal Year)",
-    "description": "Annual deficit level from FRED FYFSD (surplus/deficit), transformed to positive deficit magnitudes. YoY computed on deficit level.",
-    "units": "USD (billions) for value, Percent for yoy",
+    "title": "Federal Deficit (% of GDP, Fiscal Year)",
+    "description": "Federal deficit as a percent of GDP. Positive values are deficits, negative values are surpluses.",
+    "units": "Percent of GDP for value, USD billions for usdBillions",
     "frequency": "Annual (FY)",
     "coverage": {
       "start": 1979,
-      "end": 2024
+      "end": 2025
     },
-    "fetchedAt": "2025-09-07T22:44:00.318Z",
+    "fetchedAt": "2026-10-06T11:48:52.327Z",
     "source": {
-      "name": "FRED (FYFSD) — Federal Surplus or Deficit (-), Fiscal Year",
-      "homepage": "https://fred.stlouisfed.org/series/FYFSD",
-      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FYFSD",
-      "attribution": "Federal Reserve Bank of St. Louis"
+      "name": "FRED (FYFSGDA188S, FYFSD)",
+      "homepage": "https://fred.stlouisfed.org/series/FYFSGDA188S",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=FYFSGDA188S",
+      "attribution": "Federal Reserve Bank of St. Louis; U.S. Office of Management and Budget"
     },
-    "notes": "FYFSD is negative for deficits; values converted to positive deficit magnitudes in billions. YoY computed on level. Coverage begins in 1947; filtered to 1979+."
+    "series": [
+      {
+        "id": "FYFSGDA188S",
+        "label": "Federal Surplus or Deficit as Percent of GDP (sign flipped)"
+      }
+    ],
+    "notes": "FRED reports surpluses as positive and deficits as negative. Signs are flipped so a deficit is positive. FYFSD is reported in millions and converted to billions."
   },
   "data": [
     {
       "year": 1979,
-      "value": 40726
+      "value": 1.55,
+      "usdBillions": 40.73
     },
     {
       "year": 1980,
-      "value": 73830,
-      "yoy": 81.28
+      "value": 2.58,
+      "usdBillions": 73.83
     },
     {
       "year": 1981,
-      "value": 78968,
-      "yoy": 6.96
+      "value": 2.46,
+      "usdBillions": 78.97
     },
     {
       "year": 1982,
-      "value": 127977,
-      "yoy": 62.06
+      "value": 3.83,
+      "usdBillions": 127.98
     },
     {
       "year": 1983,
-      "value": 207802,
-      "yoy": 62.37
+      "value": 5.72,
+      "usdBillions": 207.8
     },
     {
       "year": 1984,
-      "value": 185367,
-      "yoy": -10.8
+      "value": 4.59,
+      "usdBillions": 185.37
     },
     {
       "year": 1985,
-      "value": 212308,
-      "yoy": 14.53
+      "value": 4.89,
+      "usdBillions": 212.31
     },
     {
       "year": 1986,
-      "value": 221227,
-      "yoy": 4.2
+      "value": 4.83,
+      "usdBillions": 221.23
     },
     {
       "year": 1987,
-      "value": 149730,
-      "yoy": -32.32
+      "value": 3.08,
+      "usdBillions": 149.73
     },
     {
       "year": 1988,
-      "value": 155178,
-      "yoy": 3.64
+      "value": 2.96,
+      "usdBillions": 155.18
     },
     {
       "year": 1989,
-      "value": 152639,
-      "yoy": -1.64
+      "value": 2.71,
+      "usdBillions": 152.64
     },
     {
       "year": 1990,
-      "value": 221036,
-      "yoy": 44.81
+      "value": 3.71,
+      "usdBillions": 221.04
     },
     {
       "year": 1991,
-      "value": 269238,
-      "yoy": 21.81
+      "value": 4.37,
+      "usdBillions": 269.24
     },
     {
       "year": 1992,
-      "value": 290321,
-      "yoy": 7.83
+      "value": 4.45,
+      "usdBillions": 290.32
     },
     {
       "year": 1993,
-      "value": 255051,
-      "yoy": -12.15
+      "value": 3.72,
+      "usdBillions": 255.05
     },
     {
       "year": 1994,
-      "value": 203186,
-      "yoy": -20.34
+      "value": 2.79,
+      "usdBillions": 203.19
     },
     {
       "year": 1995,
-      "value": 163952,
-      "yoy": -19.31
+      "value": 2.15,
+      "usdBillions": 163.95
     },
     {
       "year": 1996,
-      "value": 107431,
-      "yoy": -34.47
+      "value": 1.33,
+      "usdBillions": 107.43
     },
     {
       "year": 1997,
-      "value": 21884,
-      "yoy": -79.63
+      "value": 0.26,
+      "usdBillions": 21.88
     },
     {
       "year": 1998,
-      "value": 69270,
-      "yoy": 216.53
+      "value": -0.76,
+      "usdBillions": -69.27
     },
     {
       "year": 1999,
-      "value": 125610,
-      "yoy": 81.33
+      "value": -1.3,
+      "usdBillions": -125.61
     },
     {
       "year": 2000,
-      "value": 236241,
-      "yoy": 88.07
+      "value": -2.3,
+      "usdBillions": -236.24
     },
     {
       "year": 2001,
-      "value": 128236,
-      "yoy": -45.72
+      "value": -1.21,
+      "usdBillions": -128.24
     },
     {
       "year": 2002,
-      "value": 157758,
-      "yoy": 23.02
+      "value": 1.44,
+      "usdBillions": 157.76
     },
     {
       "year": 2003,
-      "value": 377585,
-      "yoy": 139.34
+      "value": 3.3,
+      "usdBillions": 377.58
     },
     {
       "year": 2004,
-      "value": 412727,
-      "yoy": 9.31
+      "value": 3.38,
+      "usdBillions": 412.73
     },
     {
       "year": 2005,
-      "value": 318346,
-      "yoy": -22.87
+      "value": 2.44,
+      "usdBillions": 318.35
     },
     {
       "year": 2006,
-      "value": 248181,
-      "yoy": -22.04
+      "value": 1.8,
+      "usdBillions": 248.18
     },
     {
       "year": 2007,
-      "value": 160701,
-      "yoy": -35.25
+      "value": 1.11,
+      "usdBillions": 160.7
     },
     {
       "year": 2008,
-      "value": 458553,
-      "yoy": 185.35
+      "value": 3.1,
+      "usdBillions": 458.55
     },
     {
       "year": 2009,
-      "value": 1412688,
-      "yoy": 208.08
+      "value": 9.76,
+      "usdBillions": 1412.69
     },
     {
       "year": 2010,
-      "value": 1294373,
-      "yoy": -8.38
+      "value": 8.6,
+      "usdBillions": 1294.37
     },
     {
       "year": 2011,
-      "value": 1299599,
-      "yoy": 0.4
+      "value": 8.33,
+      "usdBillions": 1299.6
     },
     {
       "year": 2012,
-      "value": 1076573,
-      "yoy": -17.16
+      "value": 6.62,
+      "usdBillions": 1076.57
     },
     {
       "year": 2013,
-      "value": 679775,
-      "yoy": -36.86
+      "value": 4.03,
+      "usdBillions": 679.77
     },
     {
       "year": 2014,
-      "value": 484793,
-      "yoy": -28.68
+      "value": 2.75,
+      "usdBillions": 484.79
     },
     {
       "year": 2015,
-      "value": 441960,
-      "yoy": -8.84
+      "value": 2.42,
+      "usdBillions": 441.96
     },
     {
       "year": 2016,
-      "value": 584650,
-      "yoy": 32.29
+      "value": 3.11,
+      "usdBillions": 584.65
     },
     {
       "year": 2017,
-      "value": 665450,
-      "yoy": 13.82
+      "value": 3.39,
+      "usdBillions": 665.45
     },
     {
       "year": 2018,
-      "value": 779074,
-      "yoy": 17.07
+      "value": 3.77,
+      "usdBillions": 779.07
     },
     {
       "year": 2019,
-      "value": 983588,
-      "yoy": 26.25
+      "value": 4.57,
+      "usdBillions": 983.59
     },
     {
       "year": 2020,
-      "value": 3132456,
-      "yoy": 218.47
+      "value": 14.48,
+      "usdBillions": 3095.65
     },
     {
       "year": 2021,
-      "value": 2775350,
-      "yoy": -11.4
+      "value": 11.69,
+      "usdBillions": 2773.59
     },
     {
       "year": 2022,
-      "value": 1375920,
-      "yoy": -50.42
+      "value": 5.27,
+      "usdBillions": 1374.17
     },
     {
       "year": 2023,
-      "value": 1695240,
-      "yoy": 23.21
+      "value": 6.07,
+      "usdBillions": 1687.47
     },
     {
       "year": 2024,
-      "value": 1832816,
-      "yoy": 8.12
+      "value": 6.2,
+      "usdBillions": 1815.38
+    },
+    {
+      "year": 2025,
+      "value": 5.77,
+      "usdBillions": 1774.68
     }
   ]
 }

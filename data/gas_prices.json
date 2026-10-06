@@ -1,279 +1,275 @@
 {
   "meta": {
     "id": "gas_prices",
-    "title": "Gasoline Price (Regular, Retail)",
-    "description": "Annual average USD/gal computed from EIA monthly/weekly series; latest is most recent point. Backfilled with BLS average price where needed to reach 1979.",
-    "units": "USD per gallon (value), Percent (yoy)",
-    "frequency": "Annual (avg value + yoy), plus latest point",
+    "title": "Gas Prices (Regular, U.S. City Average)",
+    "description": "Average retail price of regular unleaded gasoline, adjusted for inflation. Annual value is the average of monthly prices.",
+    "units": "USD per gallon in 2026-08 dollars (value); pump price (nominal)",
+    "frequency": "Monthly, annualized by average",
+    "realBase": "2026-08",
+    "source": {
+      "name": "FRED (APU000074714)",
+      "homepage": "https://fred.stlouisfed.org/series/APU000074714",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=APU000074714",
+      "attribution": "U.S. Bureau of Labor Statistics via FRED"
+    },
+    "series": [
+      {
+        "id": "APU000074714",
+        "label": "Average Price: Gasoline, Unleaded Regular"
+      },
+      {
+        "id": "CPIAUCNS",
+        "label": "CPI-U, NSA (deflator)"
+      }
+    ],
     "coverage": {
       "start": 1979,
       "end": 2025
     },
-    "fetchedAt": "2025-09-06T01:11:34.156Z",
-    "source": {
-      "name": "U.S. Energy Information Administration",
-      "homepage": "https://www.eia.gov/petroleum/gasdiesel/",
-      "api": "https://api.eia.gov/v2/seriesid/",
-      "attribution": "Public domain"
-    },
-    "seriesId": "PET.EMM_EPMRR_PTE_NUS_DPG.M",
-    "notes": "Annual level is average of period observations; YoY computed off those levels. EIA U.S. Regular All Formulations series, with BLS APU000074714 backfill as needed. The last row may represent current year latest point."
+    "fetchedAt": "2026-10-06T12:53:37.420Z"
   },
   "data": [
     {
       "year": 1979,
-      "value": 0.9,
-      "source": "BLS"
+      "value": 4.15,
+      "nominal": 0.9
     },
     {
       "year": 1980,
-      "value": 1.25,
-      "source": "BLS",
-      "yoy": 38.89
+      "value": 5.06,
+      "nominal": 1.25
     },
     {
       "year": 1981,
-      "value": 1.38,
-      "source": "BLS",
-      "yoy": 10.4
+      "value": 5.08,
+      "nominal": 1.38
     },
     {
       "year": 1982,
-      "value": 1.3,
-      "source": "BLS",
-      "yoy": -5.8
+      "value": 4.5,
+      "nominal": 1.3
     },
     {
       "year": 1983,
-      "value": 1.24,
-      "source": "BLS",
-      "yoy": -4.62
+      "value": 4.17,
+      "nominal": 1.24
     },
     {
       "year": 1984,
-      "value": 1.21,
-      "source": "BLS",
-      "yoy": -2.42
+      "value": 3.91,
+      "nominal": 1.21
     },
     {
       "year": 1985,
-      "value": 1.2,
-      "source": "BLS",
-      "yoy": -0.83
+      "value": 3.74,
+      "nominal": 1.2
     },
     {
       "year": 1986,
-      "value": 0.93,
-      "source": "BLS",
-      "yoy": -22.5
+      "value": 2.84,
+      "nominal": 0.93
     },
     {
       "year": 1987,
-      "value": 0.95,
-      "source": "BLS",
-      "yoy": 2.15
+      "value": 2.8,
+      "nominal": 0.95
     },
     {
       "year": 1988,
-      "value": 0.95,
-      "source": "BLS",
-      "yoy": 0
+      "value": 2.68,
+      "nominal": 0.95
     },
     {
       "year": 1989,
-      "value": 1.02,
-      "source": "BLS",
-      "yoy": 7.37
+      "value": 2.76,
+      "nominal": 1.02
     },
     {
       "year": 1990,
-      "value": 1.16,
-      "source": "BLS",
-      "yoy": 13.73
+      "value": 2.98,
+      "nominal": 1.16
     },
     {
       "year": 1991,
-      "value": 1.14,
-      "source": "BLS",
-      "yoy": -1.72
+      "value": 2.8,
+      "nominal": 1.14
     },
     {
       "year": 1992,
-      "value": 1.13,
-      "source": "BLS",
-      "yoy": -0.88
+      "value": 2.69,
+      "nominal": 1.13
     },
     {
       "year": 1993,
-      "value": 1.11,
-      "source": "BLS",
-      "yoy": -1.77
+      "value": 2.57,
+      "nominal": 1.11
     },
     {
       "year": 1994,
-      "value": 0.58,
-      "yoy": -47.75
+      "value": 2.51,
+      "nominal": 1.11
     },
     {
       "year": 1995,
-      "value": 1.16,
-      "yoy": 100
+      "value": 2.52,
+      "nominal": 1.15
     },
     {
       "year": 1996,
-      "value": 1.24,
-      "yoy": 6.9
+      "value": 2.63,
+      "nominal": 1.23
     },
     {
       "year": 1997,
-      "value": 1.25,
-      "yoy": 0.81
+      "value": 2.57,
+      "nominal": 1.23
     },
     {
       "year": 1998,
-      "value": 1.08,
-      "yoy": -13.6
+      "value": 2.18,
+      "nominal": 1.06
     },
     {
       "year": 1999,
-      "value": 1.19,
-      "yoy": 10.19
+      "value": 2.34,
+      "nominal": 1.17
     },
     {
       "year": 2000,
-      "value": 1.54,
-      "yoy": 29.41
+      "value": 2.94,
+      "nominal": 1.51
     },
     {
       "year": 2001,
-      "value": 1.5,
-      "yoy": -2.6
+      "value": 2.76,
+      "nominal": 1.46
     },
     {
       "year": 2002,
-      "value": 1.4,
-      "yoy": -6.67
+      "value": 2.53,
+      "nominal": 1.36
     },
     {
       "year": 2003,
-      "value": 1.65,
-      "yoy": 17.86
+      "value": 2.9,
+      "nominal": 1.59
     },
     {
       "year": 2004,
-      "value": 1.93,
-      "yoy": 16.97
+      "value": 3.33,
+      "nominal": 1.88
     },
     {
       "year": 2005,
-      "value": 2.33,
-      "yoy": 20.73
+      "value": 3.93,
+      "nominal": 2.3
     },
     {
       "year": 2006,
-      "value": 2.65,
-      "yoy": 13.73
+      "value": 4.3,
+      "nominal": 2.59
     },
     {
       "year": 2007,
-      "value": 2.86,
-      "yoy": 7.92
+      "value": 4.52,
+      "nominal": 2.8
     },
     {
       "year": 2008,
-      "value": 3.32,
-      "yoy": 16.08
+      "value": 5.07,
+      "nominal": 3.27
     },
     {
       "year": 2009,
-      "value": 2.42,
-      "yoy": -27.11
+      "value": 3.67,
+      "nominal": 2.35
     },
     {
       "year": 2010,
-      "value": 2.86,
-      "yoy": 18.18
+      "value": 4.28,
+      "nominal": 2.79
     },
     {
       "year": 2011,
-      "value": 3.62,
-      "yoy": 26.57
+      "value": 5.25,
+      "nominal": 3.53
     },
     {
       "year": 2012,
-      "value": 3.76,
-      "yoy": 3.87
+      "value": 5.32,
+      "nominal": 3.64
     },
     {
       "year": 2013,
-      "value": 3.64,
-      "yoy": -3.19
+      "value": 5.07,
+      "nominal": 3.53
     },
     {
       "year": 2014,
-      "value": 3.49,
-      "yoy": -4.12
+      "value": 4.76,
+      "nominal": 3.37
     },
     {
       "year": 2015,
-      "value": 2.62,
-      "yoy": -24.93
+      "value": 3.46,
+      "nominal": 2.45
     },
     {
       "year": 2016,
-      "value": 2.3,
-      "yoy": -12.21
+      "value": 2.99,
+      "nominal": 2.14
     },
     {
       "year": 2017,
-      "value": 2.59,
-      "yoy": 12.61
+      "value": 3.29,
+      "nominal": 2.41
     },
     {
       "year": 2018,
-      "value": 2.91,
-      "yoy": 12.36
+      "value": 3.65,
+      "nominal": 2.74
     },
     {
       "year": 2019,
-      "value": 2.82,
-      "yoy": -3.09
+      "value": 3.45,
+      "nominal": 2.64
     },
     {
       "year": 2020,
-      "value": 2.37,
-      "yoy": -15.96
+      "value": 2.81,
+      "nominal": 2.17
     },
     {
       "year": 2021,
-      "value": 3.22,
-      "yoy": 35.86
+      "value": 3.76,
+      "nominal": 3.05
     },
     {
       "year": 2022,
-      "value": 4.28,
-      "yoy": 32.92
+      "value": 4.68,
+      "nominal": 4.09
     },
     {
       "year": 2023,
-      "value": 3.78,
-      "yoy": -11.68
+      "value": 4.02,
+      "nominal": 3.66
     },
     {
       "year": 2024,
-      "value": 3.55,
-      "yoy": -6.08
+      "value": 3.68,
+      "nominal": 3.45
     },
     {
       "year": 2025,
-      "value": 3.37,
-      "yoy": -5.07
+      "value": 3.38,
+      "nominal": 3.26
     },
     {
-      "year": 2025,
-      "value": 3.36,
+      "year": 2026,
+      "value": 3.94,
+      "nominal": 3.91,
       "latest": true,
-      "date": "2025-08"
+      "asOf": "2026-08-01"
     }
   ]
 }

@@ -7,9 +7,9 @@
     "frequency": "Annual",
     "coverage": {
       "start": 1979,
-      "end": 2023
+      "end": 2024
     },
-    "fetchedAt": "2025-09-08T01:39:10.464Z",
+    "fetchedAt": "2026-10-06T11:48:54.209Z",
     "source": {
       "name": "World Bank",
       "homepage": "https://data.worldbank.org/indicator/SP.DYN.LE00.IN",
@@ -242,6 +242,11 @@
       "year": 2023,
       "value": 78.39,
       "yoy": 1.24
+    },
+    {
+      "year": 2024,
+      "value": 78.89,
+      "yoy": 0.64
     }
   ]
 }

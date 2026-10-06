@@ -1,0 +1,366 @@
+{
+  "meta": {
+    "id": "housing_affordability",
+    "title": "Mortgage Payment as Share of Income",
+    "description": "Monthly principal and interest on a median-priced new home, 20% down, 30-year fixed, as a percent of median household income.",
+    "units": "Percent of monthly median household income",
+    "frequency": "Annual (Q4 price, December rate)",
+    "source": {
+      "name": "FRED (MSPUS)",
+      "homepage": "https://fred.stlouisfed.org/series/MSPUS",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MSPUS",
+      "attribution": "U.S. Census Bureau and HUD; Freddie Mac; via FRED"
+    },
+    "series": [
+      {
+        "id": "MSPUS",
+        "label": "Median Sales Price of Houses Sold"
+      },
+      {
+        "id": "MORTGAGE30US",
+        "label": "30-Year Fixed Rate Mortgage Average"
+      },
+      {
+        "id": "MEHOINUSA646N",
+        "label": "Median Household Income (nominal)"
+      }
+    ],
+    "notes": "Uses new-home prices, which can differ from existing-home prices. 1979-1983 income from Census Table H-5.",
+    "coverage": {
+      "start": 1979,
+      "end": 2025
+    },
+    "fetchedAt": "2026-10-06T12:53:38.648Z"
+  },
+  "data": [
+    {
+      "year": 1979,
+      "value": 40.1,
+      "price": 62600,
+      "rate": 12.9,
+      "income": 16460
+    },
+    {
+      "year": 1980,
+      "value": 44.91,
+      "price": 66400,
+      "rate": 14.79,
+      "income": 17710
+    },
+    {
+      "year": 1981,
+      "value": 50.37,
+      "price": 70400,
+      "rate": 16.95,
+      "income": 19070
+    },
+    {
+      "year": 1982,
+      "value": 39.37,
+      "price": 71600,
+      "rate": 13.62,
+      "income": 20170
+    },
+    {
+      "year": 1983,
+      "value": 39.73,
+      "price": 75900,
+      "rate": 13.42,
+      "income": 20890
+    },
+    {
+      "year": 1984,
+      "value": 38.33,
+      "price": 79900,
+      "rate": 13.18,
+      "income": 22420
+    },
+    {
+      "year": 1985,
+      "value": 34.29,
+      "price": 86800,
+      "rate": 11.26,
+      "income": 23620
+    },
+    {
+      "year": 1986,
+      "value": 30.29,
+      "price": 95000,
+      "rate": 9.31,
+      "income": 24900
+    },
+    {
+      "year": 1987,
+      "value": 38,
+      "price": 111500,
+      "rate": 10.64,
+      "income": 26060
+    },
+    {
+      "year": 1988,
+      "value": 37.07,
+      "price": 113900,
+      "rate": 10.61,
+      "income": 27230
+    },
+    {
+      "year": 1989,
+      "value": 35.59,
+      "price": 124800,
+      "rate": 9.74,
+      "income": 28910
+    },
+    {
+      "year": 1990,
+      "value": 33.25,
+      "price": 121500,
+      "rate": 9.67,
+      "income": 29940
+    },
+    {
+      "year": 1991,
+      "value": 29.39,
+      "price": 120000,
+      "rate": 8.5,
+      "income": 30130
+    },
+    {
+      "year": 1992,
+      "value": 29.54,
+      "price": 126000,
+      "rate": 8.21,
+      "income": 30640
+    },
+    {
+      "year": 1993,
+      "value": 26.42,
+      "price": 127000,
+      "rate": 7.17,
+      "income": 31240
+    },
+    {
+      "year": 1994,
+      "value": 32.17,
+      "price": 132000,
+      "rate": 9.2,
+      "income": 32260
+    },
+    {
+      "year": 1995,
+      "value": 26.39,
+      "price": 138000,
+      "rate": 7.2,
+      "income": 34080
+    },
+    {
+      "year": 1996,
+      "value": 27.52,
+      "price": 144100,
+      "rate": 7.6,
+      "income": 35490
+    },
+    {
+      "year": 1997,
+      "value": 25.12,
+      "price": 144200,
+      "rate": 7.1,
+      "income": 37010
+    },
+    {
+      "year": 1998,
+      "value": 24.47,
+      "price": 153000,
+      "rate": 6.74,
+      "income": 38890
+    },
+    {
+      "year": 1999,
+      "value": 28.37,
+      "price": 165300,
+      "rate": 7.91,
+      "income": 40700
+    },
+    {
+      "year": 2000,
+      "value": 27.32,
+      "price": 172900,
+      "rate": 7.38,
+      "income": 41990
+    },
+    {
+      "year": 2001,
+      "value": 26.05,
+      "price": 171100,
+      "rate": 7.07,
+      "income": 42230
+    },
+    {
+      "year": 2002,
+      "value": 25.93,
+      "price": 190100,
+      "rate": 6.05,
+      "income": 42410
+    },
+    {
+      "year": 2003,
+      "value": 26.06,
+      "price": 198800,
+      "rate": 5.88,
+      "income": 43320
+    },
+    {
+      "year": 2004,
+      "value": 28.92,
+      "price": 228800,
+      "rate": 5.75,
+      "income": 44330
+    },
+    {
+      "year": 2005,
+      "value": 31.15,
+      "price": 243600,
+      "rate": 6.27,
+      "income": 46330
+    },
+    {
+      "year": 2006,
+      "value": 29.73,
+      "price": 245400,
+      "rate": 6.13,
+      "income": 48200
+    },
+    {
+      "year": 2007,
+      "value": 27.6,
+      "price": 238400,
+      "rate": 6.1,
+      "income": 50230
+    },
+    {
+      "year": 2008,
+      "value": 23.54,
+      "price": 222500,
+      "rate": 5.29,
+      "income": 50300
+    },
+    {
+      "year": 2009,
+      "value": 22.49,
+      "price": 219000,
+      "rate": 4.93,
+      "income": 49780
+    },
+    {
+      "year": 2010,
+      "value": 22.7,
+      "price": 224300,
+      "rate": 4.71,
+      "income": 49280
+    },
+    {
+      "year": 2011,
+      "value": 20.14,
+      "price": 221100,
+      "rate": 3.96,
+      "income": 50050
+    },
+    {
+      "year": 2012,
+      "value": 20.86,
+      "price": 251700,
+      "rate": 3.35,
+      "income": 51020
+    },
+    {
+      "year": 2013,
+      "value": 24.71,
+      "price": 273600,
+      "rate": 4.46,
+      "income": 53590
+    },
+    {
+      "year": 2014,
+      "value": 25.11,
+      "price": 298900,
+      "rate": 3.86,
+      "income": 53660
+    },
+    {
+      "year": 2015,
+      "value": 24.42,
+      "price": 302500,
+      "rate": 3.96,
+      "income": 56520
+    },
+    {
+      "year": 2016,
+      "value": 24.72,
+      "price": 310900,
+      "rate": 4.2,
+      "income": 59040
+    },
+    {
+      "year": 2017,
+      "value": 25.18,
+      "price": 337900,
+      "rate": 3.95,
+      "income": 61140
+    },
+    {
+      "year": 2018,
+      "value": 25.25,
+      "price": 322800,
+      "rate": 4.64,
+      "income": 63180
+    },
+    {
+      "year": 2019,
+      "value": 21.09,
+      "price": 327100,
+      "rate": 3.72,
+      "income": 68700
+    },
+    {
+      "year": 2020,
+      "value": 19.35,
+      "price": 338600,
+      "rate": 2.68,
+      "income": 68010
+    },
+    {
+      "year": 2021,
+      "value": 23.97,
+      "price": 414000,
+      "rate": 3.1,
+      "income": 70780
+    },
+    {
+      "year": 2022,
+      "value": 35.5,
+      "price": 442600,
+      "rate": 6.36,
+      "income": 74580
+    },
+    {
+      "year": 2023,
+      "value": 32.91,
+      "price": 423200,
+      "rate": 6.81,
+      "income": 80610
+    },
+    {
+      "year": 2024,
+      "value": 31.28,
+      "price": 419300,
+      "rate": 6.71,
+      "income": 83160
+    },
+    {
+      "year": 2025,
+      "value": 27.69,
+      "price": 412300,
+      "rate": 6.19,
+      "income": 87460
+    }
+  ]
+}

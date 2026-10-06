@@ -15,7 +15,7 @@ export default function SiteFooter() {
             </a>
           </div>
           <p className="text-sm text-muted-foreground text-center italic">
-            Data from BLS, FRED, Census, USDA, CDC, and more
+            Data from BLS, BEA, Census, OMB, World Bank and WID
           </p>
         </div>
       </div>

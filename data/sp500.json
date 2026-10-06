@@ -2,255 +2,269 @@
   "meta": {
     "id": "sp500",
     "title": "S&P 500 Index",
-    "description": "December closes with YoY vs prior December; latest row is most recent close with YoY vs ~same date prior year.",
-    "units": "Index level (value), Percent (yoy)",
-    "frequency": "Annual (Dec), plus latest close",
+    "description": "S&P 500 price index, last close of each year, adjusted for inflation. Dividends excluded.",
+    "units": "Index level in 2026-08 dollars (value); quoted level (nominal)",
+    "frequency": "Daily, annualized by last December close",
+    "realBase": "2026-08",
+    "source": {
+      "name": "FRED (SP500)",
+      "homepage": "https://fred.stlouisfed.org/series/SP500",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500",
+      "attribution": "S&P Dow Jones Indices LLC via FRED; pre-2016 year-end closes from Stooq"
+    },
+    "series": [
+      {
+        "id": "SP500",
+        "label": "S&P 500"
+      },
+      {
+        "id": "CPIAUCNS",
+        "label": "CPI-U, NSA (deflator)"
+      }
+    ],
     "coverage": {
       "start": 1980,
       "end": 2025
     },
-    "fetchedAt": "2025-09-08T02:28:49.398Z",
-    "source": {
-      "name": "Stooq",
-      "homepage": "https://stooq.com",
-      "api": "https://stooq.com/q/d/l/",
-      "attribution": "Stooq free data"
-    },
-    "seriesId": "^spx",
-    "notes": "Annual points are last trading day in December. Latest is most recent close. YoY for latest is computed vs nearest available date one year earlier."
+    "fetchedAt": "2026-10-06T12:53:37.629Z"
   },
   "data": [
     {
       "year": 1980,
-      "value": 135.76,
-      "yoy": 25.77
+      "value": 526.96,
+      "nominal": 135.76
     },
     {
       "year": 1981,
-      "value": 122.55,
-      "yoy": -9.73
+      "value": 436.72,
+      "nominal": 122.55
     },
     {
       "year": 1982,
-      "value": 140.64,
-      "yoy": 14.76
+      "value": 482.7,
+      "nominal": 140.64
     },
     {
       "year": 1983,
-      "value": 164.93,
-      "yoy": 17.27
+      "value": 545.39,
+      "nominal": 164.93
     },
     {
       "year": 1984,
-      "value": 167.24,
-      "yoy": 1.4
+      "value": 532.02,
+      "nominal": 167.24
     },
     {
       "year": 1985,
-      "value": 211.28,
-      "yoy": 26.33
+      "value": 647.53,
+      "nominal": 211.28
     },
     {
       "year": 1986,
-      "value": 242.17,
-      "yoy": 14.62
+      "value": 734.14,
+      "nominal": 242.17
     },
     {
       "year": 1987,
-      "value": 247.08,
-      "yoy": 2.03
+      "value": 717.22,
+      "nominal": 247.08
     },
     {
       "year": 1988,
-      "value": 277.72,
-      "yoy": 12.4
+      "value": 772.04,
+      "nominal": 277.72
     },
     {
       "year": 1989,
-      "value": 353.4,
-      "yoy": 27.25
+      "value": 938.79,
+      "nominal": 353.4
     },
     {
       "year": 1990,
-      "value": 330.22,
-      "yoy": -6.56
+      "value": 826.73,
+      "nominal": 330.22
     },
     {
       "year": 1991,
-      "value": 417.09,
-      "yoy": 26.31
+      "value": 1013.17,
+      "nominal": 417.09
     },
     {
       "year": 1992,
-      "value": 435.71,
-      "yoy": 4.46
+      "value": 1028.57,
+      "nominal": 435.71
     },
     {
       "year": 1993,
-      "value": 466.45,
-      "yoy": 7.06
+      "value": 1071.68,
+      "nominal": 466.45
     },
     {
       "year": 1994,
-      "value": 459.27,
-      "yoy": -1.54
+      "value": 1027.7,
+      "nominal": 459.27
     },
     {
       "year": 1995,
-      "value": 615.93,
-      "yoy": 34.11
+      "value": 1344.13,
+      "nominal": 615.93
     },
     {
       "year": 1996,
-      "value": 740.74,
-      "yoy": 20.26
+      "value": 1564.52,
+      "nominal": 740.74
     },
     {
       "year": 1997,
-      "value": 970.43,
-      "yoy": 31.01
+      "value": 2015.34,
+      "nominal": 970.43
     },
     {
       "year": 1998,
-      "value": 1229.23,
-      "yoy": 26.67
+      "value": 2512.31,
+      "nominal": 1229.23
     },
     {
       "year": 1999,
-      "value": 1469.25,
-      "yoy": 19.53
+      "value": 2924.36,
+      "nominal": 1469.25
     },
     {
       "year": 2000,
-      "value": 1320.28,
-      "yoy": -10.14
+      "value": 2541.77,
+      "nominal": 1320.28
     },
     {
       "year": 2001,
-      "value": 1148.08,
-      "yoy": -13.04
+      "value": 2176.48,
+      "nominal": 1148.08
     },
     {
       "year": 2002,
-      "value": 879.82,
-      "yoy": -23.37
+      "value": 1629.2,
+      "nominal": 879.82
     },
     {
       "year": 2003,
-      "value": 1111.92,
-      "yoy": 26.38
+      "value": 2021,
+      "nominal": 1111.92
     },
     {
       "year": 2004,
-      "value": 1211.92,
-      "yoy": 8.99
+      "value": 2133.31,
+      "nominal": 1211.92
     },
     {
       "year": 2005,
-      "value": 1248.29,
-      "yoy": 3
+      "value": 2124.76,
+      "nominal": 1248.29
     },
     {
       "year": 2006,
-      "value": 1418.3,
-      "yoy": 13.62
+      "value": 2354.32,
+      "nominal": 1418.3
     },
     {
       "year": 2007,
-      "value": 1468.36,
-      "yoy": 3.53
+      "value": 2341.84,
+      "nominal": 1468.36
     },
     {
       "year": 2008,
-      "value": 903.25,
-      "yoy": -38.49
+      "value": 1439.25,
+      "nominal": 903.25
     },
     {
       "year": 2009,
-      "value": 1115.1,
-      "yoy": 23.45
+      "value": 1729.74,
+      "nominal": 1115.1
     },
     {
       "year": 2010,
-      "value": 1257.64,
-      "yoy": 12.78
+      "value": 1922.1,
+      "nominal": 1257.64
     },
     {
       "year": 2011,
-      "value": 1257.6,
-      "yoy": 0
+      "value": 1866.74,
+      "nominal": 1257.6
     },
     {
       "year": 2012,
-      "value": 1426.19,
-      "yoy": 13.41
+      "value": 2080.76,
+      "nominal": 1426.19
     },
     {
       "year": 2013,
-      "value": 1848.36,
-      "yoy": 29.6
+      "value": 2656.8,
+      "nominal": 1848.36
     },
     {
       "year": 2014,
-      "value": 2058.9,
-      "yoy": 11.39
+      "value": 2937.2,
+      "nominal": 2058.9
     },
     {
       "year": 2015,
-      "value": 2043.94,
-      "yoy": -0.73
+      "value": 2894.74,
+      "nominal": 2043.94
     },
     {
       "year": 2016,
-      "value": 2238.83,
-      "yoy": 9.54
+      "value": 3106.31,
+      "nominal": 2238.83
     },
     {
       "year": 2017,
-      "value": 2673.61,
-      "yoy": 19.42
+      "value": 3632.94,
+      "nominal": 2673.61
     },
     {
       "year": 2018,
-      "value": 2506.85,
-      "yoy": -6.24
+      "value": 3342.49,
+      "nominal": 2506.85
     },
     {
       "year": 2019,
-      "value": 3230.78,
-      "yoy": 28.88
+      "value": 4211.5,
+      "nominal": 3230.78
     },
     {
       "year": 2020,
-      "value": 3756.07,
-      "yoy": 16.26
+      "value": 4830.46,
+      "nominal": 3756.07
     },
     {
       "year": 2021,
-      "value": 4766.18,
-      "yoy": 26.89
+      "value": 5726.55,
+      "nominal": 4766.18
     },
     {
       "year": 2022,
-      "value": 3839.5,
-      "yoy": -19.44
+      "value": 4333.45,
+      "nominal": 3839.5
     },
     {
       "year": 2023,
-      "value": 4769.83,
-      "yoy": 24.23
+      "value": 5208.86,
+      "nominal": 4769.83
     },
     {
       "year": 2024,
-      "value": 5881.63,
-      "yoy": 23.31
+      "value": 6242.7,
+      "nominal": 5881.63
     },
     {
       "year": 2025,
-      "value": 6481.5,
+      "value": 7076.31,
+      "nominal": 6845.5
+    },
+    {
+      "year": 2026,
+      "value": 7773.95,
+      "nominal": 7773.95,
       "latest": true,
-      "date": "2025-09-05",
-      "yoy": 17.42
+      "asOf": "2026-10-05"
     }
   ]
 }

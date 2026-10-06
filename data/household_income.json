@@ -1,247 +1,217 @@
 {
   "meta": {
     "id": "household_income",
-    "title": "Household Income",
-    "description": "Median household income adjusted for inflation (real). Uses FRED MEHOINUSA672N for 1984+ and backfills 1979–1983 chaining growth from P50 individual income.",
-    "units": "USD (value), Percent (yoy)",
+    "title": "Real Median Household Income",
+    "description": "Median household income in constant dollars from the Census Current Population Survey.",
+    "units": "USD (constant dollars of the latest release year)",
     "frequency": "Annual",
-    "coverage": {
-      "start": 1979,
-      "end": 2023
-    },
-    "fetchedAt": "2025-09-08T00:40:47.302Z",
     "source": {
-      "name": "FRED (Census via FRED) + WID (P50 growth for backfill)",
+      "name": "FRED (MEHOINUSA672N)",
       "homepage": "https://fred.stlouisfed.org/series/MEHOINUSA672N",
       "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MEHOINUSA672N",
-      "attribution": "Public domain; backfill heuristic uses P50 growth as proxy."
+      "attribution": "U.S. Census Bureau via FRED; 1979-1983 from Census Historical Income Table H-5"
     },
-    "notes": "Real median household income (constant dollars). 1984+ from FRED MEHOINUSA672N. 1979–1983 backfilled by chaining inverse growth of P50 individual income to approximate earlier real household income."
+    "series": [
+      {
+        "id": "MEHOINUSA672N",
+        "label": "Real Median Household Income in the United States"
+      }
+    ],
+    "notes": "1979-1983 come from Census Table H-5, scaled to FRED by their 1984 ratio (1.0000).",
+    "coverage": {
+      "start": 1979,
+      "end": 2025
+    },
+    "fetchedAt": "2026-10-06T12:52:21.482Z"
   },
   "data": [
     {
       "year": 1979,
-      "value": 65210.83
+      "value": 63670
     },
     {
       "year": 1980,
-      "value": 62485.71,
-      "yoy": -4.18
+      "value": 61690
     },
     {
       "year": 1981,
-      "value": 61690.17,
-      "yoy": -1.27
+      "value": 60650
     },
     {
       "year": 1982,
-      "value": 57236.29,
-      "yoy": -7.22
+      "value": 60480
     },
     {
       "year": 1983,
-      "value": 56569.51,
-      "yoy": -1.16
+      "value": 60100
     },
     {
       "year": 1984,
-      "value": 58930,
-      "yoy": 4.17
+      "value": 61910
     },
     {
       "year": 1985,
-      "value": 60050,
-      "yoy": 1.9
+      "value": 63090
     },
     {
       "year": 1986,
-      "value": 62280,
-      "yoy": 3.71
+      "value": 65430
     },
     {
       "year": 1987,
-      "value": 63060,
-      "yoy": 1.25
+      "value": 66250
     },
     {
       "year": 1988,
-      "value": 63530,
-      "yoy": 0.75
+      "value": 66740
     },
     {
       "year": 1989,
-      "value": 64610,
-      "yoy": 1.7
+      "value": 67880
     },
     {
       "year": 1990,
-      "value": 63830,
-      "yoy": -1.21
+      "value": 67050
     },
     {
       "year": 1991,
-      "value": 61960,
-      "yoy": -2.93
+      "value": 65100
     },
     {
       "year": 1992,
-      "value": 61450,
-      "yoy": -0.82
+      "value": 64560
     },
     {
       "year": 1993,
-      "value": 61150,
-      "yoy": -0.49
+      "value": 64240
     },
     {
       "year": 1994,
-      "value": 61800,
-      "yoy": 1.06
+      "value": 64930
     },
     {
       "year": 1995,
-      "value": 63770,
-      "yoy": 3.19
+      "value": 66990
     },
     {
       "year": 1996,
-      "value": 64710,
-      "yoy": 1.47
+      "value": 67980
     },
     {
       "year": 1997,
-      "value": 66050,
-      "yoy": 2.07
+      "value": 69390
     },
     {
       "year": 1998,
-      "value": 68470,
-      "yoy": 3.66
+      "value": 71930
     },
     {
       "year": 1999,
-      "value": 70210,
-      "yoy": 2.54
+      "value": 73760
     },
     {
       "year": 2000,
-      "value": 70020,
-      "yoy": -0.27
+      "value": 73560
     },
     {
       "year": 2001,
-      "value": 68870,
-      "yoy": -1.64
+      "value": 72350
     },
     {
       "year": 2002,
-      "value": 68310,
-      "yoy": -0.81
+      "value": 71770
     },
     {
       "year": 2003,
-      "value": 68350,
-      "yoy": 0.06
+      "value": 71810
     },
     {
       "year": 2004,
-      "value": 68250,
-      "yoy": -0.15
+      "value": 71700
     },
     {
       "year": 2005,
-      "value": 69310,
-      "yoy": 1.55
+      "value": 72810
     },
     {
       "year": 2006,
-      "value": 70080,
-      "yoy": 1.11
+      "value": 73620
     },
     {
       "year": 2007,
-      "value": 71210,
-      "yoy": 1.61
+      "value": 74810
     },
     {
       "year": 2008,
-      "value": 68780,
-      "yoy": -3.41
+      "value": 72260
     },
     {
       "year": 2009,
-      "value": 68340,
-      "yoy": -0.64
+      "value": 71790
     },
     {
       "year": 2010,
-      "value": 66730,
-      "yoy": -2.36
+      "value": 70110
     },
     {
       "year": 2011,
-      "value": 65750,
-      "yoy": -1.47
+      "value": 69070
     },
     {
       "year": 2012,
-      "value": 65740,
-      "yoy": -0.02
+      "value": 69070
     },
     {
       "year": 2013,
-      "value": 68220,
-      "yoy": 3.77
+      "value": 71670
     },
     {
       "year": 2014,
-      "value": 67360,
-      "yoy": -1.26
+      "value": 70760
     },
     {
       "year": 2015,
-      "value": 71000,
-      "yoy": 5.4
+      "value": 74590
     },
     {
       "year": 2016,
-      "value": 73520,
-      "yoy": 3.55
+      "value": 77230
     },
     {
       "year": 2017,
-      "value": 74810,
-      "yoy": 1.75
+      "value": 78600
     },
     {
       "year": 2018,
-      "value": 75790,
-      "yoy": 1.31
+      "value": 79620
     },
     {
       "year": 2019,
-      "value": 81210,
-      "yoy": 7.15
+      "value": 85320
     },
     {
       "year": 2020,
-      "value": 79560,
-      "yoy": -2.03
+      "value": 83590
     },
     {
       "year": 2021,
-      "value": 79260,
-      "yoy": -0.38
+      "value": 83270
     },
     {
       "year": 2022,
-      "value": 77540,
-      "yoy": -2.17
+      "value": 81460
     },
     {
       "year": 2023,
-      "value": 80610,
-      "yoy": 3.96
+      "value": 84730
+    },
+    {
+      "year": 2024,
+      "value": 85210
+    },
+    {
+      "year": 2025,
+      "value": 87460
     }
   ]
 }

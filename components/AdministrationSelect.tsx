@@ -1,4 +1,4 @@
-import { administrations } from "@/lib/metrics"
+import { PARTY_GROUPS, TERMS } from "@/lib/terms"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type AdministrationSelectProps = {
@@ -24,25 +24,22 @@ export default function AdministrationSelect({ value, onChange, className }: Adm
         <SelectValue placeholder="Select Administration" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem
-          value="party-R"
-          className={`${itemHighlightClass("R")} cursor-pointer transition-colors duration-200`}
-        >
-          Republicans (1980-present)
-        </SelectItem>
-        <SelectItem
-          value="party-D"
-          className={`${itemHighlightClass("D")} cursor-pointer transition-colors duration-200`}
-        >
-          Democrats (1980-present)
-        </SelectItem>
-        {administrations.map((admin) => (
+        {PARTY_GROUPS.map((group) => (
           <SelectItem
-            key={admin.value}
-            value={admin.value}
-            className={`${itemHighlightClass((admin as any).party)} cursor-pointer transition-colors duration-200`}
+            key={group.id}
+            value={group.id}
+            className={`${itemHighlightClass(group.party)} cursor-pointer transition-colors duration-200`}
           >
-            {admin.label}
+            {group.label}
+          </SelectItem>
+        ))}
+        {TERMS.map((term) => (
+          <SelectItem
+            key={term.id}
+            value={term.id}
+            className={`${itemHighlightClass(term.party)} cursor-pointer transition-colors duration-200`}
+          >
+            {term.label}
           </SelectItem>
         ))}
       </SelectContent>

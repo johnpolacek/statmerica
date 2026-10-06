@@ -1,95 +1,81 @@
-// Fetch Federal Budget Deficit (Fiscal Year) back to 1979 using FRED series FYFSD
-// Then compute YoY on the deficit level and write to data/deficit.json
+// Fetch the federal deficit (fiscal year) as a share of GDP, back to 1979, from FRED.
 // Notes:
-// - FYFSD (Federal Surplus or Deficit [-], Fiscal Year, Billions of Dollars)
-// - FRED values are negative for deficits; we convert to positive "deficit" levels
-// - Output units: USD (billions) for value, Percent for yoy
+// - FYFSGDA188S: Federal Surplus or Deficit [-] as Percent of GDP (negative = deficit)
+// - FYFSD: Federal Surplus or Deficit [-] in MILLIONS of dollars (negative = deficit)
+// - Output `value` is the deficit as % of GDP, sign flipped so deficits are positive
+//   and surpluses are negative. Signs are preserved, never absolute-valued.
+// - Output `usdBillions` is the deficit in billions (same sign convention).
 
 import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 
-const FRED_CSV_URL = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=FYFSD'
+const FRED_CSV_URL = (id) => `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}`
 
 function round2(n) { return Number(n.toFixed(2)) }
 
-async function fetchFyfdsCsv() {
-  const res = await fetch(FRED_CSV_URL)
+async function fetchFredAnnual(seriesId) {
+  const res = await fetch(FRED_CSV_URL(seriesId))
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(`FRED request failed: ${res.status} ${res.statusText} ${text}`)
+    throw new Error(`FRED request failed for ${seriesId}: ${res.status} ${res.statusText} ${text}`)
   }
-  return await res.text()
-}
-
-function parseFRED(csvText) {
-  const lines = csvText.trim().split(/\r?\n/)
-  // Expect header like: DATE,FYFSD
-  const out = []
+  const lines = (await res.text()).trim().split(/\r?\n/)
+  const byYear = new Map()
   for (let i = 1; i < lines.length; i++) {
-    const line = lines[i]
-    if (!line) continue
-    const [dateStr, valueStr] = line.split(',')
-    if (!dateStr) continue
-    const year = Number(dateStr.slice(0, 4))
-    if (!Number.isFinite(year)) continue
-    const v = valueStr === '.' ? null : Number(valueStr)
-    if (!Number.isFinite(v)) continue
-    // Convert to positive deficit level in billions
-    const deficitBillions = v < 0 ? -v : v
-    out.push({ year, value: round2(deficitBillions) })
+    const [dateStr, valueStr] = lines[i].split(',')
+    const year = Number(dateStr?.slice(0, 4))
+    const v = Number(valueStr)
+    if (!Number.isFinite(year) || valueStr === '.' || !Number.isFinite(v)) continue
+    byYear.set(year, v)
   }
-  // Filter coverage to 1979+
-  return out.filter(r => r.year >= 1979)
-}
-
-function addYoy(rows) {
-  const withYoy = []
-  for (let i = 0; i < rows.length; i++) {
-    const row = { ...rows[i] }
-    const prev = i > 0 ? rows[i - 1] : null
-    if (prev && typeof prev.value === 'number' && prev.value !== 0) {
-      row.yoy = round2(((row.value - prev.value) / prev.value) * 100)
-    }
-    withYoy.push(row)
-  }
-  return withYoy
+  return byYear
 }
 
 async function main() {
-  const now = new Date()
-  console.log('Fetching Federal Deficit (FY) back to 1979 from FRED (FYFSD)...')
-  const csv = await fetchFyfdsCsv()
-  const base = parseFRED(csv)
-  const data = addYoy(base)
+  console.log('Fetching federal deficit (% of GDP and USD) from FRED...')
+  const [pctOfGdp, usdMillions] = await Promise.all([
+    fetchFredAnnual('FYFSGDA188S'),
+    fetchFredAnnual('FYFSD'),
+  ])
 
-  const coverage = data.length ? { start: data[0].year, end: data[data.length - 1].year } : { start: null, end: null }
-  const meta = {
-    id: 'deficit',
-    title: 'Federal Budget Deficit (Fiscal Year)',
-    description: 'Annual deficit level from FRED FYFSD (surplus/deficit), transformed to positive deficit magnitudes. YoY computed on deficit level.',
-    units: 'USD (billions) for value, Percent for yoy',
-    frequency: 'Annual (FY)',
-    coverage,
-    fetchedAt: now.toISOString(),
-    source: {
-      name: 'FRED (FYFSD) — Federal Surplus or Deficit (-), Fiscal Year',
-      homepage: 'https://fred.stlouisfed.org/series/FYFSD',
-      api: FRED_CSV_URL,
-      attribution: 'Federal Reserve Bank of St. Louis',
+  const data = [...pctOfGdp.entries()]
+    .filter(([year]) => year >= 1979)
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, surplusPct]) => {
+      const row = { year, value: round2(-surplusPct) }
+      const usd = usdMillions.get(year)
+      if (typeof usd === 'number') row.usdBillions = round2(-usd / 1000)
+      return row
+    })
+
+  const out = {
+    meta: {
+      id: 'deficit',
+      title: 'Federal Deficit (% of GDP, Fiscal Year)',
+      description: 'Federal deficit as a percent of GDP. Positive values are deficits, negative values are surpluses.',
+      units: 'Percent of GDP for value, USD billions for usdBillions',
+      frequency: 'Annual (FY)',
+      coverage: { start: data[0]?.year ?? null, end: data.at(-1)?.year ?? null },
+      fetchedAt: new Date().toISOString(),
+      source: {
+        name: 'FRED (FYFSGDA188S, FYFSD)',
+        homepage: 'https://fred.stlouisfed.org/series/FYFSGDA188S',
+        api: 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=FYFSGDA188S',
+        attribution: 'Federal Reserve Bank of St. Louis; U.S. Office of Management and Budget',
+      },
+      series: [{ id: 'FYFSGDA188S', label: 'Federal Surplus or Deficit as Percent of GDP (sign flipped)' }],
+      notes: 'FRED reports surpluses as positive and deficits as negative. Signs are flipped so a deficit is positive. FYFSD is reported in millions and converted to billions.',
     },
-    notes: 'FYFSD is negative for deficits; values converted to positive deficit magnitudes in billions. YoY computed on level. Coverage begins in 1947; filtered to 1979+.'
+    data,
   }
 
-  const out = { meta, data }
   const outDir = path.join(process.cwd(), 'data')
   await mkdir(outDir, { recursive: true })
   await writeFile(path.join(outDir, 'deficit.json'), JSON.stringify(out, null, 2), 'utf8')
-  console.log(`Saved ${data.length} rows to data/deficit.json (1979+ coverage)`) 
+  console.log(`Wrote data/deficit.json with ${data.length} rows (${out.meta.coverage.start}-${out.meta.coverage.end})`)
 }
 
 main().catch((err) => {
   console.error(err)
-  process.exitCode = 1
+  process.exit(1)
 })
-
-

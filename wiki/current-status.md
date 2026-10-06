@@ -2,7 +2,13 @@
 
 ## Operating Posture
 
-Statmerica appears to be a dormant but potentially seasonally relevant project. The current repo already has a usable data and dashboard foundation, but it does not yet read as an actively pushed election-season product.
+Revived on 2026-10-06 for the 2026 midterm (election day 2026-11-03). The September 4 review checkpoint was missed. A short sprint fixed data errors, refreshed every dataset, and added shareable matchup URLs with social preview images.
+
+Open items after the sprint:
+
+- statmerica.com served a parked "/lander" page on 2026-10-06. Only the vercel.app URL served the site.
+- Set `NEXT_PUBLIC_SITE_URL` on Vercel once the custom domain points at the project.
+- Data refresh is manual (`pnpm fetch:all`). No scheduled job exists yet.
 
 ## Why Reconsider It
 

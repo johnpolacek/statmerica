@@ -2,256 +2,221 @@
   "meta": {
     "id": "unemployment",
     "title": "Unemployment Rate (U-3, SA)",
-    "description": "value = percent; yoy = percent change. December values for 1980–2024; latest is most recent month.",
-    "units": "Percent (value, yoy)",
-    "frequency": "Monthly (stored as annual Dec + latest)",
+    "description": "Civilian unemployment rate, 16 years and over, seasonally adjusted. Annual value is the December rate.",
+    "units": "Percent",
+    "frequency": "Monthly, annualized by December value",
+    "source": {
+      "name": "FRED (UNRATE)",
+      "homepage": "https://fred.stlouisfed.org/series/UNRATE",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE",
+      "attribution": "U.S. Bureau of Labor Statistics via FRED"
+    },
+    "series": [
+      {
+        "id": "LNS14000000",
+        "label": "Unemployment Rate"
+      }
+    ],
     "coverage": {
-      "start": 1980,
+      "start": 1979,
       "end": 2025
     },
-    "fetchedAt": "2025-09-06T04:42:10.268Z",
-    "source": {
-      "name": "U.S. Bureau of Labor Statistics",
-      "homepage": "https://www.bls.gov/cps/",
-      "api": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      "attribution": "Public domain"
-    },
-    "seriesId": "LNS14000000",
-    "seriesLabel": "Unemployment rate (SA, 16+)",
-    "notes": "YoY uses Dec vs prior Dec for historical years; latest uses current month vs same month previous year. Lower is better."
+    "fetchedAt": "2026-10-06T11:50:20.303Z"
   },
   "data": [
     {
+      "year": 1979,
+      "value": 6
+    },
+    {
       "year": 1980,
-      "value": 7.2,
-      "yoy": 20
+      "value": 7.2
     },
     {
       "year": 1981,
-      "value": 8.5,
-      "yoy": 18.06
+      "value": 8.5
     },
     {
       "year": 1982,
-      "value": 10.8,
-      "yoy": 27.06
+      "value": 10.8
     },
     {
       "year": 1983,
-      "value": 8.3,
-      "yoy": -23.15
+      "value": 8.3
     },
     {
       "year": 1984,
-      "value": 7.3,
-      "yoy": -12.05
+      "value": 7.3
     },
     {
       "year": 1985,
-      "value": 7,
-      "yoy": -4.11
+      "value": 7
     },
     {
       "year": 1986,
-      "value": 6.6,
-      "yoy": -5.71
+      "value": 6.6
     },
     {
       "year": 1987,
-      "value": 5.7,
-      "yoy": -13.64
+      "value": 5.7
     },
     {
       "year": 1988,
-      "value": 5.3,
-      "yoy": -7.02
+      "value": 5.3
     },
     {
       "year": 1989,
-      "value": 5.4,
-      "yoy": 1.89
+      "value": 5.4
     },
     {
       "year": 1990,
-      "value": 6.3,
-      "yoy": 16.67
+      "value": 6.3
     },
     {
       "year": 1991,
-      "value": 7.3,
-      "yoy": 15.87
+      "value": 7.3
     },
     {
       "year": 1992,
-      "value": 7.4,
-      "yoy": 1.37
+      "value": 7.4
     },
     {
       "year": 1993,
-      "value": 6.5,
-      "yoy": -12.16
+      "value": 6.5
     },
     {
       "year": 1994,
-      "value": 5.5,
-      "yoy": -15.38
+      "value": 5.5
     },
     {
       "year": 1995,
-      "value": 5.6,
-      "yoy": 1.82
+      "value": 5.6
     },
     {
       "year": 1996,
-      "value": 5.4,
-      "yoy": -3.57
+      "value": 5.4
     },
     {
       "year": 1997,
-      "value": 4.7,
-      "yoy": -12.96
+      "value": 4.7
     },
     {
       "year": 1998,
-      "value": 4.4,
-      "yoy": -6.38
+      "value": 4.4
     },
     {
       "year": 1999,
-      "value": 4,
-      "yoy": -9.09
+      "value": 4
     },
     {
       "year": 2000,
-      "value": 3.9,
-      "yoy": -2.5
+      "value": 3.9
     },
     {
       "year": 2001,
-      "value": 5.7,
-      "yoy": 46.15
+      "value": 5.7
     },
     {
       "year": 2002,
-      "value": 6,
-      "yoy": 5.26
+      "value": 6
     },
     {
       "year": 2003,
-      "value": 5.7,
-      "yoy": -5
+      "value": 5.7
     },
     {
       "year": 2004,
-      "value": 5.4,
-      "yoy": -5.26
+      "value": 5.4
     },
     {
       "year": 2005,
-      "value": 4.9,
-      "yoy": -9.26
+      "value": 4.9
     },
     {
       "year": 2006,
-      "value": 4.4,
-      "yoy": -10.2
+      "value": 4.4
     },
     {
       "year": 2007,
-      "value": 5,
-      "yoy": 13.64
+      "value": 5
     },
     {
       "year": 2008,
-      "value": 7.3,
-      "yoy": 46
+      "value": 7.3
     },
     {
       "year": 2009,
-      "value": 9.9,
-      "yoy": 35.62
+      "value": 9.9
     },
     {
       "year": 2010,
-      "value": 9.3,
-      "yoy": -6.06
+      "value": 9.3
     },
     {
       "year": 2011,
-      "value": 8.5,
-      "yoy": -8.6
+      "value": 8.5
     },
     {
       "year": 2012,
-      "value": 7.9,
-      "yoy": -7.06
+      "value": 7.9
     },
     {
       "year": 2013,
-      "value": 6.7,
-      "yoy": -15.19
+      "value": 6.7
     },
     {
       "year": 2014,
-      "value": 5.6,
-      "yoy": -16.42
+      "value": 5.6
     },
     {
       "year": 2015,
-      "value": 5,
-      "yoy": -10.71
+      "value": 5
     },
     {
       "year": 2016,
-      "value": 4.7,
-      "yoy": -6
+      "value": 4.7
     },
     {
       "year": 2017,
-      "value": 4.1,
-      "yoy": -12.77
+      "value": 4.1
     },
     {
       "year": 2018,
-      "value": 3.9,
-      "yoy": -4.88
+      "value": 3.9
     },
     {
       "year": 2019,
-      "value": 3.6,
-      "yoy": -7.69
+      "value": 3.6
     },
     {
       "year": 2020,
-      "value": 6.7,
-      "yoy": 86.11
+      "value": 6.7
     },
     {
       "year": 2021,
-      "value": 3.9,
-      "yoy": -41.79
+      "value": 3.9
     },
     {
       "year": 2022,
-      "value": 3.5,
-      "yoy": -10.26
+      "value": 3.5
     },
     {
       "year": 2023,
-      "value": 3.8,
-      "yoy": 8.57
+      "value": 3.8
     },
     {
       "year": 2024,
-      "value": 4.1,
-      "yoy": 7.89
+      "value": 4.1
     },
     {
       "year": 2025,
-      "value": 4.3,
+      "value": 4.4
+    },
+    {
+      "year": 2026,
+      "value": 4.2,
       "latest": true,
-      "month": 8,
-      "yoy": 2.38
+      "asOf": "2026-09-01"
     }
   ]
 }

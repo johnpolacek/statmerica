@@ -1,40 +1,40 @@
 {
   "meta": {
-    "id": "cpi",
-    "title": "Consumer Price Index (CPI-U, NSA)",
-    "description": "CPI for All Urban Consumers, all items, U.S. city average, not seasonally adjusted. Annual value is the December index.",
+    "id": "groceries",
+    "title": "Grocery Prices (CPI Food at Home)",
+    "description": "Consumer price index for food bought at grocery stores, not seasonally adjusted. Annual value is December.",
     "units": "Index (1982-84=100)",
     "frequency": "Monthly, annualized by December value",
     "source": {
-      "name": "FRED (CPIAUCNS)",
-      "homepage": "https://fred.stlouisfed.org/series/CPIAUCNS",
-      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS",
+      "name": "FRED (CUUR0000SAF11)",
+      "homepage": "https://fred.stlouisfed.org/series/CUUR0000SAF11",
+      "api": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CUUR0000SAF11",
       "attribution": "U.S. Bureau of Labor Statistics via FRED"
     },
     "series": [
       {
-        "id": "CUUR0000SA0",
-        "label": "All items, U.S. city average, NSA"
+        "id": "CUUR0000SAF11",
+        "label": "CPI-U: Food at Home, U.S. City Average, NSA"
       }
     ],
     "coverage": {
       "start": 1979,
       "end": 2025
     },
-    "fetchedAt": "2026-10-06T11:50:19.992Z"
+    "fetchedAt": "2026-10-06T12:53:38.177Z"
   },
   "data": [
     {
       "year": 1979,
-      "value": 76.7
+      "value": 83.9
     },
     {
       "year": 1980,
-      "value": 86.3
+      "value": 92.7
     },
     {
       "year": 1981,
-      "value": 94
+      "value": 95.4
     },
     {
       "year": 1982,
@@ -42,31 +42,31 @@
     },
     {
       "year": 1983,
-      "value": 101.3
+      "value": 99.4
     },
     {
       "year": 1984,
-      "value": 105.3
+      "value": 103
     },
     {
       "year": 1985,
-      "value": 109.3
+      "value": 105.1
     },
     {
       "year": 1986,
-      "value": 110.5
+      "value": 109
     },
     {
       "year": 1987,
-      "value": 115.4
+      "value": 112.8
     },
     {
       "year": 1988,
-      "value": 120.5
+      "value": 119.1
     },
     {
       "year": 1989,
-      "value": 126.1
+      "value": 126.5
     },
     {
       "year": 1990,
@@ -74,147 +74,147 @@
     },
     {
       "year": 1991,
-      "value": 137.9
+      "value": 135.5
     },
     {
       "year": 1992,
-      "value": 141.9
+      "value": 137.5
     },
     {
       "year": 1993,
-      "value": 145.8
+      "value": 142.3
     },
     {
       "year": 1994,
-      "value": 149.7
+      "value": 147.3
     },
     {
       "year": 1995,
-      "value": 153.5
+      "value": 150.3
     },
     {
       "year": 1996,
-      "value": 158.6
+      "value": 157.7
     },
     {
       "year": 1997,
-      "value": 161.3
+      "value": 159.2
     },
     {
       "year": 1998,
-      "value": 163.9
+      "value": 162.6
     },
     {
       "year": 1999,
-      "value": 168.3
+      "value": 165.4
     },
     {
       "year": 2000,
-      "value": 174
+      "value": 170.2
     },
     {
       "year": 2001,
-      "value": 176.7
+      "value": 174.7
     },
     {
       "year": 2002,
-      "value": 180.9
+      "value": 176.1
     },
     {
       "year": 2003,
-      "value": 184.3
+      "value": 184.1
     },
     {
       "year": 2004,
-      "value": 190.3
+      "value": 188.5
     },
     {
       "year": 2005,
-      "value": 196.8
+      "value": 191.7
     },
     {
       "year": 2006,
-      "value": 201.8
+      "value": 194.3
     },
     {
       "year": 2007,
-      "value": 210.04
+      "value": 205.21
     },
     {
       "year": 2008,
-      "value": 210.23
+      "value": 218.68
     },
     {
       "year": 2009,
-      "value": 215.95
+      "value": 213.36
     },
     {
       "year": 2010,
-      "value": 219.18
+      "value": 216.96
     },
     {
       "year": 2011,
-      "value": 225.67
+      "value": 229.98
     },
     {
       "year": 2012,
-      "value": 229.6
+      "value": 232.9
     },
     {
       "year": 2013,
-      "value": 233.05
+      "value": 233.8
     },
     {
       "year": 2014,
-      "value": 234.81
+      "value": 242.46
     },
     {
       "year": 2015,
-      "value": 236.53
+      "value": 241.38
     },
     {
       "year": 2016,
-      "value": 241.43
+      "value": 236.46
     },
     {
       "year": 2017,
-      "value": 246.52
+      "value": 238.58
     },
     {
       "year": 2018,
-      "value": 251.23
+      "value": 239.99
     },
     {
       "year": 2019,
-      "value": 256.97
+      "value": 241.75
     },
     {
       "year": 2020,
-      "value": 260.47
+      "value": 251.25
     },
     {
       "year": 2021,
-      "value": 278.8
+      "value": 267.56
     },
     {
       "year": 2022,
-      "value": 296.8
+      "value": 299.09
     },
     {
       "year": 2023,
-      "value": 306.75
+      "value": 303
     },
     {
       "year": 2024,
-      "value": 315.61
+      "value": 308.38
     },
     {
       "year": 2025,
-      "value": 324.05
+      "value": 315.66
     },
     {
       "year": 2026,
-      "value": 334.98,
+      "value": 321.5,
       "latest": true,
       "asOf": "2026-08-01"
     }

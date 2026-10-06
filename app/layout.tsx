@@ -5,13 +5,23 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Suspense } from "react"
+import { SITE_URL } from "@/lib/site"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Statmerica - Track America Across Administrations",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Statmerica - Track America Across Administrations",
+    template: "%s | Statmerica",
+  },
   description:
     "Explore key U.S. statistics on economy, society, health, and environment across presidential administrations",
-  generator: "v0.app",
+  openGraph: {
+    siteName: "Statmerica",
+    type: "website",
+    images: [{ url: "/api/og", width: 1200, height: 630 }],
+  },
+  twitter: { card: "summary_large_image", images: ["/api/og"] },
   icons: {
     icon: [
       {

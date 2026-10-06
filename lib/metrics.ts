@@ -1,287 +1,278 @@
-export const administrations = [
-  { value: "trump-2", label: "Trump (2025-)", party: "R" },
-  
-  // Biden
-  { value: "biden-1", label: "Biden (2021–2024)", party: "D" },
+import cpi from "@/data/cpi.json"
+import debtToGdp from "@/data/debt_to_gdp.json"
+import deficit from "@/data/deficit.json"
+import disposableIncome from "@/data/disposable_income.json"
+import gas from "@/data/gas_prices.json"
+import gdp from "@/data/gdp.json"
+import groceries from "@/data/groceries.json"
+import homeownership from "@/data/homeownership.json"
+import householdIncome from "@/data/household_income.json"
+import housingAffordability from "@/data/housing_affordability.json"
+import incomeGap from "@/data/income_gap.json"
+import jobs from "@/data/jobs.json"
+import lifeExpectancy from "@/data/life_expectancy.json"
+import sp500 from "@/data/sp500.json"
+import unemployment from "@/data/unemployment.json"
+import wages from "@/data/wages.json"
 
-  // Trump
-  { value: "trump-1", label: "Trump (2017–2020)", party: "R" },
+// `nominal` is set on inflation-adjusted series and holds the original dollars.
+export type DataRow = { year: number; value: number; nominal?: number; latest?: boolean; asOf?: string }
 
-  // Obama
-  { value: "obama-1", label: "Obama (2009–2012)", party: "D" },
-  { value: "obama-2", label: "Obama (2013–2016)", party: "D" },
+// How a metric's movement over a term is measured.
+// - "pct": percent change of the level, for amounts like prices, income and GDP.
+// - "diff": plain difference, for values that are already rates or ratios of GDP
+//   (4.0% → 5.0% unemployment is "+1.0 pts", not "+25%").
+export type ChangeKind = "pct" | "diff"
 
-  // George W. Bush
-  { value: "gwbush-1", label: "George W. Bush (2001–2004)", party: "R" },
-  { value: "gwbush-2", label: "George W. Bush (2005–2008)", party: "R" },
-
-  // Clinton
-  { value: "clinton-1", label: "Clinton (1993–1996)", party: "D" },
-  { value: "clinton-2", label: "Clinton (1997–2000)", party: "D" },
-
-  // George H. W. Bush
-  { value: "ghwbush-1", label: "George H. W. Bush (1989–1992)", party: "R" },
-
-  // Reagan
-  { value: "reagan-1", label: "Reagan (1981–1984)", party: "R" },
-  { value: "reagan-2", label: "Reagan (1985–1988)", party: "R" },
-];
-
-export type MetricSummary = {
+export type MetricDef = {
+  id: string
   title: string
-  value: string
-  trend: string
-  change: string
-  explanation?: string
+  better: "higher" | "lower"
+  changeKind: ChangeKind
+  diffUnit?: string
+  levelLabel: string
+  formatLevel: (v: number) => string
+  explanation: string
+  // Known distortions readers should weigh, shown under the explanation.
+  caveat?: string
+  source: string
+  sourceAnchor: string
+  // Granularity of the in-progress `latest` row, used to label it ("Aug 2026", "Q2 2026").
+  latestPeriod?: "month" | "quarter" | "day" | "ytd-average"
+  rows: DataRow[]
 }
 
-export const metrics: MetricSummary[] = [
-  { title: "Inflation (CPI)", value: "3.2%", trend: "up", change: "+0.4%" },
-  { title: "Average Wage", value: "$28.50/hr", trend: "up", change: "+2.1%" },
-  { title: "Gas Prices", value: "$3.45/gal", trend: "down", change: "-0.15%" },
-  { title: "Home Prices", value: "$420K", trend: "up", change: "+5.2%" },
-  { title: "NASDAQ Composite", value: "14,000", trend: "up", change: "+12.3%" },
-  { title: "Population Growth", value: "0.4%", trend: "down", change: "-0.1%" },
-  { title: "Marriage Rate", value: "6.1/1000", trend: "down", change: "-0.3%" },
-  { title: "Life Expectancy", value: "76.4 years", trend: "down", change: "-0.2%" },
-  { title: "Healthcare Costs", value: "$12,914", trend: "up", change: "+4.1%" },
-  { title: "Obesity Rate", value: "36.2%", trend: "up", change: "+1.1%" },
-  { title: "Air Quality (AQI)", value: "48", trend: "stable", change: "0%" },
-  { title: "Average Temperature", value: "53.8°F", trend: "up", change: "+0.3°F" },
-  { title: "College Tuition", value: "$37,650", trend: "up", change: "+3.2%" },
-  { title: "Student Debt", value: "$37,338", trend: "up", change: "+2.8%" },
-  { title: "Violent Crime", value: "366/100K", trend: "down", change: "-1.7%" },
-  { title: "Incarceration Rate", value: "505/100K", trend: "down", change: "-2.1%" },
+const rowsOf = (json: { data: DataRow[] }) => json.data
+
+const fixed = (v: number, digits: number) =>
+  v.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })
+
+// "2026-08" -> "Aug 2026 dollars"
+const realBaseLabel = (json: { meta: { realBase?: string } }) => {
+  const base = json.meta.realBase
+  if (!base) return "inflation-adjusted"
+  const [y, m] = base.split("-").map(Number)
+  return `${new Date(Date.UTC(y, m - 1, 1)).toLocaleString("en-US", { month: "short", timeZone: "UTC" })} ${y} dollars`
+}
+
+export const METRICS: MetricDef[] = [
+  {
+    id: "gdp",
+    title: "GDP Growth",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: "Real GDP, chained 2017 dollars",
+    formatLevel: (v) => `$${fixed(v / 1000, 1)}T`,
+    explanation: "Growth in real GDP, measured fourth quarter to fourth quarter and adjusted for inflation. Higher is better.",
+    source: "U.S. Bureau of Economic Analysis via FRED",
+    sourceAnchor: "gdp",
+    latestPeriod: "quarter",
+    rows: rowsOf(gdp),
+  },
+  {
+    id: "jobs",
+    title: "Jobs",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: "Nonfarm payroll jobs, December",
+    formatLevel: (v) => `${fixed(v / 1000, 1)}M jobs`,
+    explanation: "Growth in total nonfarm payroll jobs, December to December. Measured as a percent so terms decades apart compare fairly. Higher is better.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "jobs",
+    latestPeriod: "month",
+    rows: rowsOf(jobs),
+  },
+  {
+    id: "unemployment",
+    title: "Unemployment",
+    better: "lower",
+    changeKind: "diff",
+    diffUnit: "pts",
+    levelLabel: "Unemployment rate, December",
+    formatLevel: (v) => `${fixed(v, 1)}%`,
+    explanation: "Change in the unemployment rate (U-3, seasonally adjusted), in percentage points, December to December. Lower is better.",
+    caveat: "Terms that start in a recession, like 2009 or 2021, get credit for the recovery.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "unemployment",
+    latestPeriod: "month",
+    rows: rowsOf(unemployment),
+  },
+  {
+    id: "wages",
+    title: "Wages",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: "Real hourly earnings, 1982–84 dollars",
+    formatLevel: (v) => `$${fixed(v, 2)}/hr`,
+    explanation: "Growth in average hourly earnings for production and nonsupervisory workers, adjusted for inflation. Higher is better.",
+    caveat: "In 2020, low-wage workers lost jobs first, which pushed the average up without anyone getting a raise.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "wages",
+    latestPeriod: "month",
+    rows: rowsOf(wages),
+  },
+  {
+    id: "household-income",
+    title: "Household Income",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: "Real median household income",
+    formatLevel: (v) => `$${fixed(v, 0)}`,
+    explanation: "Growth in real median household income, in constant dollars. Higher is better.",
+    caveat: "Census publishes each year's figure the following September.",
+    source: "U.S. Census Bureau via FRED",
+    sourceAnchor: "household-income",
+    rows: rowsOf(householdIncome),
+  },
+  {
+    id: "disposable-income",
+    title: "Disposable Income",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: "Real after-tax income per person, 2017 dollars",
+    formatLevel: (v) => `$${fixed(v, 0)}`,
+    explanation: "Growth in income per person after taxes, including Social Security and other government payments, adjusted for inflation. December to December. Higher is better.",
+    caveat: "Pandemic relief payments in 2020 and 2021 caused large temporary swings.",
+    source: "U.S. Bureau of Economic Analysis via FRED",
+    sourceAnchor: "disposable-income",
+    latestPeriod: "month",
+    rows: rowsOf(disposableIncome),
+  },
+  {
+    id: "inflation",
+    title: "Inflation",
+    better: "lower",
+    changeKind: "pct",
+    levelLabel: "CPI-U index, December",
+    formatLevel: (v) => fixed(v, 1),
+    explanation: "Total rise in consumer prices (CPI-U), December to December. Yearly points are the annual inflation rate. Lower is better.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "cpi",
+    latestPeriod: "month",
+    rows: rowsOf(cpi),
+  },
+  {
+    id: "groceries",
+    title: "Grocery Prices",
+    better: "lower",
+    changeKind: "pct",
+    levelLabel: "CPI food at home, December",
+    formatLevel: (v) => fixed(v, 1),
+    explanation: "Total rise in prices for food bought at grocery stores, December to December. Lower is better.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "groceries",
+    latestPeriod: "month",
+    rows: rowsOf(groceries),
+  },
+  {
+    id: "gas",
+    title: "Gas Prices",
+    better: "lower",
+    changeKind: "pct",
+    levelLabel: `Regular gas, yearly average, ${realBaseLabel(gas)}`,
+    formatLevel: (v) => `$${fixed(v, 2)}`,
+    explanation: "Change in the average price of regular gasoline, adjusted for inflation, using yearly averages. Pump prices at the time appear as nominal in the chart tooltip. Lower is better.",
+    source: "U.S. Bureau of Labor Statistics via FRED",
+    sourceAnchor: "gas",
+    latestPeriod: "ytd-average",
+    rows: rowsOf(gas),
+  },
+  {
+    id: "housing-affordability",
+    title: "Housing Affordability",
+    better: "lower",
+    changeKind: "diff",
+    diffUnit: "pts",
+    levelLabel: "Mortgage payment as % of median income",
+    formatLevel: (v) => `${fixed(v, 1)}% of income`,
+    explanation:
+      "Change in the monthly mortgage payment on a median-priced new home, with 20% down on a 30-year fixed loan, as a share of median household income. Includes price, interest rate and income. Lower is better.",
+    caveat: "Uses new-home prices, the longest free national series. Existing homes usually sell for less. Mortgage rates are set by markets and the Fed, not the president.",
+    source: "Census, HUD and Freddie Mac via FRED",
+    sourceAnchor: "housing-affordability",
+    rows: rowsOf(housingAffordability),
+  },
+  {
+    id: "homeownership",
+    title: "Homeownership",
+    better: "higher",
+    changeKind: "diff",
+    diffUnit: "pts",
+    levelLabel: "Homeownership rate, Q4",
+    formatLevel: (v) => `${fixed(v, 1)}%`,
+    explanation: "Change in the share of homes that are owner-occupied, in percentage points, Q4 to Q4. Higher is better.",
+    caveat: "Census changed how it collected this survey during 2020, which inflated readings that year.",
+    source: "U.S. Census Bureau via FRED",
+    sourceAnchor: "homeownership",
+    latestPeriod: "quarter",
+    rows: rowsOf(homeownership),
+  },
+  {
+    id: "sp500",
+    title: "S&P 500",
+    better: "higher",
+    changeKind: "pct",
+    levelLabel: `S&P 500 year-end close, ${realBaseLabel(sp500)}`,
+    formatLevel: (v) => fixed(v, 0),
+    explanation: "Growth in the S&P 500 price index, year-end close to year-end close, adjusted for inflation. Quoted index levels appear as nominal in the chart tooltip. Dividends are not included. Higher is better.",
+    source: "S&P Dow Jones Indices via FRED",
+    sourceAnchor: "sp500",
+    latestPeriod: "day",
+    rows: rowsOf(sp500),
+  },
+  {
+    id: "debt-to-gdp",
+    title: "Debt / GDP",
+    better: "lower",
+    changeKind: "diff",
+    diffUnit: "pts",
+    levelLabel: "Debt held by the public as % of GDP, Q4",
+    formatLevel: (v) => `${fixed(v, 1)}%`,
+    explanation: "Change in federal debt held by the public as a share of GDP, in percentage points, Q4 to Q4. Leaves out debt the government owes itself, such as Social Security trust fund bonds. Lower is better.",
+    source: "U.S. Treasury via FRED",
+    sourceAnchor: "debt-to-gdp",
+    latestPeriod: "quarter",
+    rows: rowsOf(debtToGdp),
+  },
+  {
+    id: "deficit",
+    title: "Federal Deficit",
+    better: "lower",
+    changeKind: "diff",
+    diffUnit: "pts",
+    levelLabel: "Deficit as % of GDP, fiscal year",
+    formatLevel: (v) => (v < 0 ? `${fixed(-v, 1)}% surplus` : `${fixed(v, 1)}% of GDP`),
+    explanation: "Change in the federal deficit as a share of GDP, in percentage points, by fiscal year. Surpluses count as negative deficits. Lower is better.",
+    caveat: "Fiscal years start in October, so a term's first fiscal year began under the previous president and budget.",
+    source: "FRED / OMB",
+    sourceAnchor: "deficit",
+    rows: rowsOf(deficit),
+  },
+  {
+    id: "income-gap",
+    title: "Income Gap",
+    better: "lower",
+    changeKind: "pct",
+    levelLabel: "Top 10% avg income ÷ bottom 50% avg",
+    formatLevel: (v) => `${fixed(v, 1)}×`,
+    explanation: "Change in how many times more the average top-10% adult earns than the average bottom-50% adult, before taxes. Lower is better.",
+    caveat: "The World Inequality Database publishes with a lag of two or more years.",
+    source: "World Inequality Database",
+    sourceAnchor: "income-gap",
+    rows: rowsOf(incomeGap),
+  },
+  {
+    id: "life-expectancy",
+    title: "Life Expectancy",
+    better: "higher",
+    changeKind: "diff",
+    diffUnit: "yrs",
+    levelLabel: "Life expectancy at birth",
+    formatLevel: (v) => `${fixed(v, 1)} yrs`,
+    explanation: "Change in U.S. life expectancy at birth, in years. Higher is better.",
+    caveat: "COVID-19 dominates 2020 to 2022. The World Bank publishes with a lag of a year or more.",
+    source: "World Bank",
+    sourceAnchor: "life-expectancy",
+    rows: rowsOf(lifeExpectancy),
+  },
 ]
-
-export const generateChartData = (title: string, trend: string) => {
-  const data: { year: number; value: number }[] = []
-
-  const metricData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1, 3.2],
-    "Average Wage": [26.8, 27.2, 27.8, 28.1, 28.5],
-    "Gas Prices": [2.17, 3.01, 5.01, 3.52, 3.45],
-    "Home Prices": [322, 350, 384, 402, 420],
-    "NASDAQ Composite": [12888, 15744, 10466, 13200, 14000],
-    "Population Growth": [0.7, 0.6, 0.4, 0.4, 0.4],
-    "Marriage Rate": [7.1, 6.9, 6.5, 6.3, 6.1],
-    "Life Expectancy": [78.8, 77.0, 76.1, 76.4, 76.4],
-    "Healthcare Costs": [11172, 11948, 12414, 12764, 12914],
-    "Obesity Rate": [34.2, 35.1, 35.7, 36.0, 36.2],
-    "Air Quality (AQI)": [51, 49, 47, 48, 48],
-    "Average Temperature": [53.2, 53.4, 53.6, 53.7, 53.8],
-    "College Tuition": [32635, 34740, 36436, 37100, 37650],
-    "Student Debt": [33560, 35200, 36510, 37000, 37338],
-    "Violent Crime": [398, 387, 380, 370, 366],
-    "Incarceration Rate": [531, 520, 515, 510, 505],
-  }
-
-  const values = metricData[title] || [50, 55, 60, 58, 62]
-
-  for (let i = 0; i < 5; i++) {
-    data.push({
-      year: 2020 + i,
-      value: values[i],
-    })
-  }
-
-  return data
-}
-
-export const generateComparisonData = (title: string) => {
-  const data: { year: string; trump: number; biden: number }[] = []
-
-  const trumpData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [2.3, 1.8, 1.2, 0.1],
-    "Average Wage": [25.2, 25.8, 26.1, 26.8],
-    "Gas Prices": [2.74, 2.6, 2.17, 2.25],
-    "Home Prices": [245, 265, 295, 322],
-    "NASDAQ Composite": [5383, 6635, 8972, 12888],
-    "Population Growth": [0.7, 0.6, 0.5, 0.4],
-    "Marriage Rate": [7.8, 7.5, 7.3, 7.1],
-    "Life Expectancy": [78.6, 78.7, 78.8, 78.8],
-    "Healthcare Costs": [9596, 10348, 10966, 11172],
-    "Obesity Rate": [31.9, 32.5, 33.7, 34.2],
-    "Air Quality (AQI)": [55, 53, 52, 51],
-    "Average Temperature": [52.7, 52.9, 53.0, 53.2],
-    "College Tuition": [28775, 30094, 31394, 32635],
-    "Student Debt": [28950, 30100, 31750, 33560],
-    "Violent Crime": [386, 383, 379, 398],
-    "Incarceration Rate": [655, 581, 541, 531],
-  }
-
-  const bidenData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1],
-    "Average Wage": [26.8, 27.2, 27.8, 28.1],
-    "Gas Prices": [2.17, 3.01, 5.01, 3.52],
-    "Home Prices": [322, 350, 384, 402],
-    "NASDAQ Composite": [12888, 15744, 10466, 13200],
-    "Population Growth": [0.7, 0.6, 0.4, 0.4],
-    "Marriage Rate": [7.1, 6.9, 6.5, 6.3],
-    "Life Expectancy": [78.8, 77.0, 76.1, 76.4],
-    "Healthcare Costs": [11172, 11948, 12414, 12764],
-    "Obesity Rate": [34.2, 35.1, 35.7, 36.0],
-    "Air Quality (AQI)": [51, 49, 47, 48],
-    "Average Temperature": [53.2, 53.4, 53.6, 53.7],
-    "College Tuition": [32635, 34740, 36436, 37100],
-    "Student Debt": [33560, 35200, 36510, 37000],
-    "Violent Crime": [398, 387, 380, 370],
-    "Incarceration Rate": [531, 520, 515, 510],
-  }
-
-  const termLabels = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-
-  for (let i = 0; i < 4; i++) {
-    data.push({
-      year: termLabels[i],
-      trump: trumpData[title][i],
-      biden: bidenData[title][i],
-    })
-  }
-
-  return data
-}
-
-export const determineWinner = (title: string) => {
-  const trumpData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [2.3, 1.8, 1.2, 0.1],
-    "Average Wage": [25.2, 25.8, 26.1, 26.8],
-    "Gas Prices": [2.74, 2.6, 2.17, 2.25],
-    "Home Prices": [245, 265, 295, 322],
-    "S&P 500": [2239, 2674, 3231, 3756],
-    "Population Growth": [0.7, 0.6, 0.5, 0.4],
-    "Marriage Rate": [7.8, 7.5, 7.3, 7.1],
-    "Life Expectancy": [78.6, 78.7, 78.8, 78.8],
-    "Healthcare Costs": [9596, 10348, 10966, 11172],
-    "Obesity Rate": [31.9, 32.5, 33.7, 34.2],
-    "Air Quality (AQI)": [55, 53, 52, 51],
-    "Average Temperature": [52.7, 52.9, 53.0, 53.2],
-    "College Tuition": [28775, 30094, 31394, 32635],
-    "Student Debt": [28950, 30100, 31750, 33560],
-    "Violent Crime": [386, 383, 379, 398],
-    "Incarceration Rate": [655, 581, 541, 531],
-  }
-
-  const bidenData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1],
-    "Average Wage": [26.8, 27.2, 27.8, 28.1],
-    "Gas Prices": [2.17, 3.01, 5.01, 3.52],
-    "Home Prices": [322, 350, 384, 402],
-    "S&P 500": [3756, 4766, 3840, 4080],
-    "Population Growth": [0.7, 0.6, 0.4, 0.4],
-    "Marriage Rate": [7.1, 6.9, 6.5, 6.3],
-    "Life Expectancy": [78.8, 77.0, 76.1, 76.4],
-    "Healthcare Costs": [11172, 11948, 12414, 12764],
-    "Obesity Rate": [34.2, 35.1, 35.7, 36.0],
-    "Air Quality (AQI)": [51, 49, 47, 48],
-    "Average Temperature": [53.2, 53.4, 53.6, 53.7],
-    "College Tuition": [32635, 34740, 36436, 37100],
-    "Student Debt": [33560, 35200, 36510, 37000],
-    "Violent Crime": [398, 387, 380, 370],
-    "Incarceration Rate": [531, 520, 515, 510],
-  }
-
-  const lowerIsBetter = [
-    "Inflation (CPI)",
-    "Gas Prices",
-    "Healthcare Costs",
-    "Obesity Rate",
-    "Average Temperature",
-    "College Tuition",
-    "Student Debt",
-    "Violent Crime",
-    "Incarceration Rate",
-  ]
-
-  const trumpValues = trumpData[title] || [50, 55, 60, 58]
-  const bidenValues = bidenData[title] || [60, 65, 70, 68]
-
-  const trumpAvg = trumpValues.reduce((a, b) => a + b, 0) / trumpValues.length
-  const bidenAvg = bidenValues.reduce((a, b) => a + b, 0) / bidenValues.length
-
-  if (lowerIsBetter.includes(title)) {
-    return trumpAvg < bidenAvg ? "Trump" : "Biden"
-  } else {
-    return trumpAvg > bidenAvg ? "Trump" : "Biden"
-  }
-}
-
-export const calculateOverallWinner = () => {
-  let trumpWins = 0
-  let bidenWins = 0
-  const trumpMetrics: string[] = []
-  const bidenMetrics: string[] = []
-
-  metrics.forEach((metric) => {
-    const winner = determineWinner(metric.title)
-    if (winner === "Trump") {
-      trumpWins++
-      trumpMetrics.push(metric.title)
-    } else {
-      bidenWins++
-      bidenMetrics.push(metric.title)
-    }
-  })
-
-  return {
-    trumpWins,
-    bidenWins,
-    trumpMetrics,
-    bidenMetrics,
-    overallWinner: trumpWins > bidenWins ? "Trump" : "Biden",
-  }
-}
-
-export const calculateTrend = (title: string, administration: "trump" | "biden") => {
-  const trumpData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [2.3, 1.8, 1.2, 0.1],
-    "Average Wage": [25.2, 25.8, 26.1, 26.8],
-    "Gas Prices": [2.74, 2.6, 2.17, 2.25],
-    "Home Prices": [245, 265, 295, 322],
-    "S&P 500": [2239, 2674, 3231, 3756],
-    "Population Growth": [0.7, 0.6, 0.5, 0.4],
-    "Marriage Rate": [7.8, 7.5, 7.3, 7.1],
-    "Life Expectancy": [78.6, 78.7, 78.8, 78.8],
-    "Healthcare Costs": [9596, 10348, 10966, 11172],
-    "Obesity Rate": [31.9, 32.5, 33.7, 34.2],
-    "Air Quality (AQI)": [55, 53, 52, 51],
-    "Average Temperature": [52.7, 52.9, 53.0, 53.2],
-    "College Tuition": [28775, 30094, 31394, 32635],
-    "Student Debt": [28950, 30100, 31750, 33560],
-    "Violent Crime": [386, 383, 379, 398],
-    "Incarceration Rate": [655, 581, 541, 531],
-  }
-
-  const bidenData: { [key: string]: number[] } = {
-    "Inflation (CPI)": [1.2, 4.7, 8.0, 4.1],
-    "Average Wage": [26.8, 27.2, 27.8, 28.1],
-    "Gas Prices": [2.17, 3.01, 5.01, 3.52],
-    "Home Prices": [322, 350, 384, 402],
-    "S&P 500": [3756, 4766, 3840, 4080],
-    "Population Growth": [0.7, 0.6, 0.4, 0.4],
-    "Marriage Rate": [7.1, 6.9, 6.5, 6.3],
-    "Life Expectancy": [78.8, 77.0, 76.1, 76.4],
-    "Healthcare Costs": [11172, 11948, 12414, 12764],
-    "Obesity Rate": [34.2, 35.1, 35.7, 36.0],
-    "Air Quality (AQI)": [51, 49, 47, 48],
-    "Average Temperature": [53.2, 53.4, 53.6, 53.7],
-    "College Tuition": [32635, 34740, 36436, 37100],
-    "Student Debt": [33560, 35200, 36510, 37000],
-    "Violent Crime": [398, 387, 380, 370],
-    "Incarceration Rate": [531, 520, 515, 510],
-  }
-
-  const data = administration === "trump" ? trumpData[title] : bidenData[title]
-  if (!data || data.length < 2) return { trend: "stable", change: "0%" }
-
-  const firstValue = data[0]
-  const lastValue = data[data.length - 1]
-  const percentChange = ((lastValue - firstValue) / firstValue) * 100
-
-  const trend = Math.abs(percentChange) < 1 ? "stable" : percentChange > 0 ? "up" : "down"
-  const change = `${percentChange > 0 ? "+" : ""}${percentChange.toFixed(1)}%`
-
-  return { trend, change }
-}
-
-
